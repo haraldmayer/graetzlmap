@@ -1,16 +1,410 @@
 ---
-
 ---
 
-<html lang="en">
+<html lang="de">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<title>Grätzlmap - Dein Guide durch Wiens Grätzln</title>
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" />
 	</head>
 	<body>
-		<h1>Astro</h1>
+		<div class="container">
+			<header>
+				<h1>Grätzlmap</h1>
+				<p class="subtitle">Entdecke Wiens Grätzln</p>
+			</header>
+
+			<nav class="graetzl-nav">
+				<h2>Grätzl auswählen</h2>
+				<ul id="graetzl-list">
+					<li><button class="graetzl-btn" data-graetzl="freihausviertel">Freihausviertel</button></li>
+					<li><button class="graetzl-btn" data-graetzl="nibelungenviertel">Nibelungenviertel</button></li>
+				</ul>
+			</nav>
+
+			<main>
+				<div id="map"></div>
+			</main>
+		</div>
+
+		<script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+		<script is:inline>
+			window.addEventListener('load', function() {
+				// Initialize map centered on Vienna
+				const map = L.map('map').setView([48.2082, 16.3738], 12);
+
+				// Add greyscale tile layer
+				L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+					attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+					subdomains: 'abcd',
+					maxZoom: 19
+				}).addTo(map);
+
+				// Grätzl registry - maps IDs to data file paths
+				const graetzlRegistry = {
+					freihausviertel: {
+						dataFile: '/data/graetzl/freihausviertel.json'
+					},
+					nibelungenviertel: {
+						dataFile: '/data/graetzl/nibelungenviertel.json'
+					}
+				};
+
+				// Cache for loaded Grätzl data
+				const graetzlCache = {};
+
+				// Category definitions (icons and metadata)
+				let categories = {};
+
+				let currentPolygon = null;
+				let currentMarkers = [];
+
+				// Function to load categories
+				async function loadCategories() {
+					try {
+						const response = await fetch('/data/categories.json');
+						if (!response.ok) {
+							throw new Error('Failed to load categories');
+						}
+						const data = await response.json();
+						categories = data.categories;
+					} catch (error) {
+						console.error('Error loading categories:', error);
+					}
+				}
+
+				// Function to load Grätzl data from JSON file
+				async function loadGraetzlData(graetzlId) {
+					// Check cache first
+					if (graetzlCache[graetzlId]) {
+						return graetzlCache[graetzlId];
+					}
+
+					// Check if Grätzl exists in registry
+					const graetzlInfo = graetzlRegistry[graetzlId];
+					if (!graetzlInfo) {
+						console.error(`Grätzl "${graetzlId}" not found in registry`);
+						return null;
+					}
+
+					try {
+						const response = await fetch(graetzlInfo.dataFile);
+						if (!response.ok) {
+							throw new Error(`Failed to load ${graetzlInfo.dataFile}`);
+						}
+						const data = await response.json();
+
+						// Cache the loaded data
+						graetzlCache[graetzlId] = data;
+						return data;
+					} catch (error) {
+						console.error(`Error loading Grätzl data for "${graetzlId}":`, error);
+						return null;
+					}
+				}
+
+				// Function to get icon for category
+				function getCategoryIcon(category) {
+					// Fallback if categories not loaded yet
+					if (!categories || Object.keys(categories).length === 0) {
+						console.warn('Categories not loaded yet');
+						return '📍';
+					}
+					const cat = categories[category];
+					if (!cat) {
+						console.warn(`Category "${category}" not found, using default`);
+						return '📍';
+					}
+					// Use image if available, otherwise use emoji
+					return cat.image || cat.emoji;
+				}
+
+				// Function to create custom icon
+				function createCustomIcon(category) {
+					const icon = getCategoryIcon(category);
+					return L.divIcon({
+						html: `<div class="custom-marker">${icon}</div>`,
+						className: 'custom-icon',
+						iconSize: [40, 40],
+						iconAnchor: [20, 40],
+						popupAnchor: [0, -40]
+					});
+				}
+
+				// Function to show Grätzl
+				async function showGraetzl(graetzlId) {
+					// Load Grätzl data dynamically
+					const graetzl = await loadGraetzlData(graetzlId);
+					if (!graetzl) return;
+
+					// Remove previous polygon and markers
+					if (currentPolygon) {
+						map.removeLayer(currentPolygon);
+					}
+					currentMarkers.forEach(marker => map.removeLayer(marker));
+					currentMarkers = [];
+
+					// Add polygon overlay for the neighborhood
+					currentPolygon = L.polygon(graetzl.bounds, {
+						color: '#FF6B6B',
+						fillColor: '#FF6B6B',
+						fillOpacity: 0.2,
+						weight: 3
+					}).addTo(map);
+
+					// Zoom to the neighborhood
+					map.setView(graetzl.center, graetzl.zoom);
+
+					// Add POI markers
+					graetzl.pois.forEach(poi => {
+						const icon = getCategoryIcon(poi.category);
+						const marker = L.marker(poi.coords, {
+							icon: createCustomIcon(poi.category)
+						}).addTo(map);
+
+						// Create popup content
+						const popupContent = `
+							<div class="poi-popup">
+								<div class="poi-icon">${icon}</div>
+								<h3>${poi.name}</h3>
+								<p>${poi.description}</p>
+								<a href="${poi.link}" target="_blank" class="poi-link">Mehr erfahren →</a>
+							</div>
+						`;
+
+						marker.bindPopup(popupContent, {
+							maxWidth: 300,
+							className: 'custom-popup'
+						});
+
+						currentMarkers.push(marker);
+					});
+
+					// Update active state in navigation
+					document.querySelectorAll('.graetzl-btn').forEach(btn => {
+						btn.classList.remove('active');
+					});
+					document.querySelector(`[data-graetzl="${graetzlId}"]`)?.classList.add('active');
+				}
+
+				// Add click handlers to navigation buttons
+				document.querySelectorAll('.graetzl-btn').forEach(btn => {
+					btn.addEventListener('click', (e) => {
+						const graetzlId = e.target.dataset.graetzl;
+						showGraetzl(graetzlId);
+					});
+				});
+
+				// Initialize: load categories and show first Grätzl
+				async function initialize() {
+					try {
+						console.log('Loading categories...');
+						await loadCategories();
+						console.log('Categories loaded:', Object.keys(categories).length);
+						console.log('Showing Freihausviertel...');
+						await showGraetzl('freihausviertel');
+					} catch (error) {
+						console.error('Initialization error:', error);
+					}
+				}
+
+				initialize();
+			});
+		</script>
+
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			body {
+				font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+				background: #f5f5f5;
+				color: #333;
+			}
+
+			.container {
+				display: grid;
+				grid-template-areas:
+					"header header"
+					"nav main";
+				grid-template-columns: 250px 1fr;
+				grid-template-rows: auto 1fr;
+				height: 100vh;
+			}
+
+			header {
+				grid-area: header;
+				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+				color: white;
+				padding: 1.5rem 2rem;
+				box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+			}
+
+			header h1 {
+				font-size: 2rem;
+				font-weight: 700;
+				margin-bottom: 0.25rem;
+			}
+
+			.subtitle {
+				font-size: 0.9rem;
+				opacity: 0.9;
+			}
+
+			.graetzl-nav {
+				grid-area: nav;
+				background: white;
+				padding: 1.5rem;
+				overflow-y: auto;
+				box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+			}
+
+			.graetzl-nav h2 {
+				font-size: 1rem;
+				font-weight: 600;
+				margin-bottom: 1rem;
+				color: #666;
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+			}
+
+			#graetzl-list {
+				list-style: none;
+			}
+
+			.graetzl-btn {
+				width: 100%;
+				padding: 0.875rem 1rem;
+				margin-bottom: 0.5rem;
+				background: #f8f9fa;
+				border: 2px solid transparent;
+				border-radius: 8px;
+				font-size: 0.95rem;
+				font-weight: 500;
+				cursor: pointer;
+				transition: all 0.2s ease;
+				text-align: left;
+				color: #333;
+			}
+
+			.graetzl-btn:hover {
+				background: #e9ecef;
+				border-color: #667eea;
+			}
+
+			.graetzl-btn.active {
+				background: #667eea;
+				color: white;
+				border-color: #667eea;
+			}
+
+			main {
+				grid-area: main;
+				position: relative;
+			}
+
+			#map {
+				width: 100%;
+				height: 100%;
+			}
+
+			.custom-marker {
+				font-size: 28px;
+				text-align: center;
+				line-height: 40px;
+				text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+				cursor: pointer;
+				transition: transform 0.2s ease;
+			}
+
+			.custom-marker:hover {
+				transform: scale(1.2);
+			}
+
+			.poi-popup {
+				padding: 0.5rem;
+			}
+
+			.poi-popup .poi-icon {
+				font-size: 2.5rem;
+				text-align: center;
+				margin-bottom: 0.5rem;
+			}
+
+			.poi-popup h3 {
+				font-size: 1.1rem;
+				font-weight: 600;
+				margin-bottom: 0.5rem;
+				color: #333;
+			}
+
+			.poi-popup p {
+				font-size: 0.9rem;
+				line-height: 1.5;
+				color: #666;
+				margin-bottom: 0.75rem;
+			}
+
+			.poi-link {
+				display: inline-block;
+				padding: 0.5rem 1rem;
+				background: #667eea;
+				color: white;
+				text-decoration: none;
+				border-radius: 6px;
+				font-size: 0.875rem;
+				font-weight: 500;
+				transition: background 0.2s ease;
+			}
+
+			.poi-link:hover {
+				background: #5568d3;
+			}
+
+			/* Leaflet popup customization */
+			.custom-popup .leaflet-popup-content-wrapper {
+				border-radius: 12px;
+				box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+			}
+
+			.custom-popup .leaflet-popup-content {
+				margin: 1rem;
+			}
+
+			@media (max-width: 768px) {
+				.container {
+					grid-template-areas:
+						"header"
+						"nav"
+						"main";
+					grid-template-columns: 1fr;
+					grid-template-rows: auto auto 1fr;
+				}
+
+				.graetzl-nav {
+					padding: 1rem;
+					max-height: 150px;
+				}
+
+				#graetzl-list {
+					display: flex;
+					gap: 0.5rem;
+					overflow-x: auto;
+				}
+
+				.graetzl-btn {
+					white-space: nowrap;
+					margin-bottom: 0;
+					min-width: 150px;
+				}
+			}
+		</style>
 	</body>
 </html>

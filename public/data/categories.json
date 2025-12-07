@@ -1,0 +1,74 @@
+{
+  "categories": {
+    "restaurant": {
+      "name": "Restaurant",
+      "emoji": "🍽️",
+      "image": null
+    },
+    "cafe": {
+      "name": "Café",
+      "emoji": "☕",
+      "image": null
+    },
+    "breakfast": {
+      "name": "Frühstück",
+      "emoji": "🥐",
+      "image": null
+    },
+    "bar": {
+      "name": "Bar",
+      "emoji": "🍺",
+      "image": null
+    },
+    "gasthaus": {
+      "name": "Gasthaus",
+      "emoji": "🍺",
+      "image": null
+    },
+    "bookshop": {
+      "name": "Buchhandlung",
+      "emoji": "📚",
+      "image": null
+    },
+    "shop": {
+      "name": "Geschäft",
+      "emoji": "🛍️",
+      "image": null
+    },
+    "market": {
+      "name": "Markt",
+      "emoji": "🛍️",
+      "image": null
+    },
+    "cinema": {
+      "name": "Kino",
+      "emoji": "🎬",
+      "image": null
+    },
+    "theater": {
+      "name": "Theater",
+      "emoji": "🎭",
+      "image": null
+    },
+    "museum": {
+      "name": "Museum",
+      "emoji": "🏛️",
+      "image": null
+    },
+    "gallery": {
+      "name": "Galerie",
+      "emoji": "🎨",
+      "image": null
+    },
+    "park": {
+      "name": "Park",
+      "emoji": "🌳",
+      "image": null
+    },
+    "culture": {
+      "name": "Kultur",
+      "emoji": "🎪",
+      "image": null
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "name": "Nibelungenviertel",
+  "center": [48.1965, 16.3365],
+  "zoom": 15,
+  "bounds": [
+    [48.2010, 16.3365],
+    [48.2009, 16.3375],
+    [48.2007, 16.3385],
+    [48.2004, 16.3395],
+    [48.2000, 16.3404],
+    [48.1995, 16.3412],
+    [48.1989, 16.3419],
+    [48.1982, 16.3424],
+    [48.1974, 16.3428],
+    [48.1966, 16.3430],
+    [48.1958, 16.3431],
+    [48.1950, 16.3430],
+    [48.1942, 16.3428],
+    [48.1935, 16.3424],
+    [48.1928, 16.3419],
+    [48.1922, 16.3412],
+    [48.1917, 16.3404],
+    [48.1913, 16.3395],
+    [48.1910, 16.3385],
+    [48.1908, 16.3375],
+    [48.1907, 16.3365],
+    [48.1908, 16.3355],
+    [48.1910, 16.3345],
+    [48.1913, 16.3336],
+    [48.1917, 16.3327],
+    [48.1922, 16.3319],
+    [48.1928, 16.3312],
+    [48.1935, 16.3306],
+    [48.1942, 16.3301],
+    [48.1950, 16.3298],
+    [48.1958, 16.3296],
+    [48.1966, 16.3295],
+    [48.1974, 16.3296],
+    [48.1982, 16.3298],
+    [48.1989, 16.3302],
+    [48.1995, 16.3307],
+    [48.2000, 16.3314],
+    [48.2004, 16.3322],
+    [48.2007, 16.3331],
+    [48.2009, 16.3341],
+    [48.2010, 16.3351],
+    [48.2010, 16.3361],
+    [48.2010, 16.3365]
+  ],
+  "pois": [
+    {
+      "name": "Buchkontor",
+      "category": "bookshop",
+      "coords": [48.1965, 16.3370],
+      "description": "Beliebte Buchhandlung am Kriemhildplatz mit persönlicher Beratung und ausgewähltem Sortiment.",
+      "link": "https://www.falter.at/best-of-vienna/artikel/20251117/hotspots-im-nibelungenviertel"
+    },
+    {
+      "name": "franzundjulius",
+      "category": "cafe",
+      "coords": [48.1958, 16.3378],
+      "description": "Charmantes Café in umgebauter Tischlerei mit hausgemachten Kuchen und regionalen Getränken.",
+      "link": "https://www.falter.at/best-of-vienna/artikel/20251117/hotspots-im-nibelungenviertel"
+    },
+    {
+      "name": "Café Kriemhild",
+      "category": "breakfast",
+      "coords": [48.1942, 16.3385],
+      "description": "Gemütliches Kaffeehaus mit Gastgarten, bekannt für sein Shakshuka und gesellige Atmosphäre.",
+      "link": "https://www.falter.at/best-of-vienna/artikel/20251117/hotspots-im-nibelungenviertel"
+    },
+    {
+      "name": "Schutzhaus Zukunft",
+      "category": "gasthaus",
+      "coords": [48.1930, 16.3360],
+      "description": "Traditionelles Wiener Gasthaus mit Kulturflair und klassischer Küche in entspannter Umgebung.",
+      "link": "https://www.falter.at/best-of-vienna/artikel/20251117/hotspots-im-nibelungenviertel"
+    },
+    {
+      "name": "Alles Fahnen",
+      "category": "shop",
+      "coords": [48.1948, 16.3395],
+      "description": "Einzigartiges Fachgeschäft für individuelle Fahnen und Banner aller Art.",
+      "link": "https://www.falter.at/best-of-vienna/artikel/20251117/hotspots-im-nibelungenviertel"
+    }
+  ]
+}

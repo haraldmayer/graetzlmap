@@ -1,0 +1,92 @@
+{
+  "name": "Freihausviertel",
+  "center": [48.1975, 16.3665],
+  "zoom": 15,
+  "bounds": [
+    [48.2025, 16.3685],
+    [48.2024, 16.3695],
+    [48.2022, 16.3705],
+    [48.2019, 16.3715],
+    [48.2015, 16.3723],
+    [48.2010, 16.3730],
+    [48.2004, 16.3736],
+    [48.1997, 16.3740],
+    [48.1990, 16.3743],
+    [48.1982, 16.3745],
+    [48.1975, 16.3745],
+    [48.1967, 16.3744],
+    [48.1960, 16.3742],
+    [48.1953, 16.3739],
+    [48.1946, 16.3735],
+    [48.1940, 16.3730],
+    [48.1935, 16.3724],
+    [48.1930, 16.3717],
+    [48.1926, 16.3709],
+    [48.1923, 16.3700],
+    [48.1921, 16.3690],
+    [48.1920, 16.3680],
+    [48.1920, 16.3670],
+    [48.1921, 16.3660],
+    [48.1923, 16.3650],
+    [48.1926, 16.3640],
+    [48.1930, 16.3631],
+    [48.1935, 16.3623],
+    [48.1941, 16.3616],
+    [48.1948, 16.3610],
+    [48.1955, 16.3605],
+    [48.1963, 16.3601],
+    [48.1971, 16.3598],
+    [48.1979, 16.3596],
+    [48.1987, 16.3595],
+    [48.1995, 16.3596],
+    [48.2003, 16.3598],
+    [48.2010, 16.3602],
+    [48.2016, 16.3607],
+    [48.2021, 16.3614],
+    [48.2025, 16.3622],
+    [48.2028, 16.3631],
+    [48.2030, 16.3641],
+    [48.2031, 16.3651],
+    [48.2030, 16.3661],
+    [48.2028, 16.3671],
+    [48.2025, 16.3680],
+    [48.2025, 16.3685]
+  ],
+  "pois": [
+    {
+      "name": "Amacord",
+      "category": "restaurant",
+      "coords": [48.1960, 16.3650],
+      "description": "Kultiges Bistro seit 1987 mit kreativer österreichischer Küche und besonderer Atmosphäre.",
+      "link": "https://www.falter.at/zeitung/20221130/holzer-im-graetzel-schleifmuehlgasse"
+    },
+    {
+      "name": "Rösterei Alt Wien",
+      "category": "cafe",
+      "coords": [48.1952, 16.3658],
+      "description": "Wiens erste moderne Kaffeerösterei mit Single-Origin und Bio-Kaffees aus aller Welt.",
+      "link": "https://www.falter.at/zeitung/20221130/holzer-im-graetzel-schleifmuehlgasse"
+    },
+    {
+      "name": "Filmcasino",
+      "category": "cinema",
+      "coords": [48.1975, 16.3685],
+      "description": "Traditionelles Programmkino mit ausgewählten Arthouse-Filmen und Klassikern.",
+      "link": "https://www.filmcasino.at"
+    },
+    {
+      "name": "Naschmarkt",
+      "category": "market",
+      "coords": [48.1985, 16.3640],
+      "description": "Wiens bekanntester Markt mit internationalen Spezialitäten, frischen Produkten und Gastronomiebetrieben.",
+      "link": "https://www.wien.info/de/einkaufen-essen-trinken/maerkte/naschmarkt-333208"
+    },
+    {
+      "name": "Theater an der Wien",
+      "category": "theater",
+      "coords": [48.1990, 16.3655],
+      "description": "Historisches Theater mit Fokus auf Musiktheater, Oper und große Musicals.",
+      "link": "https://www.theater-wien.at"
+    }
+  ]
+}
