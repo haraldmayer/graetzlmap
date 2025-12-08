@@ -1,0 +1,35 @@
+---
+import Header from '../components/Header.astro';
+import Navigation from '../components/Navigation.astro';
+
+interface Props {
+	title?: string;
+}
+
+const { title = 'Grätzlmap - Dein Guide durch Wiens Grätzln' } = Astro.props;
+---
+
+<html lang="de">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" />
+		<link rel="stylesheet" href="/src/styles/main.css" />
+	</head>
+	<body>
+		<div class="container">
+			<Header />
+			<Navigation />
+			<main>
+				<slot />
+			</main>
+		</div>
+
+		<script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+		<script type="module" src="/src/lib/map-init.js"></script>
+	</body>
+</html>
