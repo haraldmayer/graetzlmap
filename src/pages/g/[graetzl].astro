@@ -2,6 +2,20 @@
 // This dynamic route handles /g/<graetzl-slug> URLs
 // It simply returns the main page, which will handle the graetzl selection client-side
 import Layout from '../../layouts/Layout.astro';
+import { graetzlNameToSlug } from '../../lib/slug-utils.js';
+import graetzlData from '../../../public/data/graetzl_wien2025.json';
+
+export async function getStaticPaths() {
+  // Get all active graetzl
+  const activeGraetzl = graetzlData.features.filter(f => f.properties.active === 1);
+
+  // Generate paths for each active graetzl
+  return activeGraetzl.map(graetzl => ({
+    params: {
+      graetzl: graetzlNameToSlug(graetzl.properties.Graetzl_Name)
+    }
+  }));
+}
 ---
 
 <Layout>

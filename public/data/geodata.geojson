@@ -5,20 +5,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [16.365, 48.196]
-      },
-      "properties": {
-        "name": "Amacord",
-        "category": "restaurant",
-        "description": "Kultiges Bistro seit 1987 mit kreativer österreichischer Küche und besonderer Atmosphäre.",
-        "link": "https://www.falter.at/zeitung/20221130/holzer-im-graetzel-schleifmuehlgasse"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [16.3658, 48.1952]
+        "coordinates": [16.364086589301394, 48.19818869640931]
       },
       "properties": {
         "name": "Rösterei Alt Wien",
@@ -31,7 +18,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [16.3685, 48.1975]
+        "coordinates": [16.359819554512733, 48.19250462346606]
       },
       "properties": {
         "name": "Filmcasino",
@@ -51,19 +38,6 @@
         "category": "market",
         "description": "Wiens bekanntester Markt mit internationalen Spezialitäten, frischen Produkten und Gastronomiebetrieben.",
         "link": "https://www.wien.info/de/einkaufen-essen-trinken/maerkte/naschmarkt-333208"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [16.3655, 48.199]
-      },
-      "properties": {
-        "name": "Theater an der Wien",
-        "category": "theater",
-        "description": "Historisches Theater mit Fokus auf Musiktheater, Oper und große Musicals.",
-        "link": "https://www.theater-wien.at"
       }
     },
     {
@@ -148,7 +122,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [16.373759, 48.217388]
+        "coordinates": [16.376981, 48.217386]
       },
       "properties": {
         "name": "Karmelitermarkt",
@@ -161,13 +135,52 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [16.3662526, 48.197529]
+        "coordinates": [16.36674992567765, 48.197624900430014]
       },
       "properties": {
         "name": "Crupi",
         "category": "shop",
         "description": "Sizilianische Spezialitäten",
         "link": "https://www.crupi.at/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.36534444823908, 48.19910522898673]
+      },
+      "properties": {
+        "name": "Postamt",
+        "category": "post office",
+        "description": "Kleines Postamt",
+        "link": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.358475328835407, 48.19277444701453]
+      },
+      "properties": {
+        "name": "John Harris 1040",
+        "category": "gym",
+        "description": "",
+        "link": "https://www.johnharris.at/de/studios/detail/2/margaretenplatz.html"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.36443382382972, 48.19786513449719]
+      },
+      "properties": {
+        "name": "Babette's",
+        "category": "bookshop",
+        "description": "",
+        "link": "https://babettes.at/"
       }
     }
   ]
