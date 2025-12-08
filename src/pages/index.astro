@@ -333,6 +333,20 @@
 				// Update marker sizes when zoom changes
 				map.on('zoomend', updateMarkerSizes);
 
+				// Handle map clicks to activate Grätzl
+				map.on('click', (e) => {
+					// Convert Leaflet coords [lat, lng] to GeoJSON [lng, lat]
+					const point = [e.latlng.lng, e.latlng.lat];
+
+					// Find which Grätzl contains this point
+					const graetzl = geoquery.findGraetzlAtPoint(graetzlData, point);
+
+					if (graetzl) {
+						// Activate the clicked Grätzl
+						selectGraetzl(graetzl);
+					}
+				});
+
 				// Searchable dropdown state
 				let allGraetzls = [];
 				let selectedGraetzl = null;
