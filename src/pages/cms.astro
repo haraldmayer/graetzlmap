@@ -123,7 +123,9 @@ const title = "POI → GeoJSON Generator";
 
       <div>
         <label>Category</label>
-        <input id="category" type="text" placeholder="cafe, bar, museum..." />
+        <input id="category" type="text" list="categories" placeholder="cafe, bar, museum..." />
+        <datalist id="categories"></datalist>
+        <div class="hint">Select from dropdown or type custom category</div>
       </div>
 
       <div class="full">
@@ -145,6 +147,25 @@ const title = "POI → GeoJSON Generator";
 
   <!-- ✅ THIS is the critical fix -->
   <script is:inline>
+    // Load categories from categories.json
+    async function loadCategories() {
+      try {
+        const response = await fetch('/data/categories.json');
+        const data = await response.json();
+        const datalist = document.getElementById('categories');
+
+        // Populate datalist with category options
+        Object.entries(data.categories).forEach(([key, value]) => {
+          const option = document.createElement('option');
+          option.value = key;
+          option.textContent = `${value.emoji} ${value.name}`;
+          datalist.appendChild(option);
+        });
+      } catch (error) {
+        console.error('Failed to load categories:', error);
+      }
+    }
+
     function parseGoogleMapsCoords(url) {
       const match = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
       if (!match) return null;
@@ -208,6 +229,9 @@ const title = "POI → GeoJSON Generator";
     // ✅ Proper event binding (Astro-safe)
     document.getElementById("generateBtn").addEventListener("click", generateJSON);
     document.getElementById("copyBtn").addEventListener("click", copyJSON);
+
+    // Load categories on page load
+    loadCategories();
   </script>
 
 </body>

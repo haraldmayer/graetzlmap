@@ -394,6 +394,9 @@ function createCategoryFilters() {
 		const clearButton = document.getElementById('clear-graetzl');
 		allGraetzls = geoquery.getGraetzlFeatures(graetzlData);
 
+		// Filter to only show active Grätzl
+		allGraetzls = allGraetzls.filter(g => g.properties.active === 1);
+
 		// Sort by name
 		allGraetzls.sort((a, b) =>
 			a.properties.Graetzl_Name.localeCompare(b.properties.Graetzl_Name, 'de')

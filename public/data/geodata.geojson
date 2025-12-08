@@ -148,13 +148,26 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [16.373, 48.211]
+        "coordinates": [16.373759, 48.217388]
       },
       "properties": {
-        "name": "Neutorviertel - Historisches Zentrum",
-        "category": "culture",
-        "description": "Der größte Neubau-Bereich innerhalb der Ringstraße nach dem Schleifen der Stadtmauern ab 1858. Ein Viertel mit einheitlicher, rasterförmiger Verbauung zwischen Börseplatz, Morzinplatz und dem Kai.",
-        "link": "https://www.falter.at/zeitung/20230322/holzer-im-graetzel-neutor"
+        "name": "Karmelitermarkt",
+        "category": "market",
+        "description": "Einer der schönsten Märkte Wiens mit vielfältigen Ständen, Cafés und Restaurants in einem lebendigen Viertel.",
+        "link": "https://www.wien.gv.at/freizeit/karmelitermarkt-1020"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.3662526, 48.197529]
+      },
+      "properties": {
+        "name": "Crupi",
+        "category": "shop",
+        "description": "Sizilianische Spezialitäten",
+        "link": "https://www.crupi.at/"
       }
     }
   ]
