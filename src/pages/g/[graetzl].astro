@@ -1,4 +1,6 @@
 ---
+// This dynamic route handles /g/<graetzl-slug> URLs
+// It simply returns the main page, which will handle the graetzl selection client-side
 ---
 
 <html lang="de">
@@ -78,7 +80,6 @@
 		</div>
 
 		<script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 		<script type="module" src="/src/lib/map-init.js"></script>
 
 		<style is:global>
