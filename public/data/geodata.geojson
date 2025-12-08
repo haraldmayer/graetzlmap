@@ -4,124 +4,11 @@
     {
       "type": "Feature",
       "geometry": {
-        "type": "Polygon",
-        "coordinates": [[
-          [16.3685, 48.2025],
-          [16.3695, 48.2024],
-          [16.3705, 48.2022],
-          [16.3715, 48.2019],
-          [16.3723, 48.2015],
-          [16.3730, 48.2010],
-          [16.3736, 48.2004],
-          [16.3740, 48.1997],
-          [16.3743, 48.1990],
-          [16.3745, 48.1982],
-          [16.3745, 48.1975],
-          [16.3744, 48.1967],
-          [16.3742, 48.1960],
-          [16.3739, 48.1953],
-          [16.3735, 48.1946],
-          [16.3730, 48.1940],
-          [16.3724, 48.1935],
-          [16.3717, 48.1930],
-          [16.3709, 48.1926],
-          [16.3700, 48.1923],
-          [16.3690, 48.1921],
-          [16.3680, 48.1920],
-          [16.3670, 48.1920],
-          [16.3660, 48.1921],
-          [16.3650, 48.1923],
-          [16.3640, 48.1926],
-          [16.3631, 48.1930],
-          [16.3623, 48.1935],
-          [16.3616, 48.1941],
-          [16.3610, 48.1948],
-          [16.3605, 48.1955],
-          [16.3601, 48.1963],
-          [16.3598, 48.1971],
-          [16.3596, 48.1979],
-          [16.3595, 48.1987],
-          [16.3596, 48.1995],
-          [16.3598, 48.2003],
-          [16.3602, 48.2010],
-          [16.3607, 48.2016],
-          [16.3614, 48.2021],
-          [16.3622, 48.2025],
-          [16.3631, 48.2028],
-          [16.3641, 48.2030],
-          [16.3651, 48.2031],
-          [16.3661, 48.2030],
-          [16.3671, 48.2028],
-          [16.3680, 48.2025],
-          [16.3685, 48.2025]
-        ]]
-      },
-      "properties": {
-        "featureType": "graetzl",
-        "graetzlId": "freihausviertel",
-        "name": "Freihausviertel",
-        "center": [16.3665, 48.1975],
-        "zoom": 15
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [[
-          [16.3313163, 48.2044119],
-          [16.3254154, 48.2053272],
-          [16.3255656, 48.2038971],
-          [16.3250507, 48.2001929],
-          [16.3256515, 48.19892],
-          [16.3315738, 48.2005648],
-          [16.3313163, 48.2044119]
-        ]]
-      },
-      "properties": {
-        "featureType": "graetzl",
-        "graetzlId": "nibelungenviertel",
-        "name": "Nibelungenviertel",
-        "center": [16.3283, 48.2021],
-        "zoom": 15
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [[
-          [16.3695, 48.2125],
-          [16.3710, 48.2120],
-          [16.3730, 48.2118],
-          [16.3750, 48.2115],
-          [16.3780, 48.2115],
-          [16.3785, 48.2110],
-          [16.3780, 48.2100],
-          [16.3770, 48.2095],
-          [16.3755, 48.2092],
-          [16.3735, 48.2090],
-          [16.3715, 48.2092],
-          [16.3700, 48.2095],
-          [16.3690, 48.2100],
-          [16.3685, 48.2108],
-          [16.3685, 48.2118],
-          [16.3695, 48.2125]
-        ]]
-      },
-      "properties": {
-        "featureType": "graetzl",
-        "graetzlId": "neutorviertel",
-        "name": "Neutorviertel",
-        "center": [16.3730, 48.2110],
-        "zoom": 15
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
         "type": "Point",
-        "coordinates": [16.3650, 48.1960]
+        "coordinates": [
+          16.365,
+          48.196
+        ]
       },
       "properties": {
         "featureType": "poi",
@@ -136,7 +23,10 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [16.3658, 48.1952]
+        "coordinates": [
+          16.3658,
+          48.1952
+        ]
       },
       "properties": {
         "featureType": "poi",
@@ -151,7 +41,10 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [16.3685, 48.1975]
+        "coordinates": [
+          16.3685,
+          48.1975
+        ]
       },
       "properties": {
         "featureType": "poi",
@@ -166,7 +59,10 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [16.3640, 48.1985]
+        "coordinates": [
+          16.364,
+          48.1985
+        ]
       },
       "properties": {
         "featureType": "poi",
@@ -181,7 +77,10 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [16.3655, 48.1990]
+        "coordinates": [
+          16.3655,
+          48.199
+        ]
       },
       "properties": {
         "featureType": "poi",
@@ -196,7 +95,10 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [16.3294563, 48.2022857]
+        "coordinates": [
+          16.3294563,
+          48.2022857
+        ]
       },
       "properties": {
         "featureType": "poi",
@@ -211,7 +113,10 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [16.3294563, 48.2022857]
+        "coordinates": [
+          16.3294563,
+          48.2022857
+        ]
       },
       "properties": {
         "featureType": "poi",
@@ -226,7 +131,10 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [16.330189, 48.201950]
+        "coordinates": [
+          16.330189,
+          48.20195
+        ]
       },
       "properties": {
         "featureType": "poi",
@@ -241,7 +149,10 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [16.326765, 48.202381]
+        "coordinates": [
+          16.326765,
+          48.202381
+        ]
       },
       "properties": {
         "featureType": "poi",
@@ -256,7 +167,10 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [16.3279644, 48.2037131]
+        "coordinates": [
+          16.3279644,
+          48.2037131
+        ]
       },
       "properties": {
         "featureType": "poi",
@@ -271,7 +185,10 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [16.3730, 48.2110]
+        "coordinates": [
+          16.373,
+          48.211
+        ]
       },
       "properties": {
         "featureType": "poi",

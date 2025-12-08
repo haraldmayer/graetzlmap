@@ -19,12 +19,36 @@
 			</header>
 
 			<nav class="graetzl-nav">
-				<h2>Grätzl auswählen</h2>
-				<ul id="graetzl-list">
-					<li><button class="graetzl-btn" data-graetzl="freihausviertel">Freihausviertel</button></li>
-					<li><button class="graetzl-btn" data-graetzl="nibelungenviertel">Nibelungenviertel</button></li>
-					<li><button class="graetzl-btn" data-graetzl="neutorviertel">Neutorviertel</button></li>
-				</ul>
+				<div class="nav-section">
+					<h2>Grätzl auswählen</h2>
+					<div class="searchable-select">
+						<input
+							type="text"
+							id="graetzl-search"
+							class="graetzl-search-input"
+							placeholder="Alle Grätzl werden angezeigt"
+							autocomplete="off"
+							data-selected="false"
+						/>
+						<button
+							id="clear-graetzl"
+							class="clear-button"
+							type="button"
+							style="display: none;"
+							title="Auswahl löschen"
+						>×</button>
+						<div id="graetzl-dropdown" class="graetzl-dropdown" style="display: none;">
+							<!-- Options will be populated dynamically -->
+						</div>
+					</div>
+				</div>
+
+				<div class="nav-section">
+					<h2>Kategorien filtern</h2>
+					<div id="category-filters" class="category-filters">
+						<!-- Will be populated dynamically -->
+					</div>
+				</div>
 			</nav>
 
 			<main>
@@ -47,13 +71,16 @@
 					maxZoom: 19
 				}).addTo(map);
 
-				// Load GeoJSON data
+				// Load data
 				let geoData = null;
+				let graetzlData = null;
 				try {
 					geoData = await geoquery.loadGeoData();
-					console.log('GeoData loaded:', geoData.features.length, 'features');
+					graetzlData = await geoquery.loadGraetzlData();
+					console.log('POI data loaded:', geoData.features.length, 'features');
+					console.log('Grätzl data loaded:', graetzlData.features.length, 'features');
 				} catch (error) {
-					console.error('Error loading geodata:', error);
+					console.error('Error loading data:', error);
 					return;
 				}
 
@@ -62,7 +89,8 @@
 
 				let currentPolygon = null;
 				let currentMarkers = [];
-				let currentPois = [];
+				let currentGraetzlId = null; // Track currently selected Grätzl
+				let selectedCategories = new Set(); // Track selected categories
 
 				// Function to load categories
 				async function loadCategories() {
@@ -117,44 +145,121 @@
 					const currentZoom = map.getZoom();
 					const size = getMarkerSize(currentZoom);
 
-					currentMarkers.forEach((marker, index) => {
-						const poi = currentPois[index];
-						if (poi) {
-							const iconElement = marker._icon;
-							if (iconElement) {
-								const markerDiv = iconElement.querySelector('.custom-marker');
-								if (markerDiv) {
-									markerDiv.style.width = size + 'px';
-									markerDiv.style.height = size + 'px';
-									markerDiv.style.fontSize = (size * 0.7) + 'px';
-									markerDiv.style.lineHeight = size + 'px';
-								}
-
-								iconElement.style.width = size + 'px';
-								iconElement.style.height = size + 'px';
-								iconElement.style.marginLeft = (-size / 2) + 'px';
-								iconElement.style.marginTop = (-size) + 'px';
+					currentMarkers.forEach((marker) => {
+						const iconElement = marker._icon;
+						if (iconElement) {
+							const markerDiv = iconElement.querySelector('.custom-marker');
+							if (markerDiv) {
+								markerDiv.style.width = size + 'px';
+								markerDiv.style.height = size + 'px';
+								markerDiv.style.fontSize = (size * 0.7) + 'px';
+								markerDiv.style.lineHeight = size + 'px';
 							}
+
+							iconElement.style.width = size + 'px';
+							iconElement.style.height = size + 'px';
+							iconElement.style.marginLeft = (-size / 2) + 'px';
+							iconElement.style.marginTop = (-size) + 'px';
 						}
 					});
 				}
 
-				// Function to show Grätzl
+				// Function to create category filter UI
+				function createCategoryFilters() {
+					const container = document.getElementById('category-filters');
+					const allCategories = geoquery.getAllCategories(geoData);
+
+					allCategories.forEach(categoryId => {
+						const categoryInfo = categories[categoryId];
+						if (!categoryInfo) return;
+
+						const label = document.createElement('label');
+						label.className = 'category-filter';
+
+						const checkbox = document.createElement('input');
+						checkbox.type = 'checkbox';
+						checkbox.value = categoryId;
+						checkbox.checked = true; // All selected by default
+						checkbox.addEventListener('change', () => {
+							// Rebuild selected categories based on all checkboxes
+							const allCheckboxes = container.querySelectorAll('input[type="checkbox"]');
+							selectedCategories.clear();
+
+							let checkedCount = 0;
+							allCheckboxes.forEach(cb => {
+								if (cb.checked) {
+									checkedCount++;
+									selectedCategories.add(cb.value);
+								}
+							});
+
+							// If all are checked, clear the set (means "show all")
+							if (checkedCount === allCheckboxes.length) {
+								selectedCategories.clear();
+							}
+
+							updateMarkers();
+						});
+
+						const icon = document.createElement('span');
+						icon.className = 'category-icon';
+						icon.textContent = categoryInfo.emoji;
+
+						const name = document.createElement('span');
+						name.className = 'category-name';
+						name.textContent = categoryInfo.name;
+
+						label.appendChild(checkbox);
+						label.appendChild(icon);
+						label.appendChild(name);
+						container.appendChild(label);
+					});
+				}
+
+				// Function to show all POIs (default view)
+				function showAllPOIs() {
+					currentGraetzlId = null;
+
+					// Remove polygon if exists
+					if (currentPolygon) {
+						map.removeLayer(currentPolygon);
+						currentPolygon = null;
+					}
+
+					// Reset to Vienna center view
+					map.setView([48.2082, 16.3738], 14); // Zoom 14 ≈ 1km radius
+
+					// Update markers based on current category filter
+					updateMarkers();
+
+					// Update search input
+					const searchInput = document.getElementById('graetzl-search');
+					searchInput.value = '';
+					searchInput.placeholder = 'Alle Grätzl werden angezeigt';
+					searchInput.dataset.selected = 'false';
+					selectedGraetzl = null;
+				}
+
+				// Function to show specific Grätzl
 				function showGraetzl(graetzlId) {
-					// Get Grätzl feature from GeoJSON
-					const graetzlFeature = geoquery.getGraetzl(geoData, graetzlId);
+					if (!graetzlId) {
+						showAllPOIs();
+						return;
+					}
+
+					currentGraetzlId = graetzlId;
+
+					// Get Grätzl feature from graetzl data
+					const graetzlFeature = geoquery.getGraetzl(graetzlData, parseInt(graetzlId));
 					if (!graetzlFeature) {
 						console.error(`Grätzl "${graetzlId}" not found`);
 						return;
 					}
 
-					// Remove previous polygon and markers
+					// Remove previous polygon
 					if (currentPolygon) {
 						map.removeLayer(currentPolygon);
 					}
-					currentMarkers.forEach(marker => map.removeLayer(marker));
-					currentMarkers = [];
-					currentPois = [];
 
 					// Convert GeoJSON polygon to Leaflet coordinates
 					const bounds = geoquery.featureToLeafletCoords(graetzlFeature);
@@ -167,26 +272,41 @@
 						weight: 3
 					}).addTo(map);
 
-					// Zoom to the neighborhood
-					const center = geoquery.featureToLeafletCoords({
-						geometry: {
-							type: 'Point',
-							coordinates: graetzlFeature.properties.center
-						}
-					});
-					map.setView(center, graetzlFeature.properties.zoom);
+					// Fit map to polygon bounds
+					map.fitBounds(currentPolygon.getBounds(), { padding: [50, 50] });
 
-					// Get POIs for this Grätzl
-					const poiFeatures = geoquery.getPOIsByGraetzl(geoData, graetzlId);
+					// Update markers (will filter by Grätzl and categories)
+					updateMarkers();
 
-					// Add POI markers
+					// Dropdown is updated by selectGraetzl function
+				}
+
+				// Function to update markers based on filters
+				function updateMarkers() {
+					// Remove all current markers
+					currentMarkers.forEach(marker => map.removeLayer(marker));
+					currentMarkers = [];
+
+					// Build filter
+					const filters = {};
+					if (currentGraetzlId) {
+						filters.graetzlId = parseInt(currentGraetzlId);
+					}
+					if (selectedCategories.size > 0) {
+						filters.categories = Array.from(selectedCategories);
+					}
+
+					// Get filtered POIs using spatial query
+					const poiFeatures = geoquery.filterPOIsWithGraetzl(geoData, graetzlData, filters);
+
+					// Add markers
 					poiFeatures.forEach(poiFeature => {
 						const poi = poiFeature.properties;
 						const coords = geoquery.featureToLeafletCoords(poiFeature);
 						const icon = getCategoryIcon(poi.category);
 
 						const marker = L.marker(coords, {
-							icon: createCustomIcon(poi.category, graetzlFeature.properties.zoom)
+							icon: createCustomIcon(poi.category, map.getZoom())
 						}).addTo(map);
 
 						// Create popup content
@@ -205,35 +325,194 @@
 						});
 
 						currentMarkers.push(marker);
-						currentPois.push(poi);
 					});
-
-					// Update active state in navigation
-					document.querySelectorAll('.graetzl-btn').forEach(btn => {
-						btn.classList.remove('active');
-					});
-					document.querySelector(`[data-graetzl="${graetzlId}"]`)?.classList.add('active');
 				}
 
-				// Add click handlers to navigation buttons
-				document.querySelectorAll('.graetzl-btn').forEach(btn => {
-					btn.addEventListener('click', (e) => {
-						const graetzlId = e.target.dataset.graetzl;
-						showGraetzl(graetzlId);
-					});
-				});
+				// Dropdown interactions are handled in populateGraetzlDropdown()
 
 				// Update marker sizes when zoom changes
 				map.on('zoomend', updateMarkerSizes);
 
-				// Initialize: load categories and show first Grätzl
+				// Searchable dropdown state
+				let allGraetzls = [];
+				let selectedGraetzl = null;
+				let focusedIndex = -1;
+
+				// Function to update clear button visibility
+				function updateClearButton() {
+					const searchInput = document.getElementById('graetzl-search');
+					const clearButton = document.getElementById('clear-graetzl');
+
+					// Show button if there's text or a selection
+					if (searchInput.value || searchInput.dataset.selected === 'true') {
+						clearButton.style.display = 'flex';
+					} else {
+						clearButton.style.display = 'none';
+					}
+				}
+
+				// Function to populate Grätzl dropdown
+				function populateGraetzlDropdown() {
+					const dropdown = document.getElementById('graetzl-dropdown');
+					const searchInput = document.getElementById('graetzl-search');
+					const clearButton = document.getElementById('clear-graetzl');
+					allGraetzls = geoquery.getGraetzlFeatures(graetzlData);
+
+					// Sort by name
+					allGraetzls.sort((a, b) =>
+						a.properties.Graetzl_Name.localeCompare(b.properties.Graetzl_Name, 'de')
+					);
+
+					// Add "Alle anzeigen" option
+					const allOption = document.createElement('div');
+					allOption.className = 'graetzl-option';
+					allOption.dataset.id = '';
+					allOption.dataset.name = 'Alle anzeigen';
+					allOption.textContent = 'Alle anzeigen';
+					allOption.addEventListener('click', () => selectGraetzl(null));
+					dropdown.appendChild(allOption);
+
+					// Add all Grätzl options
+					allGraetzls.forEach(graetzl => {
+						const option = document.createElement('div');
+						option.className = 'graetzl-option';
+						option.dataset.id = graetzl.properties.Graetzl_ID;
+						option.dataset.name = graetzl.properties.Graetzl_Name;
+						option.textContent = graetzl.properties.Graetzl_Name;
+						option.addEventListener('click', () => selectGraetzl(graetzl));
+						dropdown.appendChild(option);
+					});
+
+					// Clear button functionality
+					clearButton.addEventListener('click', () => {
+						selectGraetzl(null);
+					});
+
+					// Search functionality
+					searchInput.addEventListener('input', (e) => {
+						focusedIndex = -1; // Reset focus when typing
+						filterDropdown(e.target.value);
+						updateClearButton();
+					});
+
+					// Show dropdown on focus
+					searchInput.addEventListener('focus', () => {
+						// Clear input if showing default state
+						if (searchInput.dataset.selected === 'false' || !searchInput.dataset.selected) {
+							searchInput.value = '';
+						} else if (selectedGraetzl) {
+							// Select the text if a Grätzl is selected
+							searchInput.select();
+						}
+						filterDropdown(searchInput.value);
+						dropdown.style.display = 'block';
+					});
+
+					// Keyboard navigation
+					searchInput.addEventListener('keydown', (e) => {
+						const options = Array.from(dropdown.querySelectorAll('.graetzl-option:not([style*="display: none"])'));
+
+						if (e.key === 'ArrowDown') {
+							e.preventDefault();
+							focusedIndex = Math.min(focusedIndex + 1, options.length - 1);
+							updateFocusedOption(options);
+						} else if (e.key === 'ArrowUp') {
+							e.preventDefault();
+							focusedIndex = Math.max(focusedIndex - 1, -1);
+							updateFocusedOption(options);
+						} else if (e.key === 'Enter') {
+							e.preventDefault();
+							if (focusedIndex >= 0 && options[focusedIndex]) {
+								options[focusedIndex].click();
+							}
+						} else if (e.key === 'Escape') {
+							dropdown.style.display = 'none';
+							searchInput.blur();
+						}
+					});
+
+					// Close dropdown when clicking outside
+					document.addEventListener('click', (e) => {
+						if (!e.target.closest('.searchable-select')) {
+							dropdown.style.display = 'none';
+						}
+					});
+
+					console.log('Populated dropdown with', allGraetzls.length, 'Grätzl');
+				}
+
+				function filterDropdown(searchTerm) {
+					const dropdown = document.getElementById('graetzl-dropdown');
+					const options = dropdown.querySelectorAll('.graetzl-option');
+					const term = searchTerm.toLowerCase();
+
+					let visibleCount = 0;
+					options.forEach(option => {
+						const name = option.dataset.name.toLowerCase();
+						if (name.includes(term)) {
+							option.style.display = 'block';
+							visibleCount++;
+						} else {
+							option.style.display = 'none';
+						}
+					});
+
+					// Show/hide dropdown based on visible options
+					if (visibleCount > 0) {
+						dropdown.style.display = 'block';
+					} else {
+						dropdown.style.display = 'none';
+					}
+				}
+
+				function updateFocusedOption(options) {
+					options.forEach((opt, idx) => {
+						if (idx === focusedIndex) {
+							opt.classList.add('focused');
+							opt.scrollIntoView({ block: 'nearest' });
+						} else {
+							opt.classList.remove('focused');
+						}
+					});
+				}
+
+				function selectGraetzl(graetzl) {
+					const searchInput = document.getElementById('graetzl-search');
+					const dropdown = document.getElementById('graetzl-dropdown');
+
+					if (graetzl) {
+						selectedGraetzl = graetzl;
+						searchInput.value = graetzl.properties.Graetzl_Name;
+						searchInput.dataset.selected = 'true';
+						showGraetzl(graetzl.properties.Graetzl_ID.toString());
+					} else {
+						selectedGraetzl = null;
+						searchInput.value = '';
+						searchInput.placeholder = 'Alle Grätzl werden angezeigt';
+						searchInput.dataset.selected = 'false';
+						showAllPOIs();
+					}
+
+					dropdown.style.display = 'none';
+					focusedIndex = -1;
+					updateClearButton();
+				}
+
+				// Initialize: load categories and show all POIs
 				async function initialize() {
 					try {
 						console.log('Loading categories...');
 						await loadCategories();
 						console.log('Categories loaded:', Object.keys(categories).length);
-						console.log('Showing Freihausviertel...');
-						showGraetzl('freihausviertel');
+
+						// Populate Grätzl dropdown
+						populateGraetzlDropdown();
+
+						// Create category filter UI
+						createCategoryFilters();
+
+						console.log('Showing all POIs...');
+						showAllPOIs();
 					} catch (error) {
 						console.error('Initialization error:', error);
 					}
@@ -242,9 +521,11 @@
 				initialize();
 			});
 
+
+
 		</script>
 
-		<style>
+		<style is:global>
 			* {
 				margin: 0;
 				padding: 0;
@@ -294,6 +575,14 @@
 				box-shadow: 2px 0 10px rgba(0,0,0,0.05);
 			}
 
+			.nav-section {
+				margin-bottom: 2rem;
+			}
+
+			.nav-section:last-child {
+				margin-bottom: 0;
+			}
+
 			.graetzl-nav h2 {
 				font-size: 1rem;
 				font-weight: 600;
@@ -303,34 +592,156 @@
 				letter-spacing: 0.5px;
 			}
 
-			#graetzl-list {
-				list-style: none;
+			.searchable-select {
+				position: relative;
 			}
 
-			.graetzl-btn {
+			.graetzl-search-input {
 				width: 100%;
-				padding: 0.875rem 1rem;
-				margin-bottom: 0.5rem;
+				padding: 0.875rem 2.5rem 0.875rem 1rem;
 				background: #f8f9fa;
-				border: 2px solid transparent;
+				border: 2px solid #e9ecef;
 				border-radius: 8px;
 				font-size: 0.95rem;
 				font-weight: 500;
-				cursor: pointer;
+				cursor: text;
 				transition: all 0.2s ease;
-				text-align: left;
 				color: #333;
+				font-family: inherit;
+				box-sizing: border-box;
 			}
 
-			.graetzl-btn:hover {
+			.graetzl-search-input::placeholder {
+				color: #999;
+				font-weight: 400;
+			}
+
+			.graetzl-search-input:hover {
 				background: #e9ecef;
 				border-color: #667eea;
 			}
 
-			.graetzl-btn.active {
+			.graetzl-search-input:focus {
+				outline: none;
+				border-color: #667eea;
+				background: white;
+				box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+			}
+
+			.clear-button {
+				position: absolute;
+				right: 0.5rem;
+				top: 50%;
+				transform: translateY(-50%);
+				width: 24px;
+				height: 24px;
+				border: none;
+				background: #e9ecef;
+				color: #666;
+				border-radius: 50%;
+				cursor: pointer;
+				font-size: 1.2rem;
+				line-height: 1;
+				display: none;
+				align-items: center;
+				justify-content: center;
+				transition: all 0.2s ease;
+				padding: 0;
+				z-index: 1;
+			}
+
+			.clear-button:hover {
 				background: #667eea;
 				color: white;
-				border-color: #667eea;
+			}
+
+			.clear-button:active {
+				transform: translateY(-50%) scale(0.95);
+			}
+
+			.graetzl-dropdown {
+				position: absolute;
+				top: calc(100% + 0.5rem);
+				left: 0;
+				right: 0;
+				background: white;
+				border: 2px solid #e9ecef;
+				border-radius: 8px;
+				max-height: 300px;
+				overflow-y: auto;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+				z-index: 1000;
+				padding: 0.5rem;
+			}
+
+			.graetzl-option {
+				padding: 0.875rem 1rem;
+				cursor: pointer;
+				transition: all 0.15s ease;
+				font-size: 0.95rem;
+				color: #333;
+				border-radius: 6px;
+				position: relative;
+				background-color: transparent;
+				display: block;
+			}
+
+			.graetzl-option:first-child {
+				font-weight: 600;
+				color: #667eea;
+				background-color: #fafbff;
+				margin-bottom: 0.5rem;
+				border-bottom: 1px solid #e9ecef;
+				padding-bottom: 1rem;
+			}
+
+			.graetzl-dropdown .graetzl-option:hover {
+				background-color: #f0f2ff !important;
+				color: #667eea !important;
+			}
+
+			.graetzl-dropdown .graetzl-option.focused {
+				background-color: #667eea !important;
+				color: white !important;
+				font-weight: 500;
+			}
+
+			.category-filters {
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+			}
+
+			.category-filter {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				padding: 0.5rem;
+				border-radius: 6px;
+				cursor: pointer;
+				transition: background 0.2s;
+				user-select: none;
+			}
+
+			.category-filter:hover {
+				background: #f5f5f5;
+			}
+
+			.category-filter input[type="checkbox"] {
+				cursor: pointer;
+				width: 16px;
+				height: 16px;
+				accent-color: #667eea;
+			}
+
+			.category-icon {
+				font-size: 1.2rem;
+				line-height: 1;
+			}
+
+			.category-name {
+				font-size: 0.9rem;
+				color: #333;
 			}
 
 			main {
@@ -419,19 +830,49 @@
 
 				.graetzl-nav {
 					padding: 1rem;
-					max-height: 150px;
+					max-height: 200px;
 				}
 
-				#graetzl-list {
-					display: flex;
-					gap: 0.5rem;
-					overflow-x: auto;
+				.nav-section {
+					margin-bottom: 1rem;
 				}
 
-				.graetzl-btn {
-					white-space: nowrap;
-					margin-bottom: 0;
-					min-width: 150px;
+				.graetzl-search-input {
+					font-size: 0.9rem;
+					padding: 0.75rem 2.25rem 0.75rem 0.75rem;
+				}
+
+				.clear-button {
+					width: 22px;
+					height: 22px;
+					font-size: 1.1rem;
+					right: 0.4rem;
+				}
+
+				.graetzl-dropdown {
+					max-height: 200px;
+					border: 2px solid #e9ecef;
+					box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+					padding: 0.375rem;
+				}
+
+				.graetzl-option {
+					padding: 0.75rem 0.875rem;
+					font-size: 0.9rem;
+				}
+
+				.category-filters {
+					display: grid;
+					grid-template-columns: repeat(2, 1fr);
+					gap: 0.25rem;
+				}
+
+				.category-filter {
+					padding: 0.375rem;
+				}
+
+				.category-name {
+					font-size: 0.8rem;
 				}
 			}
 		</style>

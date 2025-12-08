@@ -6,9 +6,10 @@
 import * as turf from '@turf/turf';
 
 /**
- * Load and cache GeoJSON data
+ * Load and cache data
  */
 let geoDataCache = null;
+let graetzlDataCache = null;
 
 export async function loadGeoData() {
   if (geoDataCache) {
@@ -24,11 +25,25 @@ export async function loadGeoData() {
   return geoDataCache;
 }
 
+export async function loadGraetzlData() {
+  if (graetzlDataCache) {
+    return graetzlDataCache;
+  }
+
+  const response = await fetch('/data/graetzl_wien2025.json');
+  if (!response.ok) {
+    throw new Error('Failed to load graetzl data');
+  }
+
+  graetzlDataCache = await response.json();
+  return graetzlDataCache;
+}
+
 /**
- * Get all Grätzl (neighborhood) features
+ * Get all Grätzl (neighborhood) features from graetzl data
  */
-export function getGraetzlFeatures(geoData) {
-  return geoData.features.filter(f => f.properties.featureType === 'graetzl');
+export function getGraetzlFeatures(graetzlData) {
+  return graetzlData.features || [];
 }
 
 /**
@@ -41,9 +56,18 @@ export function getPOIFeatures(geoData) {
 /**
  * Get a specific Grätzl by ID
  */
-export function getGraetzl(geoData, graetzlId) {
-  return geoData.features.find(
-    f => f.properties.featureType === 'graetzl' && f.properties.graetzlId === graetzlId
+export function getGraetzl(graetzlData, graetzlId) {
+  return graetzlData.features.find(
+    f => f.properties.Graetzl_ID === graetzlId
+  );
+}
+
+/**
+ * Get a specific Grätzl by name
+ */
+export function getGraetzlByName(graetzlData, name) {
+  return graetzlData.features.find(
+    f => f.properties.Graetzl_Name === name
   );
 }
 
@@ -91,9 +115,9 @@ export function filterPOIs(geoData, filters = {}) {
  * Find which Grätzl contains a given point
  * @param {Array} point - [longitude, latitude]
  */
-export function findGraetzlAtPoint(geoData, point) {
+export function findGraetzlAtPoint(graetzlData, point) {
   const pt = turf.point(point);
-  const graetzls = getGraetzlFeatures(geoData);
+  const graetzls = getGraetzlFeatures(graetzlData);
 
   for (const graetzl of graetzls) {
     if (turf.booleanPointInPolygon(pt, graetzl)) {
@@ -108,12 +132,34 @@ export function findGraetzlAtPoint(geoData, point) {
  * Get all POIs within a specific Grätzl polygon (spatial query)
  * Uses actual point-in-polygon test
  */
-export function getPOIsInGraetzl(geoData, graetzlId) {
-  const graetzl = getGraetzl(geoData, graetzlId);
+export function getPOIsInGraetzl(geoData, graetzlData, graetzlId) {
+  const graetzl = getGraetzl(graetzlData, graetzlId);
   if (!graetzl) return [];
 
   const pois = getPOIFeatures(geoData);
   return pois.filter(poi => turf.booleanPointInPolygon(poi, graetzl));
+}
+
+/**
+ * Filter POIs by Grätzl and/or categories (with spatial query)
+ */
+export function filterPOIsWithGraetzl(geoData, graetzlData, filters = {}) {
+  let pois = getPOIFeatures(geoData);
+
+  // Filter by Grätzl using spatial query
+  if (filters.graetzlId) {
+    const graetzl = getGraetzl(graetzlData, filters.graetzlId);
+    if (graetzl) {
+      pois = pois.filter(poi => turf.booleanPointInPolygon(poi, graetzl));
+    }
+  }
+
+  // Filter by categories
+  if (filters.categories && filters.categories.length > 0) {
+    pois = pois.filter(poi => filters.categories.includes(poi.properties.category));
+  }
+
+  return pois;
 }
 
 /**
@@ -184,12 +230,15 @@ export function searchPOIs(geoData, searchText) {
 
 export default {
   loadGeoData,
+  loadGraetzlData,
   getGraetzlFeatures,
   getPOIFeatures,
   getGraetzl,
+  getGraetzlByName,
   getPOIsByGraetzl,
   getPOIsByCategory,
   filterPOIs,
+  filterPOIsWithGraetzl,
   findGraetzlAtPoint,
   getPOIsInGraetzl,
   getPOIsNearPoint,
