@@ -37,7 +37,6 @@ All geographic data is stored in a single GeoJSON file containing:
     "coordinates": [[[lng, lat], [lng, lat], ...]]
   },
   "properties": {
-    "featureType": "graetzl",
     "graetzlId": "freihausviertel",
     "name": "Freihausviertel",
     "center": [lng, lat],
@@ -55,7 +54,6 @@ All geographic data is stored in a single GeoJSON file containing:
     "coordinates": [lng, lat]
   },
   "properties": {
-    "featureType": "poi",
     "graetzlId": "freihausviertel",
     "name": "POI Name",
     "category": "restaurant",
@@ -102,42 +100,6 @@ Data is loaded once via `geoquery.loadGeoData()` and cached in memory.
 
 ## Development Guidelines
 
-### Adding a New Grätzl
-
-1. **Find Coordinates**:
-   - Use [geojson.io](http://geojson.io/) to draw the neighborhood polygon
-   - The tool automatically provides coordinates in GeoJSON format
-   - GeoJSON coordinates are in `[longitude, latitude]` order
-   - Calculate center point (or use a prominent location in the neighborhood)
-
-2. **Add Polygon Feature to geodata.geojson** (public/data/geodata.geojson):
-   ```json
-   {
-     "type": "Feature",
-     "geometry": {
-       "type": "Polygon",
-       "coordinates": [[
-         [16.xxxx, 48.xxxx],
-         [16.xxxx, 48.xxxx],
-         [16.xxxx, 48.xxxx],
-         [16.xxxx, 48.xxxx]
-       ]]
-     },
-     "properties": {
-       "featureType": "graetzl",
-       "graetzlId": "neuergraetzl",
-       "name": "Neuer Grätzl",
-       "center": [16.xxxx, 48.xxxx],
-       "zoom": 15
-     }
-   }
-   ```
-
-3. **Add Navigation Button** (src/pages/index.astro):
-   ```html
-   <li><button class="graetzl-btn" data-graetzl="neuergraetzl">Neuer Grätzl</button></li>
-   ```
-
 ### Adding POIs
 
 POIs are added as Point features in the `geodata.geojson` file:
@@ -150,7 +112,6 @@ POIs are added as Point features in the `geodata.geojson` file:
     "coordinates": [16.xxxx, 48.xxxx]
   },
   "properties": {
-    "featureType": "poi",
     "graetzlId": "freihausviertel",
     "name": "POI Name",
     "category": "cafe",

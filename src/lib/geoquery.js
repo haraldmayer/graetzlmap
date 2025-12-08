@@ -50,7 +50,7 @@ export function getGraetzlFeatures(graetzlData) {
  * Get all POI features
  */
 export function getPOIFeatures(geoData) {
-  return geoData.features.filter(f => f.properties.featureType === 'poi');
+  return geoData.features;
 }
 
 /**
@@ -76,7 +76,7 @@ export function getGraetzlByName(graetzlData, name) {
  */
 export function getPOIsByGraetzl(geoData, graetzlId) {
   return geoData.features.filter(
-    f => f.properties.featureType === 'poi' && f.properties.graetzlId === graetzlId
+    f.properties.graetzlId === graetzlId
   );
 }
 
@@ -85,7 +85,7 @@ export function getPOIsByGraetzl(geoData, graetzlId) {
  */
 export function getPOIsByCategory(geoData, category) {
   return geoData.features.filter(
-    f => f.properties.featureType === 'poi' && f.properties.category === category
+    f.properties.category === category
   );
 }
 
