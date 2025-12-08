@@ -65,9 +65,10 @@
 		});
 	};
 
-	// Example filter function
-	window.filterPOIsByCategories = function(geoData, graetzlId, selectedCategories) {
-		return geoquery.filterPOIs(geoData, {
+	// Example filter function using spatial queries
+	window.filterPOIsByCategories = async function(geoData, graetzlId, selectedCategories) {
+		const graetzlData = await geoquery.loadGraetzlData();
+		return geoquery.filterPOIsWithGraetzl(geoData, graetzlData, {
 			graetzlId: graetzlId,
 			categories: selectedCategories
 		});

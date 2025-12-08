@@ -8,7 +8,6 @@
         "coordinates": [16.365, 48.196]
       },
       "properties": {
-        "graetzlId": "freihausviertel",
         "name": "Amacord",
         "category": "restaurant",
         "description": "Kultiges Bistro seit 1987 mit kreativer österreichischer Küche und besonderer Atmosphäre.",
@@ -22,7 +21,6 @@
         "coordinates": [16.3658, 48.1952]
       },
       "properties": {
-        "graetzlId": "freihausviertel",
         "name": "Rösterei Alt Wien",
         "category": "cafe",
         "description": "Wiens erste moderne Kaffeerösterei mit Single-Origin und Bio-Kaffees aus aller Welt.",
@@ -36,7 +34,6 @@
         "coordinates": [16.3685, 48.1975]
       },
       "properties": {
-        "graetzlId": "freihausviertel",
         "name": "Filmcasino",
         "category": "cinema",
         "description": "Traditionelles Programmkino mit ausgewählten Arthouse-Filmen und Klassikern.",
@@ -50,7 +47,6 @@
         "coordinates": [16.364, 48.1985]
       },
       "properties": {
-        "graetzlId": "freihausviertel",
         "name": "Naschmarkt",
         "category": "market",
         "description": "Wiens bekanntester Markt mit internationalen Spezialitäten, frischen Produkten und Gastronomiebetrieben.",
@@ -64,7 +60,6 @@
         "coordinates": [16.3655, 48.199]
       },
       "properties": {
-        "graetzlId": "freihausviertel",
         "name": "Theater an der Wien",
         "category": "theater",
         "description": "Historisches Theater mit Fokus auf Musiktheater, Oper und große Musicals.",
@@ -75,10 +70,22 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
+        "coordinates": [16.3658069, 48.1979108]
+      },
+      "properties": {
+        "name": "Bao Bar",
+        "category": "restaurant",
+        "description": "Modernes Asian Diner mit Baozi (gedämpfte chinesische Teigtaschen) und asiatischer Fusionsküche. Drei Standorte in Wien.",
+        "link": "https://www.baobar.at"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
         "coordinates": [16.3294563, 48.2022857]
       },
       "properties": {
-        "graetzlId": "nibelungenviertel",
         "name": "Buchkontor",
         "category": "bookshop",
         "description": "Unabhängige Buchhandlung am Kriemhildplatz seit 16 Jahren. Kuratierte Auswahl mit persönlicher Beratung von Inhaberin Ulla Harms.",
@@ -92,7 +99,6 @@
         "coordinates": [16.3294563, 48.2022857]
       },
       "properties": {
-        "graetzlId": "nibelungenviertel",
         "name": "franzundjulius",
         "category": "cafe",
         "description": "Café in umgebauter Tischlerwerkstatt. Benannt nach den Gebrüdern Franz und Julius Huber, den ursprünglichen Architekten. Serviert Kaffee aus lokaler Röstung, hausgemachte Kuchen und regionale Getränke.",
@@ -106,7 +112,6 @@
         "coordinates": [16.330189, 48.20195]
       },
       "properties": {
-        "graetzlId": "nibelungenviertel",
         "name": "Café Kriemhild",
         "category": "breakfast",
         "description": "Gemütliches Kulturcafé mit saisonalem Gastgarten. Bekannt für Shakshuka und entspannte Atmosphäre. Billardtisch im Innenbereich.",
@@ -120,7 +125,6 @@
         "coordinates": [16.326765, 48.202381]
       },
       "properties": {
-        "graetzlId": "nibelungenviertel",
         "name": "Schutzhaus Zukunft",
         "category": "gasthaus",
         "description": "Traditionelles Wiener Gasthaus auf der Schmelz mit Biergarten. Veranstaltet Kulturprogramm und serviert klassische Wiener Küche.",
@@ -134,7 +138,6 @@
         "coordinates": [16.3279644, 48.2037131]
       },
       "properties": {
-        "graetzlId": "nibelungenviertel",
         "name": "Alles Fahnen",
         "category": "shop",
         "description": "Fahnenmanufaktur seit 1982. Spezialisiert auf individuelle Fahnen, diplomatische Banner und personalisierte Wimpelgirlanden.",
@@ -148,7 +151,6 @@
         "coordinates": [16.373, 48.211]
       },
       "properties": {
-        "graetzlId": "neutorviertel",
         "name": "Neutorviertel - Historisches Zentrum",
         "category": "culture",
         "description": "Der größte Neubau-Bereich innerhalb der Ringstraße nach dem Schleifen der Stadtmauern ab 1858. Ein Viertel mit einheitlicher, rasterförmiger Verbauung zwischen Börseplatz, Morzinplatz und dem Kai.",

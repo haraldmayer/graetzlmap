@@ -37,10 +37,9 @@ All geographic data is stored in a single GeoJSON file containing:
     "coordinates": [[[lng, lat], [lng, lat], ...]]
   },
   "properties": {
-    "graetzlId": "freihausviertel",
-    "name": "Freihausviertel",
-    "center": [lng, lat],
-    "zoom": 15
+    "Graetzl_ID": 101,
+    "Graetzl_Name": "Innere Stadt",
+    "BEZIRK": 1
   }
 }
 ```
@@ -54,7 +53,6 @@ All geographic data is stored in a single GeoJSON file containing:
     "coordinates": [lng, lat]
   },
   "properties": {
-    "graetzlId": "freihausviertel",
     "name": "POI Name",
     "category": "restaurant",
     "description": "Description text",
@@ -62,6 +60,8 @@ All geographic data is stored in a single GeoJSON file containing:
   }
 }
 ```
+
+**Note**: POIs are automatically associated with Grätzl through spatial queries (point-in-polygon tests) based on their coordinates.
 
 **Important**: GeoJSON uses `[longitude, latitude]` order, while Leaflet uses `[latitude, longitude]`. The geoquery library handles conversions automatically.
 
@@ -112,7 +112,6 @@ POIs are added as Point features in the `geodata.geojson` file:
     "coordinates": [16.xxxx, 48.xxxx]
   },
   "properties": {
-    "graetzlId": "freihausviertel",
     "name": "POI Name",
     "category": "cafe",
     "description": "Detailed description of the location",
@@ -121,7 +120,7 @@ POIs are added as Point features in the `geodata.geojson` file:
 }
 ```
 
-**Note**: Coordinates in GeoJSON are `[longitude, latitude]` order.
+**Note**: Coordinates in GeoJSON are `[longitude, latitude]` order. POIs are automatically associated with their Grätzl through spatial queries based on their coordinates.
 
 **Available Categories** (defined in `public/data/categories.json`):
 - `restaurant` - 🍽️ Restaurant
@@ -299,33 +298,33 @@ const freihausviertel = geoquery.getGraetzl(geoData, 'freihausviertel');
 ### Filtering POIs
 
 ```javascript
-// Get all POIs in a specific Grätzl
-const fhvPOIs = geoquery.getPOIsByGraetzl(geoData, 'freihausviertel');
-
 // Get all POIs of a specific category (across all Grätzl)
 const restaurants = geoquery.getPOIsByCategory(geoData, 'restaurant');
 
-// Combined filter: category + neighborhood
-const fhvRestaurants = geoquery.filterPOIs(geoData, {
-  graetzlId: 'freihausviertel',
-  category: 'restaurant'
+// Get all POIs in a specific Grätzl (using spatial query)
+const graetzlData = await geoquery.loadGraetzlData();
+const fhvPOIs = geoquery.getPOIsInGraetzl(geoData, graetzlData, 101); // Using Graetzl_ID
+
+// Combined filter: category + neighborhood using spatial queries
+const fhvRestaurants = geoquery.filterPOIsWithGraetzl(geoData, graetzlData, {
+  graetzlId: 101, // Graetzl_ID from graetzl_wien2025.json
+  categories: ['restaurant']
 });
 
-// Filter by multiple categories
-const foodPlaces = geoquery.filterPOIs(geoData, {
-  graetzlId: 'freihausviertel',
+// Filter by multiple categories in a specific Grätzl
+const foodPlaces = geoquery.filterPOIsWithGraetzl(geoData, graetzlData, {
+  graetzlId: 101,
   categories: ['restaurant', 'cafe', 'gasthaus']
 });
 
 // Filter without specifying neighborhood (all Grätzl)
-const allCafes = geoquery.filterPOIs(geoData, {
+const allCafes = geoquery.filterPOIsWithGraetzl(geoData, graetzlData, {
   categories: ['cafe', 'breakfast']
 });
 ```
 
 **Filter Options:**
-- `graetzlId`: string (optional) - Filter by neighborhood
-- `category`: string (optional) - Filter by single category
+- `graetzlId`: number (optional) - Filter by Grätzl using Graetzl_ID (spatial point-in-polygon test)
 - `categories`: string[] (optional) - Filter by multiple categories
 
 ### Spatial Queries
@@ -341,7 +340,7 @@ const nearby = geoquery.getPOIsNearPoint(geoData, point, 0.5); // 0.5km
 // Returns: Array of POI features within radius
 
 // Point-in-polygon validation (ensures POIs are actually inside boundary)
-const poisInside = geoquery.getPOIsInGraetzl(geoData, 'freihausviertel');
+const poisInside = geoquery.getPOIsInGraetzl(geoData, graetzlData, 101);
 // Returns: Array of POI features that are geometrically inside the polygon
 ```
 
@@ -379,11 +378,12 @@ import geoquery from '/src/lib/geoquery.js';
 
 // Initialize
 const geoData = await geoquery.loadGeoData();
+const graetzlData = await geoquery.loadGraetzlData();
 
 // Get filter options for UI
-const neighborhoods = geoquery.getGraetzlFeatures(geoData).map(g => ({
-  id: g.properties.graetzlId,
-  name: g.properties.name
+const neighborhoods = geoquery.getGraetzlFeatures(graetzlData).map(g => ({
+  id: g.properties.Graetzl_ID,
+  name: g.properties.Graetzl_Name
 }));
 
 const categories = geoquery.getAllCategories(geoData);
@@ -393,18 +393,18 @@ function applyFilters(selectedNeighborhood, selectedCategories) {
   const filters = {};
 
   if (selectedNeighborhood) {
-    filters.graetzlId = selectedNeighborhood;
+    filters.graetzlId = selectedNeighborhood; // Graetzl_ID
   }
 
   if (selectedCategories.length > 0) {
     filters.categories = selectedCategories;
   }
 
-  return geoquery.filterPOIs(geoData, filters);
+  return geoquery.filterPOIsWithGraetzl(geoData, graetzlData, filters);
 }
 
 // Usage
-const results = applyFilters('freihausviertel', ['restaurant', 'cafe']);
+const results = applyFilters(101, ['restaurant', 'cafe']); // 101 is Graetzl_ID
 // Display results on map...
 ```
 

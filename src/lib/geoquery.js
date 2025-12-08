@@ -72,43 +72,12 @@ export function getGraetzlByName(graetzlData, name) {
 }
 
 /**
- * Get all POIs for a specific Grätzl
- */
-export function getPOIsByGraetzl(geoData, graetzlId) {
-  return geoData.features.filter(
-    f.properties.graetzlId === graetzlId
-  );
-}
-
-/**
  * Get POIs by category
  */
 export function getPOIsByCategory(geoData, category) {
   return geoData.features.filter(
     f.properties.category === category
   );
-}
-
-/**
- * Filter POIs by multiple criteria
- * @param {Object} filters - { graetzlId?, category?, categories? }
- */
-export function filterPOIs(geoData, filters = {}) {
-  let pois = getPOIFeatures(geoData);
-
-  if (filters.graetzlId) {
-    pois = pois.filter(p => p.properties.graetzlId === filters.graetzlId);
-  }
-
-  if (filters.category) {
-    pois = pois.filter(p => p.properties.category === filters.category);
-  }
-
-  if (filters.categories && Array.isArray(filters.categories)) {
-    pois = pois.filter(p => filters.categories.includes(p.properties.category));
-  }
-
-  return pois;
 }
 
 /**
@@ -235,9 +204,7 @@ export default {
   getPOIFeatures,
   getGraetzl,
   getGraetzlByName,
-  getPOIsByGraetzl,
   getPOIsByCategory,
-  filterPOIs,
   filterPOIsWithGraetzl,
   findGraetzlAtPoint,
   getPOIsInGraetzl,
