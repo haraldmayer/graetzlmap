@@ -23,6 +23,7 @@
 				<ul id="graetzl-list">
 					<li><button class="graetzl-btn" data-graetzl="freihausviertel">Freihausviertel</button></li>
 					<li><button class="graetzl-btn" data-graetzl="nibelungenviertel">Nibelungenviertel</button></li>
+					<li><button class="graetzl-btn" data-graetzl="neutorviertel">Neutorviertel</button></li>
 				</ul>
 			</nav>
 
@@ -51,6 +52,9 @@
 					},
 					nibelungenviertel: {
 						dataFile: '/data/graetzl/nibelungenviertel.json'
+					},
+					neutorviertel: {
+						dataFile: '/data/graetzl/neutorviertel.json'
 					}
 				};
 
@@ -62,6 +66,7 @@
 
 				let currentPolygon = null;
 				let currentMarkers = [];
+				let currentPois = [];
 
 				// Function to load categories
 				async function loadCategories() {
@@ -123,15 +128,48 @@
 					return cat.image || cat.emoji;
 				}
 
+				// Function to calculate marker size based on zoom level
+				function getMarkerSize(zoom) {
+					return Math.max(10, Math.min(50, 10 + (zoom - 10) * 3.33));
+				}
+
 				// Function to create custom icon
-				function createCustomIcon(category) {
+				function createCustomIcon(category, zoom) {
 					const icon = getCategoryIcon(category);
+					const size = getMarkerSize(zoom || map.getZoom());
 					return L.divIcon({
-						html: `<div class="custom-marker">${icon}</div>`,
+						html: `<div class="custom-marker" style="width: ${size}px; height: ${size}px; font-size: ${size * 0.7}px; line-height: ${size}px;">${icon}</div>`,
 						className: 'custom-icon',
-						iconSize: [40, 40],
-						iconAnchor: [20, 40],
-						popupAnchor: [0, -40]
+						iconSize: [size, size],
+						iconAnchor: [size / 2, size],
+						popupAnchor: [0, -size]
+					});
+				}
+
+				// Function to update marker sizes based on current zoom
+				function updateMarkerSizes() {
+					const currentZoom = map.getZoom();
+					const size = getMarkerSize(currentZoom);
+
+					currentMarkers.forEach((marker, index) => {
+						const poi = currentPois[index];
+						if (poi) {
+							const iconElement = marker._icon;
+							if (iconElement) {
+								const markerDiv = iconElement.querySelector('.custom-marker');
+								if (markerDiv) {
+									markerDiv.style.width = size + 'px';
+									markerDiv.style.height = size + 'px';
+									markerDiv.style.fontSize = (size * 0.7) + 'px';
+									markerDiv.style.lineHeight = size + 'px';
+								}
+
+								iconElement.style.width = size + 'px';
+								iconElement.style.height = size + 'px';
+								iconElement.style.marginLeft = (-size / 2) + 'px';
+								iconElement.style.marginTop = (-size) + 'px';
+							}
+						}
 					});
 				}
 
@@ -147,6 +185,7 @@
 					}
 					currentMarkers.forEach(marker => map.removeLayer(marker));
 					currentMarkers = [];
+					currentPois = [];
 
 					// Add polygon overlay for the neighborhood
 					currentPolygon = L.polygon(graetzl.bounds, {
@@ -163,7 +202,7 @@
 					graetzl.pois.forEach(poi => {
 						const icon = getCategoryIcon(poi.category);
 						const marker = L.marker(poi.coords, {
-							icon: createCustomIcon(poi.category)
+							icon: createCustomIcon(poi.category, graetzl.zoom)
 						}).addTo(map);
 
 						// Create popup content
@@ -182,6 +221,7 @@
 						});
 
 						currentMarkers.push(marker);
+						currentPois.push(poi);
 					});
 
 					// Update active state in navigation
@@ -198,6 +238,9 @@
 						showGraetzl(graetzlId);
 					});
 				});
+
+				// Update marker sizes when zoom changes
+				map.on('zoomend', updateMarkerSizes);
 
 				// Initialize: load categories and show first Grätzl
 				async function initialize() {
@@ -316,9 +359,10 @@
 			}
 
 			.custom-marker {
-				font-size: 28px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
 				text-align: center;
-				line-height: 40px;
 				text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 				cursor: pointer;
 				transition: transform 0.2s ease;
