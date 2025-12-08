@@ -1,0 +1,286 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [16.3685, 48.2025],
+          [16.3695, 48.2024],
+          [16.3705, 48.2022],
+          [16.3715, 48.2019],
+          [16.3723, 48.2015],
+          [16.3730, 48.2010],
+          [16.3736, 48.2004],
+          [16.3740, 48.1997],
+          [16.3743, 48.1990],
+          [16.3745, 48.1982],
+          [16.3745, 48.1975],
+          [16.3744, 48.1967],
+          [16.3742, 48.1960],
+          [16.3739, 48.1953],
+          [16.3735, 48.1946],
+          [16.3730, 48.1940],
+          [16.3724, 48.1935],
+          [16.3717, 48.1930],
+          [16.3709, 48.1926],
+          [16.3700, 48.1923],
+          [16.3690, 48.1921],
+          [16.3680, 48.1920],
+          [16.3670, 48.1920],
+          [16.3660, 48.1921],
+          [16.3650, 48.1923],
+          [16.3640, 48.1926],
+          [16.3631, 48.1930],
+          [16.3623, 48.1935],
+          [16.3616, 48.1941],
+          [16.3610, 48.1948],
+          [16.3605, 48.1955],
+          [16.3601, 48.1963],
+          [16.3598, 48.1971],
+          [16.3596, 48.1979],
+          [16.3595, 48.1987],
+          [16.3596, 48.1995],
+          [16.3598, 48.2003],
+          [16.3602, 48.2010],
+          [16.3607, 48.2016],
+          [16.3614, 48.2021],
+          [16.3622, 48.2025],
+          [16.3631, 48.2028],
+          [16.3641, 48.2030],
+          [16.3651, 48.2031],
+          [16.3661, 48.2030],
+          [16.3671, 48.2028],
+          [16.3680, 48.2025],
+          [16.3685, 48.2025]
+        ]]
+      },
+      "properties": {
+        "featureType": "graetzl",
+        "graetzlId": "freihausviertel",
+        "name": "Freihausviertel",
+        "center": [16.3665, 48.1975],
+        "zoom": 15
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [16.3313163, 48.2044119],
+          [16.3254154, 48.2053272],
+          [16.3255656, 48.2038971],
+          [16.3250507, 48.2001929],
+          [16.3256515, 48.19892],
+          [16.3315738, 48.2005648],
+          [16.3313163, 48.2044119]
+        ]]
+      },
+      "properties": {
+        "featureType": "graetzl",
+        "graetzlId": "nibelungenviertel",
+        "name": "Nibelungenviertel",
+        "center": [16.3283, 48.2021],
+        "zoom": 15
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [16.3695, 48.2125],
+          [16.3710, 48.2120],
+          [16.3730, 48.2118],
+          [16.3750, 48.2115],
+          [16.3780, 48.2115],
+          [16.3785, 48.2110],
+          [16.3780, 48.2100],
+          [16.3770, 48.2095],
+          [16.3755, 48.2092],
+          [16.3735, 48.2090],
+          [16.3715, 48.2092],
+          [16.3700, 48.2095],
+          [16.3690, 48.2100],
+          [16.3685, 48.2108],
+          [16.3685, 48.2118],
+          [16.3695, 48.2125]
+        ]]
+      },
+      "properties": {
+        "featureType": "graetzl",
+        "graetzlId": "neutorviertel",
+        "name": "Neutorviertel",
+        "center": [16.3730, 48.2110],
+        "zoom": 15
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.3650, 48.1960]
+      },
+      "properties": {
+        "featureType": "poi",
+        "graetzlId": "freihausviertel",
+        "name": "Amacord",
+        "category": "restaurant",
+        "description": "Kultiges Bistro seit 1987 mit kreativer österreichischer Küche und besonderer Atmosphäre.",
+        "link": "https://www.falter.at/zeitung/20221130/holzer-im-graetzel-schleifmuehlgasse"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.3658, 48.1952]
+      },
+      "properties": {
+        "featureType": "poi",
+        "graetzlId": "freihausviertel",
+        "name": "Rösterei Alt Wien",
+        "category": "cafe",
+        "description": "Wiens erste moderne Kaffeerösterei mit Single-Origin und Bio-Kaffees aus aller Welt.",
+        "link": "https://www.falter.at/zeitung/20221130/holzer-im-graetzel-schleifmuehlgasse"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.3685, 48.1975]
+      },
+      "properties": {
+        "featureType": "poi",
+        "graetzlId": "freihausviertel",
+        "name": "Filmcasino",
+        "category": "cinema",
+        "description": "Traditionelles Programmkino mit ausgewählten Arthouse-Filmen und Klassikern.",
+        "link": "https://www.filmcasino.at"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.3640, 48.1985]
+      },
+      "properties": {
+        "featureType": "poi",
+        "graetzlId": "freihausviertel",
+        "name": "Naschmarkt",
+        "category": "market",
+        "description": "Wiens bekanntester Markt mit internationalen Spezialitäten, frischen Produkten und Gastronomiebetrieben.",
+        "link": "https://www.wien.info/de/einkaufen-essen-trinken/maerkte/naschmarkt-333208"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.3655, 48.1990]
+      },
+      "properties": {
+        "featureType": "poi",
+        "graetzlId": "freihausviertel",
+        "name": "Theater an der Wien",
+        "category": "theater",
+        "description": "Historisches Theater mit Fokus auf Musiktheater, Oper und große Musicals.",
+        "link": "https://www.theater-wien.at"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.3294563, 48.2022857]
+      },
+      "properties": {
+        "featureType": "poi",
+        "graetzlId": "nibelungenviertel",
+        "name": "Buchkontor",
+        "category": "bookshop",
+        "description": "Unabhängige Buchhandlung am Kriemhildplatz seit 16 Jahren. Kuratierte Auswahl mit persönlicher Beratung von Inhaberin Ulla Harms.",
+        "link": "http://www.buchkontor.at"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.3294563, 48.2022857]
+      },
+      "properties": {
+        "featureType": "poi",
+        "graetzlId": "nibelungenviertel",
+        "name": "franzundjulius",
+        "category": "cafe",
+        "description": "Café in umgebauter Tischlerwerkstatt. Benannt nach den Gebrüdern Franz und Julius Huber, den ursprünglichen Architekten. Serviert Kaffee aus lokaler Röstung, hausgemachte Kuchen und regionale Getränke.",
+        "link": "https://www.franzundjulius.at"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.330189, 48.201950]
+      },
+      "properties": {
+        "featureType": "poi",
+        "graetzlId": "nibelungenviertel",
+        "name": "Café Kriemhild",
+        "category": "breakfast",
+        "description": "Gemütliches Kulturcafé mit saisonalem Gastgarten. Bekannt für Shakshuka und entspannte Atmosphäre. Billardtisch im Innenbereich.",
+        "link": "http://www.kulturcafe-kriemhild.at"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.326765, 48.202381]
+      },
+      "properties": {
+        "featureType": "poi",
+        "graetzlId": "nibelungenviertel",
+        "name": "Schutzhaus Zukunft",
+        "category": "gasthaus",
+        "description": "Traditionelles Wiener Gasthaus auf der Schmelz mit Biergarten. Veranstaltet Kulturprogramm und serviert klassische Wiener Küche.",
+        "link": "https://www.schutzhaus-zukunft.at"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.3279644, 48.2037131]
+      },
+      "properties": {
+        "featureType": "poi",
+        "graetzlId": "nibelungenviertel",
+        "name": "Alles Fahnen",
+        "category": "shop",
+        "description": "Fahnenmanufaktur seit 1982. Spezialisiert auf individuelle Fahnen, diplomatische Banner und personalisierte Wimpelgirlanden.",
+        "link": "https://www.allesfahnen.at"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.3730, 48.2110]
+      },
+      "properties": {
+        "featureType": "poi",
+        "graetzlId": "neutorviertel",
+        "name": "Neutorviertel - Historisches Zentrum",
+        "category": "culture",
+        "description": "Der größte Neubau-Bereich innerhalb der Ringstraße nach dem Schleifen der Stadtmauern ab 1858. Ein Viertel mit einheitlicher, rasterförmiger Verbauung zwischen Börseplatz, Morzinplatz und dem Kai.",
+        "link": "https://www.falter.at/zeitung/20230322/holzer-im-graetzel-neutor"
+      }
+    }
+  ]
+}

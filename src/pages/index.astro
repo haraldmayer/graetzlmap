@@ -33,8 +33,10 @@
 		</div>
 
 		<script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-		<script is:inline>
-			window.addEventListener('load', function() {
+		<script type="module">
+			import geoquery from '/src/lib/geoquery.js';
+
+			window.addEventListener('load', async function() {
 				// Initialize map centered on Vienna
 				const map = L.map('map').setView([48.2082, 16.3738], 12);
 
@@ -45,21 +47,15 @@
 					maxZoom: 19
 				}).addTo(map);
 
-				// Grätzl registry - maps IDs to data file paths
-				const graetzlRegistry = {
-					freihausviertel: {
-						dataFile: '/data/graetzl/freihausviertel.json'
-					},
-					nibelungenviertel: {
-						dataFile: '/data/graetzl/nibelungenviertel.json'
-					},
-					neutorviertel: {
-						dataFile: '/data/graetzl/neutorviertel.json'
-					}
-				};
-
-				// Cache for loaded Grätzl data
-				const graetzlCache = {};
+				// Load GeoJSON data
+				let geoData = null;
+				try {
+					geoData = await geoquery.loadGeoData();
+					console.log('GeoData loaded:', geoData.features.length, 'features');
+				} catch (error) {
+					console.error('Error loading geodata:', error);
+					return;
+				}
 
 				// Category definitions (icons and metadata)
 				let categories = {};
@@ -79,36 +75,6 @@
 						categories = data.categories;
 					} catch (error) {
 						console.error('Error loading categories:', error);
-					}
-				}
-
-				// Function to load Grätzl data from JSON file
-				async function loadGraetzlData(graetzlId) {
-					// Check cache first
-					if (graetzlCache[graetzlId]) {
-						return graetzlCache[graetzlId];
-					}
-
-					// Check if Grätzl exists in registry
-					const graetzlInfo = graetzlRegistry[graetzlId];
-					if (!graetzlInfo) {
-						console.error(`Grätzl "${graetzlId}" not found in registry`);
-						return null;
-					}
-
-					try {
-						const response = await fetch(graetzlInfo.dataFile);
-						if (!response.ok) {
-							throw new Error(`Failed to load ${graetzlInfo.dataFile}`);
-						}
-						const data = await response.json();
-
-						// Cache the loaded data
-						graetzlCache[graetzlId] = data;
-						return data;
-					} catch (error) {
-						console.error(`Error loading Grätzl data for "${graetzlId}":`, error);
-						return null;
 					}
 				}
 
@@ -174,10 +140,13 @@
 				}
 
 				// Function to show Grätzl
-				async function showGraetzl(graetzlId) {
-					// Load Grätzl data dynamically
-					const graetzl = await loadGraetzlData(graetzlId);
-					if (!graetzl) return;
+				function showGraetzl(graetzlId) {
+					// Get Grätzl feature from GeoJSON
+					const graetzlFeature = geoquery.getGraetzl(geoData, graetzlId);
+					if (!graetzlFeature) {
+						console.error(`Grätzl "${graetzlId}" not found`);
+						return;
+					}
 
 					// Remove previous polygon and markers
 					if (currentPolygon) {
@@ -187,8 +156,11 @@
 					currentMarkers = [];
 					currentPois = [];
 
+					// Convert GeoJSON polygon to Leaflet coordinates
+					const bounds = geoquery.featureToLeafletCoords(graetzlFeature);
+
 					// Add polygon overlay for the neighborhood
-					currentPolygon = L.polygon(graetzl.bounds, {
+					currentPolygon = L.polygon(bounds, {
 						color: '#FF6B6B',
 						fillColor: '#FF6B6B',
 						fillOpacity: 0.2,
@@ -196,13 +168,25 @@
 					}).addTo(map);
 
 					// Zoom to the neighborhood
-					map.setView(graetzl.center, graetzl.zoom);
+					const center = geoquery.featureToLeafletCoords({
+						geometry: {
+							type: 'Point',
+							coordinates: graetzlFeature.properties.center
+						}
+					});
+					map.setView(center, graetzlFeature.properties.zoom);
+
+					// Get POIs for this Grätzl
+					const poiFeatures = geoquery.getPOIsByGraetzl(geoData, graetzlId);
 
 					// Add POI markers
-					graetzl.pois.forEach(poi => {
+					poiFeatures.forEach(poiFeature => {
+						const poi = poiFeature.properties;
+						const coords = geoquery.featureToLeafletCoords(poiFeature);
 						const icon = getCategoryIcon(poi.category);
-						const marker = L.marker(poi.coords, {
-							icon: createCustomIcon(poi.category, graetzl.zoom)
+
+						const marker = L.marker(coords, {
+							icon: createCustomIcon(poi.category, graetzlFeature.properties.zoom)
 						}).addTo(map);
 
 						// Create popup content
@@ -249,7 +233,7 @@
 						await loadCategories();
 						console.log('Categories loaded:', Object.keys(categories).length);
 						console.log('Showing Freihausviertel...');
-						await showGraetzl('freihausviertel');
+						showGraetzl('freihausviertel');
 					} catch (error) {
 						console.error('Initialization error:', error);
 					}
@@ -257,6 +241,7 @@
 
 				initialize();
 			});
+
 		</script>
 
 		<style>
