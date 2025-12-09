@@ -1,0 +1,21 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.36531453933356,
+      48.19704141449791
+    ]
+  },
+  "properties": {
+    "name": "Schikaneder Kino & Bar",
+    "category": "cinema",
+    "description": {
+      "de": "Kino + Bar",
+      "en": ""
+    },
+    "link": "",
+    "tags": [],
+    "id": "poi_1765295329999_6c16edf7p"
+  }
+}
