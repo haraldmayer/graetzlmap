@@ -10,7 +10,10 @@
   "properties": {
     "name": "Anzengruber",
     "category": "cafe",
-    "description": "",
+    "description": {
+      "de": "",
+      "en": ""
+    },
     "link": "",
     "tags": [],
     "id": "poi_1765280402823_mhddqn0al"

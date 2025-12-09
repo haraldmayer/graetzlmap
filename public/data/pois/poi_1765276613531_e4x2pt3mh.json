@@ -10,7 +10,10 @@
   "properties": {
     "name": "Wetter",
     "category": "restaurant",
-    "description": "Ligurische Küche",
+    "description": {
+      "de": "Ligurische Küche",
+      "en": "Ligurische Küche"
+    },
     "link": "http://www.restaurantwetter.net/",
     "id": "poi_1765276613531_e4x2pt3mh"
   }

@@ -10,7 +10,10 @@
   "properties": {
     "name": "Chicken Karate",
     "category": "restaurant",
-    "description": "",
+    "description": {
+      "de": "",
+      "en": ""
+    },
     "link": "",
     "tags": [],
     "id": "poi_1765280336645_tznalctnq"

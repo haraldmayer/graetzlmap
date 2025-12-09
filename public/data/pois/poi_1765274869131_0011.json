@@ -10,7 +10,10 @@
   "properties": {
     "name": "Postamt",
     "category": "post-office",
-    "description": "Kleines Postamt",
+    "description": {
+      "de": "Kleines Postamt",
+      "en": "Kleines Postamt"
+    },
     "link": "",
     "id": "poi_1765274869131_0011"
   }

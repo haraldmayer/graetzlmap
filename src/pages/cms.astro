@@ -538,8 +538,13 @@ const title = "POI Management System";
           </div>
 
           <div class="full">
-            <label>Description</label>
-            <textarea id="description" placeholder="Description of the place"></textarea>
+            <label>Description (German) *</label>
+            <textarea id="description-de" placeholder="Beschreibung des Ortes (Deutsch)" required></textarea>
+          </div>
+
+          <div class="full">
+            <label>Description (English)</label>
+            <textarea id="description-en" placeholder="Description of the place (English)"></textarea>
           </div>
 
           <div class="full">
@@ -676,16 +681,19 @@ const title = "POI Management System";
         const filterSelect = document.getElementById('filterCategory');
 
         Object.entries(data.categories).forEach(([key, value]) => {
+          // Handle multilingual names
+          const name = typeof value.name === 'object' ? value.name.de : value.name;
+
           // Add to input datalist
           const option = document.createElement('option');
           option.value = key;
-          option.label = `${value.emoji} ${value.name}`;
+          option.label = `${value.emoji} ${name}`;
           datalist.appendChild(option);
 
           // Add to filter dropdown
           const filterOption = document.createElement('option');
           filterOption.value = key;
-          filterOption.textContent = `${value.emoji} ${value.name}`;
+          filterOption.textContent = `${value.emoji} ${name}`;
           filterSelect.appendChild(filterOption);
         });
       } catch (error) {
@@ -916,6 +924,8 @@ const title = "POI Management System";
         const category = poi.properties.category || 'uncategorized';
         const coords = poi.geometry.coordinates;
         const categoryInfo = categoriesData[category] || { emoji: '📍', name: category };
+        // Handle multilingual category names
+        const categoryName = typeof categoryInfo.name === 'object' ? categoryInfo.name.de : categoryInfo.name;
         const tags = poi.properties.tags || [];
         const tagsHtml = tags.length > 0
           ? `<div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">${tags.map(t => {
@@ -928,7 +938,7 @@ const title = "POI Management System";
           <div class="poi-item">
             <div class="poi-info">
               <div class="poi-name">${name}</div>
-              <span class="poi-category">${categoryInfo.emoji} ${categoryInfo.name}</span>
+              <span class="poi-category">${categoryInfo.emoji} ${categoryName}</span>
               <div class="poi-coords">${coords[1].toFixed(6)}, ${coords[0].toFixed(6)}</div>
               ${tagsHtml}
             </div>
@@ -1012,7 +1022,18 @@ const title = "POI Management System";
         document.getElementById('lng').value = poi.geometry.coordinates[0];
         document.getElementById('name').value = poi.properties.name || '';
         document.getElementById('category').value = poi.properties.category || '';
-        document.getElementById('description').value = poi.properties.description || '';
+
+        // Handle multilingual descriptions
+        const description = poi.properties.description || {};
+        if (typeof description === 'string') {
+          // Legacy format - treat as German
+          document.getElementById('description-de').value = description;
+          document.getElementById('description-en').value = '';
+        } else {
+          document.getElementById('description-de').value = description.de || '';
+          document.getElementById('description-en').value = description.en || '';
+        }
+
         document.getElementById('link').value = poi.properties.link || '';
 
         // Load tags
@@ -1114,7 +1135,10 @@ const title = "POI Management System";
         properties: {
           name: document.getElementById('name').value,
           category: categoryKey,
-          description: document.getElementById('description').value,
+          description: {
+            de: document.getElementById('description-de').value,
+            en: document.getElementById('description-en').value
+          },
           link: document.getElementById('link').value,
           tags: selectedTags
         }

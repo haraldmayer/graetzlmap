@@ -10,7 +10,10 @@
   "properties": {
     "name": "Filmcasino",
     "category": "cinema",
-    "description": "Traditionelles Programmkino mit ausgewählten Arthouse-Filmen und Klassikern.",
+    "description": {
+      "de": "Traditionelles Programmkino mit ausgewählten Arthouse-Filmen und Klassikern.",
+      "en": "Traditionelles Programmkino mit ausgewählten Arthouse-Filmen und Klassikern."
+    },
     "link": "https://www.filmcasino.at",
     "id": "poi_1765274869129_0001"
   }

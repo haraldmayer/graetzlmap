@@ -3,21 +3,21 @@
   "geometry": {
     "type": "Point",
     "coordinates": [
-      16.358965535143362,
-      48.19688074840358
+      16.319089608149362,
+      48.19624819514787
     ]
   },
   "properties": {
-    "name": "U Kettenbrückengasse",
-    "category": "subway-station",
+    "name": "Gasthaus Jagetsberger",
+    "category": "gasthaus",
     "description": {
       "de": "",
       "en": ""
     },
     "link": "",
     "tags": [
-      "u4"
+      "wiener-kueche"
     ],
-    "id": "poi_1765279262983_996c7qpf5"
+    "id": "poi_1765294330841_i011cqu5p"
   }
 }

@@ -10,7 +10,10 @@
   "properties": {
     "name": "Schutzhaus Zukunft",
     "category": "gasthaus",
-    "description": "Traditionelles Wiener Gasthaus auf der Schmelz mit Biergarten. Veranstaltet Kulturprogramm und serviert klassische Wiener Küche.",
+    "description": {
+      "de": "Traditionelles Wiener Gasthaus auf der Schmelz mit Biergarten. Veranstaltet Kulturprogramm und serviert klassische Wiener Küche.",
+      "en": "Traditionelles Wiener Gasthaus auf der Schmelz mit Biergarten. Veranstaltet Kulturprogramm und serviert klassische Wiener Küche."
+    },
     "link": "https://www.schutzhaus-zukunft.at",
     "id": "poi_1765274869130_0007"
   }

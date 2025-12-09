@@ -10,7 +10,10 @@
   "properties": {
     "name": "KENT",
     "category": "restaurant",
-    "description": "Mutterschiff der türkischen Gastro in Wien",
+    "description": {
+      "de": "Mutterschiff der türkischen Gastro in Wien",
+      "en": "Mutterschiff der türkischen Gastro in Wien"
+    },
     "link": "http://www.kentrestaurant.at/",
     "tags": [
       "tuerkisch"

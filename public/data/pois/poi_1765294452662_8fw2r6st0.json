@@ -3,19 +3,19 @@
   "geometry": {
     "type": "Point",
     "coordinates": [
-      16.402189025841516,
-      48.22171017750721
+      16.366153285043467,
+      48.19658500721967
     ]
   },
   "properties": {
-    "name": "Vorgartenmarkt",
-    "category": "market",
+    "name": "Wunderl",
+    "category": "schuhgeschaeft",
     "description": {
       "de": "",
       "en": ""
     },
     "link": "",
     "tags": [],
-    "id": "poi_1765280305288_vec0gry2w"
+    "id": "poi_1765294452662_8fw2r6st0"
   }
 }

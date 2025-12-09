@@ -10,7 +10,10 @@
   "properties": {
     "name": "Matcha Komachi",
     "category": "restaurant",
-    "description": "Sushi, Bento, Bulgogi, Takeaway Onigiri",
+    "description": {
+      "de": "Sushi, Bento, Bulgogi, Takeaway Onigiri",
+      "en": "Sushi, Bento, Bulgogi, Takeaway Onigiri"
+    },
     "link": "https://www.matchakomachi.com/",
     "id": "poi_1765274869131_0015"
   }

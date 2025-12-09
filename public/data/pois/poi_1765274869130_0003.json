@@ -10,7 +10,10 @@
   "properties": {
     "name": "Bao Bar",
     "category": "restaurant",
-    "description": "Modernes Asian Diner mit Baozi (gedämpfte chinesische Teigtaschen) und asiatischer Fusionsküche. Drei Standorte in Wien.",
+    "description": {
+      "de": "Modernes Asian Diner mit Baozi (gedämpfte chinesische Teigtaschen) und asiatischer Fusionsküche. Drei Standorte in Wien.",
+      "en": "Modernes Asian Diner mit Baozi (gedämpfte chinesische Teigtaschen) und asiatischer Fusionsküche. Drei Standorte in Wien."
+    },
     "link": "https://www.baobar.at",
     "id": "poi_1765274869130_0003"
   }

@@ -10,7 +10,10 @@
   "properties": {
     "name": "Café Kriemhild",
     "category": "breakfast",
-    "description": "Gemütliches Kulturcafé mit saisonalem Gastgarten. Bekannt für Shakshuka und entspannte Atmosphäre. Billardtisch im Innenbereich.",
+    "description": {
+      "de": "Gemütliches Kulturcafé mit saisonalem Gastgarten. Bekannt für Shakshuka und entspannte Atmosphäre. Billardtisch im Innenbereich.",
+      "en": "Gemütliches Kulturcafé mit saisonalem Gastgarten. Bekannt für Shakshuka und entspannte Atmosphäre. Billardtisch im Innenbereich."
+    },
     "link": "http://www.kulturcafe-kriemhild.at",
     "id": "poi_1765274869130_0006"
   }

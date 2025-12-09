@@ -10,7 +10,10 @@
   "properties": {
     "name": "Yppenplatz",
     "category": "market",
-    "description": "Samstagsmarkt",
+    "description": {
+      "de": "Samstagsmarkt",
+      "en": "Samstagsmarkt"
+    },
     "link": "",
     "id": "poi_1765275411428_9qljz6ydm"
   }

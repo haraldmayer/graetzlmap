@@ -10,7 +10,10 @@
   "properties": {
     "name": "Buchkontor",
     "category": "bookshop",
-    "description": "Unabhängige Buchhandlung am Kriemhildplatz seit 16 Jahren. Kuratierte Auswahl mit persönlicher Beratung von Inhaberin Ulla Harms.",
+    "description": {
+      "de": "Unabhängige Buchhandlung am Kriemhildplatz seit 16 Jahren. Kuratierte Auswahl mit persönlicher Beratung von Inhaberin Ulla Harms.",
+      "en": "Unabhängige Buchhandlung am Kriemhildplatz seit 16 Jahren. Kuratierte Auswahl mit persönlicher Beratung von Inhaberin Ulla Harms."
+    },
     "link": "http://www.buchkontor.at",
     "id": "poi_1765274869130_0004"
   }

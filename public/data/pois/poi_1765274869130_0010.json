@@ -10,7 +10,10 @@
   "properties": {
     "name": "Crupi",
     "category": "shop",
-    "description": "Sizilianische Spezialitäten",
+    "description": {
+      "de": "Sizilianische Spezialitäten",
+      "en": "Sizilianische Spezialitäten"
+    },
     "link": "https://www.crupi.at/",
     "id": "poi_1765274869130_0010"
   }

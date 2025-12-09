@@ -10,7 +10,10 @@
   "properties": {
     "name": "John Harris 1040",
     "category": "gym",
-    "description": "",
+    "description": {
+      "de": "",
+      "en": ""
+    },
     "link": "https://www.johnharris.at/de/studios/detail/2/margaretenplatz.html",
     "id": "poi_1765274869131_0012"
   }

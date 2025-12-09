@@ -10,7 +10,10 @@
   "properties": {
     "name": "Breitenseer Lichtspiele",
     "category": "cinema",
-    "description": "Ältestes Kino Wiens",
+    "description": {
+      "de": "Ältestes Kino Wiens",
+      "en": "Ältestes Kino Wiens"
+    },
     "link": "https://www.breitenseer-lichtspiele.at/",
     "id": "poi_1765277602818_pnkzhrayo"
   }

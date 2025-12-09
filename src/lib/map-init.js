@@ -40,6 +40,16 @@ window.addEventListener('load', async function() {
 	let walkthroughData = []; // Store walkthrough data
 	let walkthroughArrows = []; // Store walkthrough arrow layers
 
+	// Language setting - defaults to German
+	const currentLanguage = 'de';
+
+	// Helper function to get translated text
+	function getTranslated(text, fallbackLang = 'de') {
+		if (!text) return '';
+		if (typeof text === 'string') return text;
+		return text[currentLanguage] || text[fallbackLang] || Object.values(text)[0] || '';
+	}
+
 	// Function to load categories
 	async function loadCategories() {
 		try {
@@ -157,7 +167,7 @@ function createCategoryFilters() {
 		const label = document.createElement('label');
 		label.className = 'category-filter';
 		label.dataset.categoryId = categoryId;
-		label.dataset.categoryName = categoryInfo.name.toLowerCase();
+		label.dataset.categoryName = getTranslated(categoryInfo.name).toLowerCase();
 
 		const checkbox = document.createElement('input');
 		checkbox.type = 'checkbox';
@@ -173,7 +183,7 @@ function createCategoryFilters() {
 
 		const name = document.createElement('span');
 		name.className = 'category-name';
-		name.textContent = categoryInfo.name;
+		name.textContent = getTranslated(categoryInfo.name);
 
 		label.appendChild(checkbox);
 		label.appendChild(icon);
@@ -370,8 +380,12 @@ function createCategoryFilters() {
 			}).addTo(map);
 
 			// Create popup content
-			const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${coords[0]},${coords[1]}`;
-			const learnMoreLink = poi.link ? `<a href="${poi.link}" target="_blank" class="poi-link">Mehr erfahren →</a>` : '';
+			const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${coords[0]},${coords[1]}`;
+			const learnMoreLink = poi.link ? `<a href="${poi.link}" target="_blank" class="poi-link">Website →</a>` : '';
+
+			// Get category info
+			const categoryInfo = categories[poi.category];
+			const categoryName = categoryInfo ? `${categoryInfo.emoji} ${getTranslated(categoryInfo.name)}` : '';
 
 			// Format tags if available
 			const tags = poi.tags || [];
@@ -383,11 +397,12 @@ function createCategoryFilters() {
 				<div class="poi-popup">
 					<div class="poi-icon">${icon}</div>
 					<h3>${poi.name}</h3>
-					<p>${poi.description}</p>
+					${categoryName ? `<div class="poi-category-label">${categoryName}</div>` : ''}
+					<p>${getTranslated(poi.description)}</p>
 					${tagsHtml}
 					<div class="poi-actions">
 						${learnMoreLink}
-						<a href="${googleMapsUrl}" target="_blank" class="poi-link poi-link-secondary">Auf Karte zeigen</a>
+						<a href="${googleMapsUrl}" target="_blank" class="poi-link poi-link-secondary">Route</a>
 					</div>
 				</div>
 			`;
@@ -685,7 +700,7 @@ function createCategoryFilters() {
 
 		resultsDiv.innerHTML = results.slice(0, 10).map(poi => {
 			const category = categories[poi.properties.category];
-			const categoryLabel = category ? `${category.emoji} ${category.name}` : poi.properties.category;
+			const categoryLabel = category ? `${category.emoji} ${getTranslated(category.name)}` : poi.properties.category;
 
 			return `
 				<div class="poi-result-item" data-poi-id="${poi.properties.id}">

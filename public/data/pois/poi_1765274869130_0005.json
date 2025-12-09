@@ -10,7 +10,10 @@
   "properties": {
     "name": "franzundjulius",
     "category": "cafe",
-    "description": "Café in umgebauter Tischlerwerkstatt. Benannt nach den Gebrüdern Franz und Julius Huber, den ursprünglichen Architekten. Serviert Kaffee aus lokaler Röstung, hausgemachte Kuchen und regionale Getränke.",
+    "description": {
+      "de": "Café in umgebauter Tischlerwerkstatt. Benannt nach den Gebrüdern Franz und Julius Huber, den ursprünglichen Architekten. Serviert Kaffee aus lokaler Röstung, hausgemachte Kuchen und regionale Getränke.",
+      "en": "Café in umgebauter Tischlerwerkstatt. Benannt nach den Gebrüdern Franz und Julius Huber, den ursprünglichen Architekten. Serviert Kaffee aus lokaler Röstung, hausgemachte Kuchen und regionale Getränke."
+    },
     "link": "https://www.franzundjulius.at",
     "id": "poi_1765274869130_0005"
   }

@@ -10,7 +10,10 @@
   "properties": {
     "name": "Meidlinger Markt",
     "category": "market",
-    "description": "",
+    "description": {
+      "de": "",
+      "en": ""
+    },
     "link": "",
     "id": "poi_1765275205509_w5p13bcym"
   }

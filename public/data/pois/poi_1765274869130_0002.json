@@ -10,7 +10,10 @@
   "properties": {
     "name": "Naschmarkt",
     "category": "market",
-    "description": "Wiens bekanntester Markt mit internationalen Spezialitäten, frischen Produkten und Gastronomiebetrieben.",
+    "description": {
+      "de": "Wiens bekanntester Markt mit internationalen Spezialitäten, frischen Produkten und Gastronomiebetrieben.",
+      "en": "Wiens bekanntester Markt mit internationalen Spezialitäten, frischen Produkten und Gastronomiebetrieben."
+    },
     "link": "https://www.wien.info/de/einkaufen-essen-trinken/maerkte/naschmarkt-333208",
     "id": "poi_1765274869130_0002"
   }

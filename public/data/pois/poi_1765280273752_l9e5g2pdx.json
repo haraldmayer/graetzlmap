@@ -10,7 +10,10 @@
   "properties": {
     "name": "Volkertmarkt",
     "category": "market",
-    "description": "",
+    "description": {
+      "de": "",
+      "en": ""
+    },
     "link": "",
     "tags": [],
     "id": "poi_1765280273752_l9e5g2pdx"

@@ -10,7 +10,10 @@
   "properties": {
     "name": "XO",
     "category": "restaurant",
-    "description": "among the best burgers in town",
+    "description": {
+      "de": "among the best burgers in town",
+      "en": "among the best burgers in town"
+    },
     "link": "http://www.xo-grill.at/",
     "id": "poi_1765274869131_0016"
   }

@@ -10,7 +10,10 @@
   "properties": {
     "name": "SHU",
     "category": "restaurant",
-    "description": "Sichuan 🌶️",
+    "description": {
+      "de": "Sichuan 🌶️",
+      "en": "Sichuan 🌶️"
+    },
     "link": "",
     "id": "poi_1765274869131_0014"
   }

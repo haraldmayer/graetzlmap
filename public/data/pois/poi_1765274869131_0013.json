@@ -10,7 +10,10 @@
   "properties": {
     "name": "Babette's",
     "category": "bookshop",
-    "description": "",
+    "description": {
+      "de": "",
+      "en": ""
+    },
     "link": "https://babettes.at/",
     "id": "poi_1765274869131_0013"
   }

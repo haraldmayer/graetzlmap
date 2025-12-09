@@ -10,7 +10,10 @@
   "properties": {
     "name": "Anna & Jagetsberger",
     "category": "cafe",
-    "description": "",
+    "description": {
+      "de": "",
+      "en": ""
+    },
     "link": "https://anna-jagetsberger.at/",
     "id": "poi_1765277663978_g2j5d7y51"
   }
