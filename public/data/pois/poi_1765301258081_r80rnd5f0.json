@@ -1,0 +1,21 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.3642968105189,
+      48.19681078039623
+    ]
+  },
+  "properties": {
+    "name": "Home",
+    "category": "home",
+    "description": {
+      "de": "",
+      "en": ""
+    },
+    "link": "",
+    "tags": [],
+    "id": "poi_1765301258081_r80rnd5f0"
+  }
+}

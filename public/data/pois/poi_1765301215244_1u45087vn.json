@@ -1,0 +1,21 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.366835583511342,
+      48.19521835895723
+    ]
+  },
+  "properties": {
+    "name": "Zur Herknerin",
+    "category": "restaurant",
+    "description": {
+      "de": "",
+      "en": ""
+    },
+    "link": "",
+    "tags": [],
+    "id": "poi_1765301215244_1u45087vn"
+  }
+}
