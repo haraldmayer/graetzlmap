@@ -152,7 +152,7 @@
       },
       "properties": {
         "name": "Postamt",
-        "category": "post office",
+        "category": "post",
         "description": "Kleines Postamt",
         "link": ""
       }
@@ -181,6 +181,32 @@
         "category": "bookshop",
         "description": "",
         "link": "https://babettes.at/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.36596075451302, 48.19827685274822]
+      },
+      "properties": {
+        "name": "SHU",
+        "category": "restaurant",
+        "description": "Sichuan 🌶️",
+        "link": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.366054606373545, 48.19796485686659]
+      },
+      "properties": {
+        "name": "Matcha Komachi",
+        "category": "restaurant",
+        "description": "Sushi, Bento, Bulgogi, Takeaway Onigiri",
+        "link": "https://www.matchakomachi.com/"
       }
     }
   ]

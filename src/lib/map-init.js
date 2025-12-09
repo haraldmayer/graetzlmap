@@ -56,15 +56,24 @@ window.addEventListener('load', async function() {
 		// Fallback if categories not loaded yet
 		if (!categories || Object.keys(categories).length === 0) {
 			console.warn('Categories not loaded yet');
-			return '📍';
+			return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>';
 		}
 		const cat = categories[category];
 		if (!cat) {
 			console.warn(`Category "${category}" not found, using default`);
-			return '📍';
+			return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>';
 		}
-		// Use image if available, otherwise use emoji
-		return cat.image || cat.emoji;
+		// Use icon (SVG) if available, otherwise fall back to emoji
+		return cat.icon || cat.emoji;
+	}
+
+	// Function to get background color for category
+	function getCategoryColor(category) {
+		if (!categories || Object.keys(categories).length === 0) {
+			return '#FFFFFF';
+		}
+		const cat = categories[category];
+		return cat?.color || '#FFFFFF';
 	}
 
 	// Function to calculate marker size based on zoom level
@@ -75,9 +84,10 @@ window.addEventListener('load', async function() {
 	// Function to create custom icon
 	function createCustomIcon(category, zoom) {
 		const icon = getCategoryIcon(category);
+		const color = getCategoryColor(category);
 		const size = getMarkerSize(zoom || map.getZoom());
 		return L.divIcon({
-			html: `<div class="custom-marker" style="width: ${size}px; height: ${size}px; font-size: ${size * 0.7}px; line-height: ${size}px;">${icon}</div>`,
+			html: `<div class="custom-marker" style="width: ${size}px; height: ${size}px; font-size: ${size * 0.7}px; line-height: ${size}px; background-color: ${color};">${icon}</div>`,
 			className: 'custom-icon',
 			iconSize: [size, size],
 			iconAnchor: [size / 2, size],
@@ -141,7 +151,7 @@ function createCategoryFilters() {
 
 		const icon = document.createElement('span');
 		icon.className = 'category-icon';
-		icon.textContent = categoryInfo.emoji;
+		icon.innerHTML = categoryInfo.icon || categoryInfo.emoji;
 
 		const name = document.createElement('span');
 		name.className = 'category-name';

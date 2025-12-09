@@ -334,6 +334,15 @@ header h1 {
 	font-size: 1.2rem;
 	line-height: 1;
 	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.category-icon svg {
+	width: 1.2rem;
+	height: 1.2rem;
+	color: #333;
 }
 
 .category-name {
@@ -364,6 +373,14 @@ main {
 	transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.custom-marker svg {
+	width: 70%;
+	height: 70%;
+	color: white;
+	stroke: white;
+	filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2));
+}
+
 .custom-marker:hover {
 	transform: scale(1.2);
 	box-shadow: 0 4px 12px rgba(0,0,0,0.35), 0 0 0 2px rgba(255,255,255,0.9);
@@ -377,6 +394,15 @@ main {
 	font-size: 2.5rem;
 	text-align: center;
 	margin-bottom: 0.5rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.poi-popup .poi-icon svg {
+	width: 2.5rem;
+	height: 2.5rem;
+	color: #333;
 }
 
 .poi-popup h3 {
