@@ -1,0 +1,40 @@
+{
+  "tags": {
+    "vegetarian": {
+      "name": "Vegetarisch",
+      "count": 0
+    },
+    "vegan": {
+      "name": "Vegan",
+      "count": 0
+    },
+    "outdoor-seating": {
+      "name": "Schanigarten",
+      "count": 0
+    },
+    "wifi": {
+      "name": "WiFi",
+      "count": 0
+    },
+    "accessible": {
+      "name": "Barrierefrei",
+      "count": 0
+    },
+    "dogs-welcome": {
+      "name": "Hundefreundlich",
+      "count": 0
+    },
+    "cash-only": {
+      "name": "Nur Bargeld",
+      "count": 0
+    },
+    "kid-friendly": {
+      "name": "Kinderfreundlich",
+      "count": 0
+    },
+    "tuerkisch": {
+      "name": "Tuerkisch",
+      "count": 0
+    }
+  }
+}

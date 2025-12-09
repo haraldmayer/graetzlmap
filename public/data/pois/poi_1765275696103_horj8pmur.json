@@ -12,6 +12,9 @@
     "category": "restaurant",
     "description": "Mutterschiff der türkischen Gastro in Wien",
     "link": "http://www.kentrestaurant.at/",
+    "tags": [
+      "tuerkisch"
+    ],
     "id": "poi_1765275696103_horj8pmur"
   }
 }
