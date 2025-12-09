@@ -2677,7 +2677,7 @@
         "Graetzl_ID": 1203,
         "Graetzl_Name": "Meidling (Zentrum)",
         "BEZIRK": 12,
-        "active": 0
+        "active": 1
       },
       "geometry": {
         "type": "Polygon",
@@ -4230,7 +4230,7 @@
         "Graetzl_ID": 1601,
         "Graetzl_Name": "Neulerchenfeld und Brunnenviertel",
         "BEZIRK": 16,
-        "active": 0
+        "active": 1
       },
       "geometry": {
         "type": "Polygon",

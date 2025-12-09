@@ -343,13 +343,14 @@ function createCategoryFilters() {
 
 			// Create popup content
 			const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${coords[0]},${coords[1]}`;
+			const learnMoreLink = poi.link ? `<a href="${poi.link}" target="_blank" class="poi-link">Mehr erfahren →</a>` : '';
 			const popupContent = `
 				<div class="poi-popup">
 					<div class="poi-icon">${icon}</div>
 					<h3>${poi.name}</h3>
 					<p>${poi.description}</p>
 					<div class="poi-actions">
-						<a href="${poi.link}" target="_blank" class="poi-link">Mehr erfahren →</a>
+						${learnMoreLink}
 						<a href="${googleMapsUrl}" target="_blank" class="poi-link poi-link-secondary">Auf Karte zeigen</a>
 					</div>
 				</div>

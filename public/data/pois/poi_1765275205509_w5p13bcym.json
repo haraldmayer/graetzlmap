@@ -1,0 +1,17 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.333178941181767,
+      48.18083737443849
+    ]
+  },
+  "properties": {
+    "name": "Meidlinger Markt",
+    "category": "market",
+    "description": "",
+    "link": "",
+    "id": "poi_1765275205509_w5p13bcym"
+  }
+}

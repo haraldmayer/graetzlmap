@@ -1,0 +1,17 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.3294563,
+      48.2022857
+    ]
+  },
+  "properties": {
+    "name": "Buchkontor",
+    "category": "bookshop",
+    "description": "Unabhängige Buchhandlung am Kriemhildplatz seit 16 Jahren. Kuratierte Auswahl mit persönlicher Beratung von Inhaberin Ulla Harms.",
+    "link": "http://www.buchkontor.at",
+    "id": "poi_1765274869130_0004"
+  }
+}

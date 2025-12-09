@@ -1,0 +1,17 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.3279644,
+      48.2037131
+    ]
+  },
+  "properties": {
+    "name": "Alles Fahnen",
+    "category": "shop",
+    "description": "Fahnenmanufaktur seit 1982. Spezialisiert auf individuelle Fahnen, diplomatische Banner und personalisierte Wimpelgirlanden.",
+    "link": "https://www.allesfahnen.at",
+    "id": "poi_1765274869130_0008"
+  }
+}

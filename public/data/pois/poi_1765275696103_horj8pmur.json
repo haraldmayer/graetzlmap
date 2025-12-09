@@ -1,0 +1,17 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.336405071639252,
+      48.21386698449984
+    ]
+  },
+  "properties": {
+    "name": "KENT",
+    "category": "restaurant",
+    "description": "Mutterschiff der türkischen Gastro in Wien",
+    "link": "http://www.kentrestaurant.at/",
+    "id": "poi_1765275696103_horj8pmur"
+  }
+}

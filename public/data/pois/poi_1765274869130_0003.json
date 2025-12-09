@@ -1,0 +1,17 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.3658069,
+      48.1979108
+    ]
+  },
+  "properties": {
+    "name": "Bao Bar",
+    "category": "restaurant",
+    "description": "Modernes Asian Diner mit Baozi (gedämpfte chinesische Teigtaschen) und asiatischer Fusionsküche. Drei Standorte in Wien.",
+    "link": "https://www.baobar.at",
+    "id": "poi_1765274869130_0003"
+  }
+}

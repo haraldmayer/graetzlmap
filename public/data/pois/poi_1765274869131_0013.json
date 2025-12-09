@@ -1,0 +1,17 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.36443382382972,
+      48.19786513449719
+    ]
+  },
+  "properties": {
+    "name": "Babette's",
+    "category": "bookshop",
+    "description": "",
+    "link": "https://babettes.at/",
+    "id": "poi_1765274869131_0013"
+  }
+}

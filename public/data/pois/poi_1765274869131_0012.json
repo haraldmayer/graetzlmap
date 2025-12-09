@@ -1,0 +1,17 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.358475328835407,
+      48.19277444701453
+    ]
+  },
+  "properties": {
+    "name": "John Harris 1040",
+    "category": "gym",
+    "description": "",
+    "link": "https://www.johnharris.at/de/studios/detail/2/margaretenplatz.html",
+    "id": "poi_1765274869131_0012"
+  }
+}

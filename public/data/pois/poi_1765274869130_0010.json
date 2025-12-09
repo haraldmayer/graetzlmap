@@ -1,0 +1,17 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.36674992567765,
+      48.197624900430014
+    ]
+  },
+  "properties": {
+    "name": "Crupi",
+    "category": "shop",
+    "description": "Sizilianische Spezialitäten",
+    "link": "https://www.crupi.at/",
+    "id": "poi_1765274869130_0010"
+  }
+}

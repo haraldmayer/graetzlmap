@@ -1,0 +1,17 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.3294563,
+      48.2022857
+    ]
+  },
+  "properties": {
+    "name": "franzundjulius",
+    "category": "cafe",
+    "description": "Café in umgebauter Tischlerwerkstatt. Benannt nach den Gebrüdern Franz und Julius Huber, den ursprünglichen Architekten. Serviert Kaffee aus lokaler Röstung, hausgemachte Kuchen und regionale Getränke.",
+    "link": "https://www.franzundjulius.at",
+    "id": "poi_1765274869130_0005"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.359819554512733,
+      48.19250462346606
+    ]
+  },
+  "properties": {
+    "name": "Filmcasino",
+    "category": "cinema",
+    "description": "Traditionelles Programmkino mit ausgewählten Arthouse-Filmen und Klassikern.",
+    "link": "https://www.filmcasino.at",
+    "id": "poi_1765274869129_0001"
+  }
+}

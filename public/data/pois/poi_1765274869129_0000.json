@@ -1,0 +1,17 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.364086589301394,
+      48.19818869640931
+    ]
+  },
+  "properties": {
+    "name": "Rösterei Alt Wien",
+    "category": "cafe",
+    "description": "Wiens erste moderne Kaffeerösterei mit Single-Origin und Bio-Kaffees aus aller Welt.",
+    "link": "https://www.falter.at/zeitung/20221130/holzer-im-graetzel-schleifmuehlgasse",
+    "id": "poi_1765274869129_0000"
+  }
+}

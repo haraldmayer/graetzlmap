@@ -1,0 +1,17 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.364,
+      48.1985
+    ]
+  },
+  "properties": {
+    "name": "Naschmarkt",
+    "category": "market",
+    "description": "Wiens bekanntester Markt mit internationalen Spezialitäten, frischen Produkten und Gastronomiebetrieben.",
+    "link": "https://www.wien.info/de/einkaufen-essen-trinken/maerkte/naschmarkt-333208",
+    "id": "poi_1765274869130_0002"
+  }
+}

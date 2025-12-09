@@ -1,0 +1,17 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.330189,
+      48.20195
+    ]
+  },
+  "properties": {
+    "name": "Café Kriemhild",
+    "category": "breakfast",
+    "description": "Gemütliches Kulturcafé mit saisonalem Gastgarten. Bekannt für Shakshuka und entspannte Atmosphäre. Billardtisch im Innenbereich.",
+    "link": "http://www.kulturcafe-kriemhild.at",
+    "id": "poi_1765274869130_0006"
+  }
+}

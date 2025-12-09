@@ -16,12 +16,19 @@ export async function loadGeoData() {
     return geoDataCache;
   }
 
-  const response = await fetch('/data/geodata.geojson');
+  const response = await fetch('/api/pois');
   if (!response.ok) {
-    throw new Error('Failed to load geodata');
+    throw new Error('Failed to load POI data');
   }
 
-  geoDataCache = await response.json();
+  const features = await response.json();
+
+  // Wrap features in GeoJSON FeatureCollection format
+  geoDataCache = {
+    type: 'FeatureCollection',
+    features: features
+  };
+
   return geoDataCache;
 }
 
