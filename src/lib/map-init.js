@@ -36,6 +36,9 @@ window.addEventListener('load', async function() {
 	let currentMarkers = [];
 	let currentGraetzlId = null; // Track currently selected Grätzl
 	let selectedCategories = new Set(); // Track selected categories
+	let currentWalkthrough = null; // Track currently active walkthrough
+	let walkthroughData = []; // Store walkthrough data
+	let walkthroughArrows = []; // Store walkthrough arrow layers
 
 	// Function to load categories
 	async function loadCategories() {
@@ -48,6 +51,21 @@ window.addEventListener('load', async function() {
 			categories = data.categories;
 		} catch (error) {
 			console.error('Error loading categories:', error);
+		}
+	}
+
+	// Function to load walkthroughs
+	async function loadWalkthroughs() {
+		try {
+			const response = await fetch('/api/walkthroughs');
+			if (!response.ok) {
+				throw new Error('Failed to load walkthroughs');
+			}
+			walkthroughData = await response.json();
+			console.log('Walkthroughs loaded:', walkthroughData.length);
+		} catch (error) {
+			console.error('Error loading walkthroughs:', error);
+			walkthroughData = [];
 		}
 	}
 
@@ -319,17 +337,27 @@ function createCategoryFilters() {
 		currentMarkers.forEach(marker => map.removeLayer(marker));
 		currentMarkers = [];
 
-		// Build filter
-		const filters = {};
-		if (currentGraetzlId) {
-			filters.graetzlId = parseInt(currentGraetzlId);
-		}
-		if (selectedCategories.size > 0) {
-			filters.categories = Array.from(selectedCategories);
-		}
+		let poiFeatures = [];
 
-		// Get filtered POIs using spatial query
-		const poiFeatures = geoquery.filterPOIsWithGraetzl(geoData, graetzlData, filters);
+		// If in walkthrough mode, only show walkthrough POIs
+		if (currentWalkthrough && currentWalkthrough.pois && currentWalkthrough.pois.length > 0) {
+			// Filter to only show POIs in the walkthrough
+			poiFeatures = geoData.features.filter(feature =>
+				currentWalkthrough.pois.includes(feature.properties.id)
+			);
+		} else {
+			// Build filter
+			const filters = {};
+			if (currentGraetzlId) {
+				filters.graetzlId = parseInt(currentGraetzlId);
+			}
+			if (selectedCategories.size > 0) {
+				filters.categories = Array.from(selectedCategories);
+			}
+
+			// Get filtered POIs using spatial query
+			poiFeatures = geoquery.filterPOIsWithGraetzl(geoData, graetzlData, filters);
+		}
 
 		// Add markers
 		poiFeatures.forEach(poiFeature => {
@@ -573,11 +601,17 @@ function createCategoryFilters() {
 			await loadCategories();
 			console.log('Categories loaded:', Object.keys(categories).length);
 
+			console.log('Loading walkthroughs...');
+			await loadWalkthroughs();
+
 			// Populate Grätzl dropdown
 			populateGraetzlDropdown();
 
 			// Create category filter UI
 			createCategoryFilters();
+
+			// Setup walkthrough selector
+			setupWalkthroughSelector();
 
 			// Check if a Grätzl is specified in the URL
 			const graetzlSlug = getGraetzlSlugFromPath();
@@ -695,6 +729,242 @@ function createCategoryFilters() {
 				marker.openPopup();
 			}
 		});
+	}
+
+	// Draw arrows between walkthrough POIs
+	function drawWalkthroughArrows(poiIds) {
+		// Clear existing arrows
+		clearWalkthroughArrows();
+
+		if (!poiIds || poiIds.length < 2) return;
+
+		// Get POI coordinates
+		const coords = [];
+		poiIds.forEach(poiId => {
+			const poi = geoData.features.find(f => f.properties.id === poiId);
+			if (poi) {
+				const [lng, lat] = poi.geometry.coordinates;
+				coords.push([lat, lng]);
+			}
+		});
+
+		// Draw arrows between consecutive POIs
+		for (let i = 0; i < coords.length - 1; i++) {
+			const start = coords[i];
+			const end = coords[i + 1];
+
+			// Create a polyline with arrow
+			const polyline = L.polyline([start, end], {
+				color: '#667eea',
+				weight: 3,
+				opacity: 0.8,
+				smoothFactor: 1
+			}).addTo(map);
+
+			// Create arrow decorator
+			const arrowHead = L.polylineDecorator(polyline, {
+				patterns: [
+					{
+						offset: '100%',
+						repeat: 0,
+						symbol: L.Symbol.arrowHead({
+							pixelSize: 12,
+							polygon: true,
+							pathOptions: {
+								fillColor: '#667eea',
+								fillOpacity: 1,
+								weight: 0,
+								color: '#667eea'
+							}
+						})
+					},
+					{
+						offset: '50%',
+						repeat: 0,
+						symbol: L.Symbol.arrowHead({
+							pixelSize: 8,
+							polygon: true,
+							pathOptions: {
+								fillColor: '#667eea',
+								fillOpacity: 0.6,
+								weight: 0,
+								color: '#667eea'
+							}
+						})
+					}
+				]
+			}).addTo(map);
+
+			walkthroughArrows.push(polyline);
+			walkthroughArrows.push(arrowHead);
+		}
+
+		// Add number markers at each POI
+		coords.forEach((coord, index) => {
+			const numberMarker = L.marker(coord, {
+				icon: L.divIcon({
+					html: `<div style="
+						background: #667eea;
+						color: white;
+						width: 24px;
+						height: 24px;
+						border-radius: 50%;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						font-weight: bold;
+						font-size: 12px;
+						border: 2px solid white;
+						box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+					">${index + 1}</div>`,
+					className: 'walkthrough-number',
+					iconSize: [24, 24],
+					iconAnchor: [12, 12]
+				}),
+				zIndexOffset: 1000
+			}).addTo(map);
+
+			walkthroughArrows.push(numberMarker);
+		});
+	}
+
+	// Clear walkthrough arrows
+	function clearWalkthroughArrows() {
+		walkthroughArrows.forEach(layer => {
+			map.removeLayer(layer);
+		});
+		walkthroughArrows = [];
+	}
+
+	// Zoom map to fit walkthrough POIs
+	function zoomToWalkthroughPOIs(poiIds) {
+		if (!poiIds || poiIds.length === 0) return;
+
+		const bounds = [];
+		poiIds.forEach(poiId => {
+			const poi = geoData.features.find(f => f.properties.id === poiId);
+			if (poi) {
+				const [lng, lat] = poi.geometry.coordinates;
+				bounds.push([lat, lng]);
+			}
+		});
+
+		if (bounds.length > 0) {
+			map.fitBounds(bounds, {
+				padding: [50, 50],
+				maxZoom: 16
+			});
+		}
+	}
+
+	// Walkthrough selector functionality
+	function setupWalkthroughSelector() {
+		const selectElement = document.getElementById('walkthrough-select');
+		const infoDiv = document.getElementById('walkthrough-info');
+		const descriptionP = document.getElementById('walkthrough-description');
+		const exitButton = document.getElementById('exit-walkthrough');
+		const categoryToggle = document.getElementById('category-toggle');
+		const categoryDropdown = document.getElementById('category-dropdown');
+
+		if (!selectElement || !infoDiv || !descriptionP || !exitButton) {
+			console.warn('Walkthrough UI elements not found');
+			return;
+		}
+
+		// Populate walkthrough options
+		function populateWalkthroughs() {
+			// Clear existing options except the first (default)
+			selectElement.innerHTML = '<option value="">Kein Walk ausgewählt</option>';
+
+			walkthroughData.forEach(walkthrough => {
+				const option = document.createElement('option');
+				option.value = walkthrough.id;
+				option.textContent = walkthrough.title;
+				selectElement.appendChild(option);
+			});
+		}
+
+		// Activate walkthrough
+		function activateWalkthrough(walkthroughId) {
+			const walkthrough = walkthroughData.find(w => w.id === walkthroughId);
+			if (!walkthrough) {
+				console.warn('Walkthrough not found:', walkthroughId);
+				return;
+			}
+
+			currentWalkthrough = walkthrough;
+
+			// Show description and exit button
+			descriptionP.textContent = walkthrough.description || '';
+			infoDiv.style.display = 'block';
+
+			// Disable category filter toggle
+			if (categoryToggle) {
+				categoryToggle.disabled = true;
+				categoryToggle.style.opacity = '0.5';
+				categoryToggle.style.cursor = 'not-allowed';
+			}
+
+			// Close category dropdown if open
+			if (categoryDropdown) {
+				categoryDropdown.style.display = 'none';
+			}
+
+			// Update markers to show only walkthrough POIs
+			updateMarkers();
+
+			// Zoom map to fit all walkthrough POIs
+			zoomToWalkthroughPOIs(walkthrough.pois);
+
+			// Draw arrows connecting the POIs
+			drawWalkthroughArrows(walkthrough.pois);
+
+			console.log('Walkthrough activated:', walkthrough.title);
+		}
+
+		// Deactivate walkthrough
+		function deactivateWalkthrough() {
+			currentWalkthrough = null;
+
+			// Hide description and exit button
+			infoDiv.style.display = 'none';
+
+			// Re-enable category filter toggle
+			if (categoryToggle) {
+				categoryToggle.disabled = false;
+				categoryToggle.style.opacity = '1';
+				categoryToggle.style.cursor = 'pointer';
+			}
+
+			// Clear walkthrough arrows
+			clearWalkthroughArrows();
+
+			// Reset select to default
+			selectElement.value = '';
+
+			// Update markers to show filtered POIs
+			updateMarkers();
+
+			console.log('Walkthrough deactivated');
+		}
+
+		// Handle select change
+		selectElement.addEventListener('change', (e) => {
+			const walkthroughId = e.target.value;
+			if (walkthroughId) {
+				activateWalkthrough(walkthroughId);
+			} else {
+				deactivateWalkthrough();
+			}
+		});
+
+		// Handle exit button
+		exitButton.addEventListener('click', () => {
+			deactivateWalkthrough();
+		});
+
+		// Initial population
+		populateWalkthroughs();
 	}
 
 	// Handle browser back/forward buttons

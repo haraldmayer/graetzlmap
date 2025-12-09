@@ -1,0 +1,20 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.358965535143362,
+      48.19688074840358
+    ]
+  },
+  "properties": {
+    "name": "U Kettenbrückengasse",
+    "category": "subway-station",
+    "description": "",
+    "link": "",
+    "tags": [
+      "u4"
+    ],
+    "id": "poi_1765279262983_996c7qpf5"
+  }
+}

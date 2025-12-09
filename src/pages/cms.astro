@@ -265,13 +265,187 @@ const title = "POI Management System";
       min-width: 120px;
       font-size: 14px;
     }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      background: white;
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px 20px;
+      background: #f3f4f6;
+      color: #6b7280;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      background: #e5e7eb;
+    }
+
+    .tab-btn.active {
+      background: #2563eb;
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .poi-selector {
+      position: relative;
+    }
+
+    .poi-search-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      margin-top: 4px;
+      max-height: 200px;
+      overflow-y: auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      z-index: 10;
+      display: none;
+    }
+
+    .poi-search-results.show {
+      display: block;
+    }
+
+    .poi-search-result-item {
+      padding: 8px 12px;
+      cursor: pointer;
+      border-bottom: 1px solid #f3f4f6;
+      transition: background 0.15s;
+    }
+
+    .poi-search-result-item:hover {
+      background: #f9fafb;
+    }
+
+    .poi-search-result-item:last-child {
+      border-bottom: none;
+    }
+
+    .poi-search-result-name {
+      font-weight: 600;
+      font-size: 13px;
+      color: #111827;
+    }
+
+    .poi-search-result-category {
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    .selected-pois-container {
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 8px;
+      min-height: 100px;
+      background: #f9fafb;
+    }
+
+    .selected-poi-item {
+      background: white;
+      padding: 10px 12px;
+      margin-bottom: 6px;
+      border-radius: 6px;
+      border: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: move;
+      transition: all 0.2s;
+    }
+
+    .selected-poi-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .selected-poi-item:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .selected-poi-item.dragging {
+      opacity: 0.5;
+    }
+
+    .selected-poi-info {
+      flex: 1;
+    }
+
+    .selected-poi-name {
+      font-weight: 600;
+      font-size: 13px;
+      color: #111827;
+    }
+
+    .selected-poi-category {
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    .selected-poi-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .drag-handle {
+      color: #9ca3af;
+      cursor: move;
+      font-size: 18px;
+      padding: 0 8px;
+    }
+
+    .remove-poi-btn {
+      background: #dc2626;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .remove-poi-btn:hover {
+      background: #b91c1c;
+    }
   </style>
 </head>
 <body>
 
-  <div class="layout">
-    <!-- POI Form Panel -->
-    <div class="panel">
+  <div style="max-width: 1400px; margin: 0 auto 20px auto;">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="pois">POI Management</button>
+      <button class="tab-btn" data-tab="walkthroughs">Walkthrough Management</button>
+    </div>
+  </div>
+
+  <!-- POI Management Tab -->
+  <div class="tab-content active" id="pois-tab">
+    <div class="layout">
+      <!-- POI Form Panel -->
+      <div class="panel">
       <h1 id="formTitle">Add New POI</h1>
 
       <form id="poiForm">
@@ -359,6 +533,64 @@ const title = "POI Management System";
 
       <div class="poi-list" id="poiList">
         <div class="empty-state">Loading POIs...</div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- Walkthrough Management Tab -->
+  <div class="tab-content" id="walkthroughs-tab" style="display: none;">
+    <div class="layout">
+      <!-- Walkthrough Form Panel -->
+      <div class="panel">
+        <h1 id="walkthroughFormTitle">Add New Walkthrough</h1>
+
+        <form id="walkthroughForm">
+          <input type="hidden" id="walkthroughEditingId" value="">
+
+          <div class="full">
+            <label>Title *</label>
+            <input id="walkthroughTitle" type="text" placeholder="Walkthrough Title" required />
+          </div>
+
+          <div class="full">
+            <label>Description *</label>
+            <textarea id="walkthroughDescription" placeholder="Describe this walkthrough..." required></textarea>
+          </div>
+
+          <div class="full">
+            <label>Select POIs</label>
+            <div class="poi-selector">
+              <input
+                id="poiSearchWalkthrough"
+                type="text"
+                placeholder="Search POIs to add..."
+                autocomplete="off"
+              />
+              <div id="poiSearchResults" class="poi-search-results"></div>
+            </div>
+          </div>
+
+          <div class="full">
+            <label>Selected POIs (drag to reorder)</label>
+            <div id="selectedPOIsContainer" class="selected-pois-container">
+              <div class="empty-state" style="padding: 20px;">No POIs selected yet</div>
+            </div>
+          </div>
+
+          <div class="button-group">
+            <button type="submit">Save Walkthrough</button>
+            <button type="button" class="secondary" id="walkthroughCancelBtn">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Walkthrough List Panel -->
+      <div class="panel">
+        <h2>Existing Walkthroughs</h2>
+        <div class="poi-list" id="walkthroughList">
+          <div class="empty-state">Loading walkthroughs...</div>
+        </div>
       </div>
     </div>
   </div>
@@ -882,6 +1114,323 @@ const title = "POI Management System";
     loadPOIs();
     setupFilters();
     setupTagInput();
+
+    // ============ WALKTHROUGH MANAGEMENT ============
+
+    let walkthroughs = [];
+    let selectedWalkthroughPOIs = []; // Array of POI IDs in order
+    let currentWalkthroughId = null;
+    let draggedElement = null;
+
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tabId = btn.dataset.tab;
+
+        // Update active tab button
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Update visible tab content
+        document.querySelectorAll('.tab-content').forEach(content => {
+          content.classList.remove('active');
+          content.style.display = 'none';
+        });
+
+        const activeTab = document.getElementById(`${tabId}-tab`);
+        activeTab.classList.add('active');
+        activeTab.style.display = 'block';
+
+        // Load walkthroughs when switching to that tab
+        if (tabId === 'walkthroughs' && walkthroughs.length === 0) {
+          loadWalkthroughs();
+        }
+      });
+    });
+
+    // Load walkthroughs
+    async function loadWalkthroughs() {
+      try {
+        const response = await fetch('/api/walkthroughs');
+        walkthroughs = await response.json();
+        renderWalkthroughs();
+      } catch (error) {
+        console.error('Failed to load walkthroughs:', error);
+        showToast('Failed to load walkthroughs', 'error');
+      }
+    }
+
+    // Render walkthrough list
+    function renderWalkthroughs() {
+      const container = document.getElementById('walkthroughList');
+
+      if (walkthroughs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No walkthroughs yet. Create your first one!</div>';
+        return;
+      }
+
+      container.innerHTML = walkthroughs.map(walkthrough => `
+        <div class="poi-item">
+          <div class="poi-info">
+            <div class="poi-name">${walkthrough.title}</div>
+            <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
+              ${walkthrough.pois ? walkthrough.pois.length : 0} POIs
+            </div>
+          </div>
+          <div class="poi-actions">
+            <button class="small secondary" onclick="editWalkthrough('${walkthrough.id}')">Edit</button>
+            <button class="small danger" onclick="deleteWalkthrough('${walkthrough.id}')">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // POI Search for walkthrough
+    const poiSearchWalkthrough = document.getElementById('poiSearchWalkthrough');
+    const poiSearchResults = document.getElementById('poiSearchResults');
+
+    poiSearchWalkthrough.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.trim().toLowerCase();
+
+      if (!searchTerm) {
+        poiSearchResults.classList.remove('show');
+        return;
+      }
+
+      const filtered = allPOIs.filter(poi => {
+        const name = poi.properties.name.toLowerCase();
+        const category = poi.properties.category.toLowerCase();
+        return (name.includes(searchTerm) || category.includes(searchTerm)) &&
+               !selectedWalkthroughPOIs.includes(poi.properties.id);
+      });
+
+      if (filtered.length === 0) {
+        poiSearchResults.innerHTML = '<div class="empty-state" style="padding: 12px;">No POIs found</div>';
+        poiSearchResults.classList.add('show');
+        return;
+      }
+
+      poiSearchResults.innerHTML = filtered.slice(0, 10).map(poi => `
+        <div class="poi-search-result-item" data-poi-id="${poi.properties.id}">
+          <div class="poi-search-result-name">${poi.properties.name}</div>
+          <div class="poi-search-result-category">${poi.properties.category}</div>
+        </div>
+      `).join('');
+
+      poiSearchResults.querySelectorAll('.poi-search-result-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const poiId = item.dataset.poiId;
+          addPOIToWalkthrough(poiId);
+          poiSearchWalkthrough.value = '';
+          poiSearchResults.classList.remove('show');
+        });
+      });
+
+      poiSearchResults.classList.add('show');
+    });
+
+    // Close search results when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.poi-selector')) {
+        poiSearchResults.classList.remove('show');
+      }
+    });
+
+    // Add POI to walkthrough
+    function addPOIToWalkthrough(poiId) {
+      if (!selectedWalkthroughPOIs.includes(poiId)) {
+        selectedWalkthroughPOIs.push(poiId);
+        renderSelectedPOIs();
+      }
+    }
+
+    // Render selected POIs with drag-and-drop
+    function renderSelectedPOIs() {
+      const container = document.getElementById('selectedPOIsContainer');
+
+      if (selectedWalkthroughPOIs.length === 0) {
+        container.innerHTML = '<div class="empty-state" style="padding: 20px;">No POIs selected yet</div>';
+        return;
+      }
+
+      container.innerHTML = selectedWalkthroughPOIs.map((poiId, index) => {
+        const poi = allPOIs.find(p => p.properties.id === poiId);
+        if (!poi) return '';
+
+        return `
+          <div class="selected-poi-item" draggable="true" data-poi-id="${poiId}" data-index="${index}">
+            <div class="drag-handle">☰</div>
+            <div class="selected-poi-info">
+              <div class="selected-poi-name">${poi.properties.name}</div>
+              <div class="selected-poi-category">${poi.properties.category}</div>
+            </div>
+            <div class="selected-poi-actions">
+              <button class="remove-poi-btn" onclick="removePOIFromWalkthrough('${poiId}')">Remove</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Setup drag and drop
+      setupDragAndDrop();
+    }
+
+    // Remove POI from walkthrough
+    window.removePOIFromWalkthrough = function(poiId) {
+      selectedWalkthroughPOIs = selectedWalkthroughPOIs.filter(id => id !== poiId);
+      renderSelectedPOIs();
+    };
+
+    // Drag and drop functionality
+    function setupDragAndDrop() {
+      const items = document.querySelectorAll('.selected-poi-item');
+
+      items.forEach(item => {
+        item.addEventListener('dragstart', handleDragStart);
+        item.addEventListener('dragover', handleDragOver);
+        item.addEventListener('drop', handleDrop);
+        item.addEventListener('dragend', handleDragEnd);
+      });
+    }
+
+    function handleDragStart(e) {
+      draggedElement = this;
+      this.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/html', this.innerHTML);
+    }
+
+    function handleDragOver(e) {
+      if (e.preventDefault) {
+        e.preventDefault();
+      }
+      e.dataTransfer.dropEffect = 'move';
+      return false;
+    }
+
+    function handleDrop(e) {
+      if (e.stopPropagation) {
+        e.stopPropagation();
+      }
+
+      if (draggedElement !== this) {
+        const draggedIndex = parseInt(draggedElement.dataset.index);
+        const droppedIndex = parseInt(this.dataset.index);
+
+        // Reorder array
+        const [removed] = selectedWalkthroughPOIs.splice(draggedIndex, 1);
+        selectedWalkthroughPOIs.splice(droppedIndex, 0, removed);
+
+        renderSelectedPOIs();
+      }
+
+      return false;
+    }
+
+    function handleDragEnd(e) {
+      this.classList.remove('dragging');
+    }
+
+    // Edit walkthrough
+    window.editWalkthrough = async function(id) {
+      try {
+        const response = await fetch(`/api/walkthroughs/${id}`);
+        const walkthrough = await response.json();
+
+        currentWalkthroughId = id;
+        document.getElementById('walkthroughEditingId').value = id;
+        document.getElementById('walkthroughFormTitle').textContent = 'Edit Walkthrough';
+        document.getElementById('walkthroughTitle').value = walkthrough.title;
+        document.getElementById('walkthroughDescription').value = walkthrough.description;
+        selectedWalkthroughPOIs = walkthrough.pois || [];
+        renderSelectedPOIs();
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (error) {
+        showToast('Failed to load walkthrough', 'error');
+        console.error(error);
+      }
+    };
+
+    // Delete walkthrough
+    window.deleteWalkthrough = async function(id) {
+      if (!confirm('Are you sure you want to delete this walkthrough?')) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/walkthroughs/${id}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          showToast('Walkthrough deleted successfully');
+          loadWalkthroughs();
+        } else {
+          throw new Error('Delete failed');
+        }
+      } catch (error) {
+        showToast('Failed to delete walkthrough', 'error');
+        console.error(error);
+      }
+    };
+
+    // Reset walkthrough form
+    function resetWalkthroughForm() {
+      currentWalkthroughId = null;
+      document.getElementById('walkthroughForm').reset();
+      document.getElementById('walkthroughEditingId').value = '';
+      document.getElementById('walkthroughFormTitle').textContent = 'Add New Walkthrough';
+      selectedWalkthroughPOIs = [];
+      renderSelectedPOIs();
+    }
+
+    // Save walkthrough
+    document.getElementById('walkthroughForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const title = document.getElementById('walkthroughTitle').value.trim();
+      const description = document.getElementById('walkthroughDescription').value.trim();
+      const editingId = document.getElementById('walkthroughEditingId').value;
+
+      if (!title || !description) {
+        showToast('Please fill in all required fields', 'error');
+        return;
+      }
+
+      const walkthrough = {
+        title,
+        description,
+        pois: selectedWalkthroughPOIs
+      };
+
+      try {
+        const url = editingId ? `/api/walkthroughs/${editingId}` : '/api/walkthroughs';
+        const method = editingId ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(walkthrough)
+        });
+
+        if (response.ok) {
+          showToast(editingId ? 'Walkthrough updated successfully' : 'Walkthrough created successfully');
+          resetWalkthroughForm();
+          loadWalkthroughs();
+        } else {
+          throw new Error('Save failed');
+        }
+      } catch (error) {
+        showToast('Failed to save walkthrough', 'error');
+        console.error(error);
+      }
+    });
+
+    // Cancel walkthrough editing
+    document.getElementById('walkthroughCancelBtn').addEventListener('click', resetWalkthroughForm);
   </script>
 
 </body>
