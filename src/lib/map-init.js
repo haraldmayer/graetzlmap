@@ -592,6 +592,103 @@ function createCategoryFilters() {
 		}
 	}
 
+	// POI Search functionality
+	function setupPOISearch() {
+		const searchInput = document.getElementById('poi-search');
+		const resultsDiv = document.getElementById('poi-results');
+
+		if (!searchInput || !resultsDiv) return;
+
+		let searchTimeout;
+
+		searchInput.addEventListener('input', (e) => {
+			const searchTerm = e.target.value.trim().toLowerCase();
+
+			// Clear previous timeout
+			clearTimeout(searchTimeout);
+
+			if (!searchTerm) {
+				resultsDiv.style.display = 'none';
+				return;
+			}
+
+			// Debounce search
+			searchTimeout = setTimeout(() => {
+				const results = geoData.features.filter(poi => {
+					const name = (poi.properties.name || '').toLowerCase();
+					const description = (poi.properties.description || '').toLowerCase();
+					return name.includes(searchTerm) || description.includes(searchTerm);
+				});
+
+				displaySearchResults(results);
+			}, 200);
+		});
+
+		// Close results when clicking outside
+		document.addEventListener('click', (e) => {
+			if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
+				resultsDiv.style.display = 'none';
+			}
+		});
+	}
+
+	function displaySearchResults(results) {
+		const resultsDiv = document.getElementById('poi-results');
+
+		if (results.length === 0) {
+			resultsDiv.innerHTML = '<div class="poi-result-empty">Keine POIs gefunden</div>';
+			resultsDiv.style.display = 'block';
+			return;
+		}
+
+		resultsDiv.innerHTML = results.slice(0, 10).map(poi => {
+			const category = categories[poi.properties.category];
+			const categoryLabel = category ? `${category.emoji} ${category.name}` : poi.properties.category;
+
+			return `
+				<div class="poi-result-item" data-poi-id="${poi.properties.id}">
+					<div class="poi-result-name">${poi.properties.name}</div>
+					<div class="poi-result-category">${categoryLabel}</div>
+				</div>
+			`;
+		}).join('');
+
+		// Add click handlers
+		resultsDiv.querySelectorAll('.poi-result-item').forEach(item => {
+			item.addEventListener('click', () => {
+				const poiId = item.dataset.poiId;
+				const poi = geoData.features.find(p => p.properties.id === poiId);
+				if (poi) {
+					centerOnPOI(poi);
+					resultsDiv.style.display = 'none';
+					document.getElementById('poi-search').value = poi.properties.name;
+				}
+			});
+		});
+
+		resultsDiv.style.display = 'block';
+	}
+
+	function centerOnPOI(poi) {
+		const coords = poi.geometry.coordinates;
+		const latLng = [coords[1], coords[0]]; // GeoJSON uses [lng, lat]
+
+		// Center map on POI with zoom
+		map.setView(latLng, 16, {
+			animate: true,
+			duration: 0.5
+		});
+
+		// Find and open the marker's popup
+		currentMarkers.forEach(marker => {
+			const markerLatLng = marker.getLatLng();
+			if (Math.abs(markerLatLng.lat - latLng[0]) < 0.0001 &&
+			    Math.abs(markerLatLng.lng - latLng[1]) < 0.0001) {
+				marker.openPopup();
+			}
+		});
+	}
+
 	// Handle browser back/forward buttons
 	window.addEventListener('popstate', (event) => {
 		const graetzlSlug = getGraetzlSlugFromPath();
@@ -604,6 +701,9 @@ function createCategoryFilters() {
 			selectGraetzl(null);
 		}
 	});
+
+	// Setup POI search
+	setupPOISearch();
 
 	initialize();
 });

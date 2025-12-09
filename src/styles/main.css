@@ -298,6 +298,79 @@ header h1 {
 	color: #999;
 }
 
+.poi-search-container {
+	position: relative;
+}
+
+.poi-search-input {
+	width: 100%;
+	padding: 0.625rem;
+	background: #f8f9fa;
+	border: 1px solid #e9ecef;
+	border-radius: 6px;
+	font-size: 0.9rem;
+	font-family: inherit;
+	transition: all 0.2s ease;
+}
+
+.poi-search-input:focus {
+	outline: none;
+	border-color: #667eea;
+	background: white;
+	box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.poi-search-input::placeholder {
+	color: #999;
+}
+
+.poi-results {
+	position: absolute;
+	width: 100%;
+	max-height: 300px;
+	overflow-y: auto;
+	background: white;
+	border: 1px solid #e9ecef;
+	border-radius: 6px;
+	margin-top: 4px;
+	box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+	z-index: 10;
+}
+
+.poi-result-item {
+	padding: 0.625rem;
+	cursor: pointer;
+	border-bottom: 1px solid #f1f3f5;
+	transition: background 0.15s ease;
+}
+
+.poi-result-item:hover {
+	background: #f8f9fa;
+}
+
+.poi-result-item:last-child {
+	border-bottom: none;
+}
+
+.poi-result-name {
+	font-weight: 600;
+	font-size: 0.9rem;
+	color: #333;
+	margin-bottom: 2px;
+}
+
+.poi-result-category {
+	font-size: 0.8rem;
+	color: #666;
+}
+
+.poi-result-empty {
+	padding: 1rem;
+	text-align: center;
+	color: #999;
+	font-size: 0.9rem;
+}
+
 .category-filters {
 	display: flex;
 	flex-direction: column;
