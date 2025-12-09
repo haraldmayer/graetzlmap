@@ -152,7 +152,7 @@
       },
       "properties": {
         "name": "Postamt",
-        "category": "post",
+        "category": "post-office",
         "description": "Kleines Postamt",
         "link": ""
       }
@@ -207,6 +207,19 @@
         "category": "restaurant",
         "description": "Sushi, Bento, Bulgogi, Takeaway Onigiri",
         "link": "https://www.matchakomachi.com/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [16.36017068166236, 48.1959801840249]
+      },
+      "properties": {
+        "name": "XO",
+        "category": "restaurant",
+        "description": "among the best burgers in town",
+        "link": "http://www.xo-grill.at/"
       }
     }
   ]

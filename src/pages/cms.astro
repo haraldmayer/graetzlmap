@@ -92,6 +92,29 @@ const title = "POI → GeoJSON Generator";
       color: #666;
       margin-top: 4px;
     }
+
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #10b981;
+      color: white;
+      padding: 16px 24px;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
   </style>
 </head>
 <body>
@@ -111,9 +134,9 @@ const title = "POI → GeoJSON Generator";
       </div>
 
       <div class="full">
-        <label>OR Google Maps Link</label>
-        <input id="gmaps" type="url" placeholder="https://www.google.com/maps/place/.../@48.1979,16.3658,..." />
-        <div class="hint">Coordinates are read automatically from the @lat,long part</div>
+        <label>OR Google Maps Coordinates</label>
+        <input id="gmaps" type="text" placeholder="48.1959801840249, 16.36017068166236" />
+        <div class="hint">Paste coordinates directly from Google Maps (format: latitude, longitude)</div>
       </div>
 
       <div>
@@ -145,6 +168,8 @@ const title = "POI → GeoJSON Generator";
     <pre id="output">{}</pre>
   </div>
 
+  <div id="toast" class="toast">Copied to clipboard!</div>
+
   <!-- ✅ THIS is the critical fix -->
   <script is:inline>
     // Load categories from categories.json
@@ -166,14 +191,26 @@ const title = "POI → GeoJSON Generator";
       }
     }
 
-    function parseGoogleMapsCoords(url) {
-      const match = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
-      if (!match) return null;
+    function parseGoogleMapsCoords(input) {
+      // First try to parse as simple "lat, lng" format
+      const simpleMatch = input.match(/^\s*(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)\s*$/);
+      if (simpleMatch) {
+        return {
+          lat: parseFloat(simpleMatch[1]),
+          lng: parseFloat(simpleMatch[2])
+        };
+      }
 
-      return {
-        lat: parseFloat(match[1]),
-        lng: parseFloat(match[2])
-      };
+      // Fallback: try to parse as Google Maps URL with @lat,lng
+      const urlMatch = input.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+      if (urlMatch) {
+        return {
+          lat: parseFloat(urlMatch[1]),
+          lng: parseFloat(urlMatch[2])
+        };
+      }
+
+      return null;
     }
 
     function generateJSON() {
@@ -185,7 +222,7 @@ const title = "POI → GeoJSON Generator";
       if (gmaps) {
         const coords = parseGoogleMapsCoords(gmaps);
         if (!coords) {
-          alert("Invalid Google Maps link. Could not extract coordinates.");
+          alert("Invalid coordinates format. Please use format: latitude, longitude (e.g., 48.1959801840249, 16.36017068166236)");
           return;
         }
         lat = coords.lat;
@@ -193,7 +230,7 @@ const title = "POI → GeoJSON Generator";
       }
 
       if (isNaN(lat) || isNaN(lng)) {
-        alert("Please enter valid coordinates or a valid Google Maps link.");
+        alert("Please enter valid coordinates.");
         return;
       }
 
@@ -215,6 +252,16 @@ const title = "POI → GeoJSON Generator";
         JSON.stringify(feature, null, 2);
     }
 
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2000);
+    }
+
     function copyJSON() {
       const output = document.getElementById("output").textContent;
       if (!output || output === "{}") {
@@ -223,7 +270,7 @@ const title = "POI → GeoJSON Generator";
       }
 
       navigator.clipboard.writeText(output);
-      alert("Copied to clipboard!");
+      showToast("Copied to clipboard!");
     }
 
     // ✅ Proper event binding (Astro-safe)
