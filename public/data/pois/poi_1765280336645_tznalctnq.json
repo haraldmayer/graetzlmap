@@ -1,0 +1,18 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.401962554185303,
+      48.22193544228238
+    ]
+  },
+  "properties": {
+    "name": "Chicken Karate",
+    "category": "restaurant",
+    "description": "",
+    "link": "",
+    "tags": [],
+    "id": "poi_1765280336645_tznalctnq"
+  }
+}

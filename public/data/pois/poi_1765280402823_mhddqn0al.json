@@ -1,0 +1,18 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.36455168536053,
+      48.19802091921777
+    ]
+  },
+  "properties": {
+    "name": "Anzengruber",
+    "category": "cafe",
+    "description": "",
+    "link": "",
+    "tags": [],
+    "id": "poi_1765280402823_mhddqn0al"
+  }
+}

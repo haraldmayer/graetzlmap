@@ -1092,7 +1092,7 @@
         "Graetzl_ID": 602,
         "Graetzl_Name": "Laimgrube",
         "BEZIRK": 6,
-        "active": 0
+        "active": 1
       },
       "geometry": {
         "type": "Polygon",

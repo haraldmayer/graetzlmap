@@ -430,9 +430,50 @@ const title = "POI Management System";
     .remove-poi-btn:hover {
       background: #b91c1c;
     }
+
+    .header {
+      max-width: 1400px;
+      margin: 0 auto 20px auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      color: #111827;
+    }
+
+    .view-map-btn {
+      padding: 12px 24px;
+      background: #667eea;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .view-map-btn:hover {
+      background: #764ba2;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+    }
   </style>
 </head>
 <body>
+
+  <div class="header">
+    <h1>POI Management System</h1>
+    <a href="/" class="view-map-btn">🗺️ View Map</a>
+  </div>
 
   <div style="max-width: 1400px; margin: 0 auto 20px auto;">
     <div class="tabs">
