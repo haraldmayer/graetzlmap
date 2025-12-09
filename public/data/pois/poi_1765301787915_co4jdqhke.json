@@ -1,0 +1,21 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.372943652221558,
+      48.19956583439551
+    ]
+  },
+  "properties": {
+    "name": "Wien Museum",
+    "category": "museum",
+    "description": {
+      "de": "",
+      "en": ""
+    },
+    "link": "",
+    "tags": [],
+    "id": "poi_1765301787915_co4jdqhke"
+  }
+}

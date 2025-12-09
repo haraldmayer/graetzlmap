@@ -893,8 +893,12 @@ const title = "POI Management System";
         const searchLower = currentSearchTerm.toLowerCase();
         filteredPOIs = filteredPOIs.filter(poi => {
           const name = (poi.properties.name || '').toLowerCase();
-          const description = (poi.properties.description || '').toLowerCase();
-          return name.includes(searchLower) || description.includes(searchLower);
+          // Handle multilingual description
+          const description = poi.properties.description || {};
+          const descriptionText = typeof description === 'string'
+            ? description
+            : (description.de || '') + ' ' + (description.en || '');
+          return name.includes(searchLower) || descriptionText.toLowerCase().includes(searchLower);
         });
       }
 

@@ -1,0 +1,23 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.35976898338075,
+      48.19455064540735
+    ]
+  },
+  "properties": {
+    "name": "Weinschenke",
+    "category": "gasthaus",
+    "description": {
+      "de": "",
+      "en": ""
+    },
+    "link": "",
+    "tags": [
+      "burger"
+    ],
+    "id": "poi_1765301359273_t4a2bumcd"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.371604558674207,
+      48.20085808839353
+    ]
+  },
+  "properties": {
+    "name": "Albertina Modern",
+    "category": "museum",
+    "description": {
+      "de": "",
+      "en": ""
+    },
+    "link": "",
+    "tags": [],
+    "id": "poi_1765301543120_wcho0qxjq"
+  }
+}

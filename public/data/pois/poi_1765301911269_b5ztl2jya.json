@@ -1,0 +1,21 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.372943652221558,
+      48.19956583439551
+    ]
+  },
+  "properties": {
+    "name": "U Karlsplatz",
+    "category": "subway-station",
+    "description": {
+      "de": "U1, U2, U4",
+      "en": ""
+    },
+    "link": "",
+    "tags": [],
+    "id": "poi_1765301911269_b5ztl2jya"
+  }
+}

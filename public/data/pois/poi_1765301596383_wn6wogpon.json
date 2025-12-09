@@ -1,0 +1,21 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.365744681662413,
+      48.19697385785821
+    ]
+  },
+  "properties": {
+    "name": "EVO",
+    "category": "gym",
+    "description": {
+      "de": "",
+      "en": ""
+    },
+    "link": "",
+    "tags": [],
+    "id": "poi_1765301596383_wn6wogpon"
+  }
+}

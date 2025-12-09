@@ -1,0 +1,21 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.364287492809098,
+      48.2021738550682
+    ]
+  },
+  "properties": {
+    "name": "John Harris",
+    "category": "gym",
+    "description": {
+      "de": "",
+      "en": ""
+    },
+    "link": "",
+    "tags": [],
+    "id": "poi_1765301514193_xo7wjxn26"
+  }
+}

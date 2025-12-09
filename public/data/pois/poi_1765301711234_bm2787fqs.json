@@ -1,0 +1,21 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.37164326816906,
+      48.1952791141761
+    ]
+  },
+  "properties": {
+    "name": "Post",
+    "category": "post-office",
+    "description": {
+      "de": "",
+      "en": ""
+    },
+    "link": "",
+    "tags": [],
+    "id": "poi_1765301711234_bm2787fqs"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.365700144014347,
+      48.19684531236729
+    ]
+  },
+  "properties": {
+    "name": "Mani",
+    "category": "restaurant",
+    "description": {
+      "de": "",
+      "en": ""
+    },
+    "link": "",
+    "tags": [],
+    "id": "poi_1765302007105_lqvd690ic"
+  }
+}

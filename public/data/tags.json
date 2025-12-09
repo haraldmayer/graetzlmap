@@ -43,6 +43,10 @@
     "wiener-kueche": {
       "name": "Wiener Kueche",
       "count": 0
+    },
+    "burger": {
+      "name": "Burger",
+      "count": 0
     }
   }
 }
