@@ -1,0 +1,17 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.33443095753456,
+      48.214949969320706
+    ]
+  },
+  "properties": {
+    "name": "Wetter",
+    "category": "restaurant",
+    "description": "Ligurische Küche",
+    "link": "http://www.restaurantwetter.net/",
+    "id": "poi_1765276613531_e4x2pt3mh"
+  }
+}

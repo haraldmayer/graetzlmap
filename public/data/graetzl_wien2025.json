@@ -940,7 +940,7 @@
         "Graetzl_ID": 501,
         "Graetzl_Name": "Margareten (Zentrum)",
         "BEZIRK": 5,
-        "active": 0
+        "active": 1
       },
       "geometry": {
         "type": "Polygon",
@@ -3365,7 +3365,7 @@
         "Graetzl_ID": 1402,
         "Graetzl_Name": "Breitensee",
         "BEZIRK": 14,
-        "active": 0
+        "active": 1
       },
       "geometry": {
         "type": "Polygon",

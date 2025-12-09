@@ -1,0 +1,17 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.309383738835734,
+      48.201338755800656
+    ]
+  },
+  "properties": {
+    "name": "Breitenseer Lichtspiele",
+    "category": "cinema",
+    "description": "Ältestes Kino Wiens",
+    "link": "https://www.breitenseer-lichtspiele.at/",
+    "id": "poi_1765277602818_pnkzhrayo"
+  }
+}
