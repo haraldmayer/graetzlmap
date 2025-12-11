@@ -417,6 +417,13 @@ function createCategoryFilters() {
 				icon: createCustomIcon(poi.category, map.getZoom())
 			}).addTo(map);
 
+			// Add tooltip with POI name
+			marker.bindTooltip(poi.name, {
+				direction: 'top',
+				offset: [0, -10],
+				opacity: 0.9
+			});
+
 			// Create popup content
 			const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${coords[0]},${coords[1]}`;
 			const learnMoreLink = poi.link ? `<a href="${poi.link}" target="_blank" class="poi-link">Website →</a>` : '';
