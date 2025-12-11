@@ -29,6 +29,25 @@
         "poi_1765274869130_0009"
       ],
       "id": "list_1765475474952_ojsmqc88l"
+    },
+    {
+      "title": {
+        "de": "Schwimmen in Wien",
+        "en": "Swimming in Vienna"
+      },
+      "description": {
+        "de": "",
+        "en": ""
+      },
+      "slug": "schwimmen-in-wien",
+      "pois": [
+        "poi_1765478206759_x7i4gzh6p",
+        "poi_1765478229869_9xiwjr661",
+        "poi_1765478155056_yvvfbq634",
+        "poi_1765478275765_wwofztipq",
+        "poi_1765478475573_a16us2z0h"
+      ],
+      "id": "list_1765478372407_o59hbz5bs"
     }
   ]
 }

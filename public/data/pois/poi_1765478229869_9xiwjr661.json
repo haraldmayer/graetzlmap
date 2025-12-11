@@ -3,13 +3,13 @@
   "geometry": {
     "type": "Point",
     "coordinates": [
-      16.37294926823222,
-      48.19960144837969
+      16.406862954741563,
+      48.23104075380825
     ]
   },
   "properties": {
-    "name": "Wien Museum",
-    "category": "museum",
+    "name": "Pier 22",
+    "category": "schwimmen",
     "description": {
       "de": "",
       "en": ""
@@ -17,6 +17,6 @@
     "link": "",
     "instagram": "",
     "tags": [],
-    "id": "poi_1765301787915_co4jdqhke"
+    "id": "poi_1765478229869_9xiwjr661"
   }
 }
