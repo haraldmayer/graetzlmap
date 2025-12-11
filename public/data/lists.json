@@ -1,0 +1,34 @@
+{
+  "lists": [
+    {
+      "title": "Die besten im 4.",
+      "description": "",
+      "pois": [
+        "poi_1765274869131_0014",
+        "poi_1765274869130_0003",
+        "poi_1765280402823_mhddqn0al"
+      ],
+      "id": "list_1765469098673_jjs7cp57i"
+    },
+    {
+      "title": {
+        "de": "Die schönsten Märkte",
+        "en": "The best farmers markets"
+      },
+      "description": {
+        "de": "",
+        "en": ""
+      },
+      "slug": "die-schoensten-maerkte",
+      "pois": [
+        "poi_1765275411428_9qljz6ydm",
+        "poi_1765274869130_0002",
+        "poi_1765280305288_vec0gry2w",
+        "poi_1765280273752_l9e5g2pdx",
+        "poi_1765275205509_w5p13bcym",
+        "poi_1765274869130_0009"
+      ],
+      "id": "list_1765475474952_ojsmqc88l"
+    }
+  ]
+}

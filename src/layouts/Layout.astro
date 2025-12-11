@@ -27,6 +27,20 @@ const { title = 'Grätzlmap - Dein Guide durch Wiens Grätzln' } = Astro.props;
 			<main>
 				<slot />
 			</main>
+
+			<!-- POI Sidebar (for Lists and Walkthroughs) -->
+			<div id="poi-sidebar" class="poi-sidebar">
+				<div class="poi-sidebar-header">
+					<div>
+						<h2 id="poi-sidebar-title">Liste</h2>
+						<p id="poi-sidebar-description" class="poi-sidebar-description"></p>
+					</div>
+					<button id="close-poi-sidebar" class="close-sidebar-btn" type="button">×</button>
+				</div>
+				<div id="poi-sidebar-items" class="poi-sidebar-items">
+					<!-- Items will be populated dynamically -->
+				</div>
+			</div>
 		</div>
 
 		<script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

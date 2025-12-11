@@ -1,0 +1,21 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.366461891340485,
+      48.19643052033441
+    ]
+  },
+  "properties": {
+    "name": "Galerie König",
+    "category": "gallery",
+    "description": {
+      "de": "",
+      "en": ""
+    },
+    "link": "",
+    "tags": [],
+    "id": "poi_1765311945085_smr1lpiyr"
+  }
+}

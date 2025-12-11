@@ -3,8 +3,8 @@
   "geometry": {
     "type": "Point",
     "coordinates": [
-      16.333178941181767,
-      48.18083737443849
+      16.336786284184004,
+      48.214419205523726
     ]
   },
   "properties": {
@@ -15,6 +15,8 @@
       "en": "Samstagsmarkt"
     },
     "link": "",
+    "instagram": "",
+    "tags": [],
     "id": "poi_1765275411428_9qljz6ydm"
   }
 }

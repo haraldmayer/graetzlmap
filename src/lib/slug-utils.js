@@ -1,13 +1,18 @@
 /**
- * Utility functions for converting Grätzl names to URL-friendly slugs and vice versa
+ * Utility functions for converting names to URL-friendly slugs and vice versa
  */
 
 /**
- * Convert a Grätzl name to a URL-friendly slug
- * Example: "Alservorstadt und Michelbeuern" -> "alservorstadt-und-michelbeuern"
+ * Generic function to convert a name to a URL-friendly slug
+ * Example: "Die schönsten Märkte" -> "die-schoensten-maerkte"
  */
-export function graetzlNameToSlug(name) {
+export function nameToSlug(name) {
   if (!name) return '';
+
+  // Handle multilingual objects
+  if (typeof name === 'object') {
+    name = name.de || name.en || '';
+  }
 
   return name
     .toLowerCase()
@@ -17,6 +22,14 @@ export function graetzlNameToSlug(name) {
     .replace(/ß/g, 'ss')
     .replace(/[^a-z0-9]+/g, '-')  // Replace non-alphanumeric with dashes
     .replace(/^-+|-+$/g, '');      // Remove leading/trailing dashes
+}
+
+/**
+ * Convert a Grätzl name to a URL-friendly slug
+ * Example: "Alservorstadt und Michelbeuern" -> "alservorstadt-und-michelbeuern"
+ */
+export function graetzlNameToSlug(name) {
+  return nameToSlug(name);
 }
 
 /**
@@ -70,9 +83,76 @@ export function updateUrlForGraetzl(graetzl) {
   }
 }
 
+/**
+ * Get the current list slug from the URL path
+ * Returns null if not on a /l/<slug> path
+ */
+export function getListSlugFromPath() {
+  const path = window.location.pathname;
+  const match = path.match(/^\/l\/([^\/]+)\/?$/);
+  return match ? match[1] : null;
+}
+
+/**
+ * Get the current walkthrough slug from the URL path
+ * Returns null if not on a /w/<slug> path
+ */
+export function getWalkthroughSlugFromPath() {
+  const path = window.location.pathname;
+  const match = path.match(/^\/w\/([^\/]+)\/?$/);
+  return match ? match[1] : null;
+}
+
+/**
+ * Update the browser URL to reflect the selected list
+ * Uses history.pushState to avoid page reload
+ */
+export function updateUrlForList(list) {
+  if (list) {
+    const slug = list.slug || nameToSlug(list.title);
+    const newUrl = `/l/${slug}`;
+
+    // Only push if URL is different
+    if (window.location.pathname !== newUrl) {
+      window.history.pushState({ list: slug }, '', newUrl);
+    }
+  } else {
+    // No list selected, go back to root
+    if (window.location.pathname !== '/') {
+      window.history.pushState({ list: null }, '', '/');
+    }
+  }
+}
+
+/**
+ * Update the browser URL to reflect the selected walkthrough
+ * Uses history.pushState to avoid page reload
+ */
+export function updateUrlForWalkthrough(walkthrough) {
+  if (walkthrough) {
+    const slug = walkthrough.slug || nameToSlug(walkthrough.title);
+    const newUrl = `/w/${slug}`;
+
+    // Only push if URL is different
+    if (window.location.pathname !== newUrl) {
+      window.history.pushState({ walkthrough: slug }, '', newUrl);
+    }
+  } else {
+    // No walkthrough selected, go back to root
+    if (window.location.pathname !== '/') {
+      window.history.pushState({ walkthrough: null }, '', '/');
+    }
+  }
+}
+
 export default {
+  nameToSlug,
   graetzlNameToSlug,
   findGraetzlBySlug,
   getGraetzlSlugFromPath,
-  updateUrlForGraetzl
+  updateUrlForGraetzl,
+  getListSlugFromPath,
+  getWalkthroughSlugFromPath,
+  updateUrlForList,
+  updateUrlForWalkthrough
 };

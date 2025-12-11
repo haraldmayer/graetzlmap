@@ -1,0 +1,12 @@
+---
+// This dynamic route handles /l/<list-slug> URLs
+// It simply returns the main page, which will handle the list selection client-side
+import Layout from '../../layouts/Layout.astro';
+
+// Use server-side rendering or fallback mode since lists are managed dynamically
+export const prerender = false;
+---
+
+<Layout>
+	<div id="map"></div>
+</Layout>

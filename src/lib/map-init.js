@@ -3,7 +3,15 @@
  */
 
 import geoquery from './geoquery.js';
-import { findGraetzlBySlug, getGraetzlSlugFromPath, updateUrlForGraetzl } from './slug-utils.js';
+import {
+	findGraetzlBySlug,
+	getGraetzlSlugFromPath,
+	updateUrlForGraetzl,
+	getListSlugFromPath,
+	getWalkthroughSlugFromPath,
+	updateUrlForList,
+	updateUrlForWalkthrough
+} from './slug-utils.js';
 
 window.addEventListener('load', async function() {
 	// Initialize map centered on Vienna
@@ -39,6 +47,9 @@ window.addEventListener('load', async function() {
 	let currentWalkthrough = null; // Track currently active walkthrough
 	let walkthroughData = []; // Store walkthrough data
 	let walkthroughArrows = []; // Store walkthrough arrow layers
+	let currentList = null; // Track currently active list
+	let listData = []; // Store list data
+	let listMarkers = []; // Store list number markers
 
 	// Language setting - defaults to German
 	const currentLanguage = 'de';
@@ -76,6 +87,21 @@ window.addEventListener('load', async function() {
 		} catch (error) {
 			console.error('Error loading walkthroughs:', error);
 			walkthroughData = [];
+		}
+	}
+
+	// Function to load lists
+	async function loadLists() {
+		try {
+			const response = await fetch('/api/lists');
+			if (!response.ok) {
+				throw new Error('Failed to load lists');
+			}
+			listData = await response.json();
+			console.log('Lists loaded:', listData.length);
+		} catch (error) {
+			console.error('Error loading lists:', error);
+			listData = [];
 		}
 	}
 
@@ -355,6 +381,11 @@ function createCategoryFilters() {
 			poiFeatures = geoData.features.filter(feature =>
 				currentWalkthrough.pois.includes(feature.properties.id)
 			);
+		} else if (currentList && currentList.pois && currentList.pois.length > 0) {
+			// If in list mode, only show list POIs
+			poiFeatures = geoData.features.filter(feature =>
+				currentList.pois.includes(feature.properties.id)
+			);
 		} else {
 			// Build filter
 			const filters = {};
@@ -619,6 +650,9 @@ function createCategoryFilters() {
 			console.log('Loading walkthroughs...');
 			await loadWalkthroughs();
 
+			console.log('Loading lists...');
+			await loadLists();
+
 			// Populate Grätzl dropdown
 			populateGraetzlDropdown();
 
@@ -628,9 +662,43 @@ function createCategoryFilters() {
 			// Setup walkthrough selector
 			setupWalkthroughSelector();
 
-			// Check if a Grätzl is specified in the URL
+			// Setup list selector
+			setupListSelector();
+
+			// Check URL for Grätzl, Walkthrough, or List
 			const graetzlSlug = getGraetzlSlugFromPath();
-			if (graetzlSlug) {
+			const walkthroughSlug = getWalkthroughSlugFromPath();
+			const listSlug = getListSlugFromPath();
+
+			if (walkthroughSlug) {
+				console.log('Walkthrough slug from URL:', walkthroughSlug);
+				const walkthrough = walkthroughData.find(w => w.slug === walkthroughSlug);
+				if (walkthrough) {
+					console.log('Found Walkthrough:', walkthrough.title);
+					const walkthroughSelect = document.getElementById('walkthrough-select');
+					if (walkthroughSelect) {
+						walkthroughSelect.value = walkthrough.id;
+					}
+					activateWalkthrough(walkthrough.id);
+				} else {
+					console.warn('Walkthrough not found for slug:', walkthroughSlug);
+					showAllPOIs();
+				}
+			} else if (listSlug) {
+				console.log('List slug from URL:', listSlug);
+				const list = listData.find(l => l.slug === listSlug);
+				if (list) {
+					console.log('Found List:', list.title);
+					const listSelect = document.getElementById('list-select');
+					if (listSelect) {
+						listSelect.value = list.id;
+					}
+					activateList(list.id);
+				} else {
+					console.warn('List not found for slug:', listSlug);
+					showAllPOIs();
+				}
+			} else if (graetzlSlug) {
 				console.log('Grätzl slug from URL:', graetzlSlug);
 				const graetzl = findGraetzlBySlug(graetzlData, graetzlSlug);
 				if (graetzl) {
@@ -652,78 +720,163 @@ function createCategoryFilters() {
 	// POI Search functionality
 	function setupPOISearch() {
 		const searchInput = document.getElementById('poi-search');
-		const resultsDiv = document.getElementById('poi-results');
+		const dropdown = document.getElementById('poi-dropdown');
+		const clearButton = document.getElementById('clear-poi');
 
-		if (!searchInput || !resultsDiv) return;
+		if (!searchInput || !dropdown) return;
 
 		let searchTimeout;
+		let selectedPOI = null;
+		let focusedIndex = -1;
 
+		// Update clear button visibility
+		function updateClearButton() {
+			if (searchInput.value || searchInput.dataset.selected === 'true') {
+				clearButton.style.display = 'flex';
+			} else {
+				clearButton.style.display = 'none';
+			}
+		}
+
+		// Search and filter POIs
+		function searchPOIs(searchTerm) {
+			if (!searchTerm) {
+				dropdown.style.display = 'none';
+				return;
+			}
+
+			const results = geoData.features.filter(poi => {
+				const name = (poi.properties.name || '').toLowerCase();
+				const description = getTranslated(poi.properties.description).toLowerCase();
+				return name.includes(searchTerm) || description.includes(searchTerm);
+			});
+
+			displaySearchResults(results);
+		}
+
+		function displaySearchResults(results) {
+			if (results.length === 0) {
+				dropdown.innerHTML = '<div class="graetzl-option">Keine POIs gefunden</div>';
+				dropdown.style.display = 'block';
+				return;
+			}
+
+			dropdown.innerHTML = results.slice(0, 10).map(poi => {
+				const category = categories[poi.properties.category];
+				const categoryLabel = category ? `${category.emoji} ${getTranslated(category.name)}` : poi.properties.category;
+
+				return `
+					<div class="graetzl-option" data-poi-id="${poi.properties.id}" data-name="${poi.properties.name}">
+						<div style="font-weight: 600;">${poi.properties.name}</div>
+						<div style="font-size: 0.85rem; color: #666; margin-top: 2px;">${categoryLabel}</div>
+					</div>
+				`;
+			}).join('');
+
+			// Add click handlers
+			dropdown.querySelectorAll('.graetzl-option').forEach(option => {
+				option.addEventListener('click', () => {
+					const poiId = option.dataset.poiId;
+					const poi = geoData.features.find(p => p.properties.id === poiId);
+					if (poi) {
+						selectPOI(poi);
+					}
+				});
+			});
+
+			dropdown.style.display = 'block';
+		}
+
+		function selectPOI(poi) {
+			selectedPOI = poi;
+			searchInput.value = poi.properties.name;
+			searchInput.dataset.selected = 'true';
+			dropdown.style.display = 'none';
+			focusedIndex = -1;
+			updateClearButton();
+			centerOnPOI(poi);
+		}
+
+		function clearSelection() {
+			selectedPOI = null;
+			searchInput.value = '';
+			searchInput.dataset.selected = 'false';
+			dropdown.style.display = 'none';
+			focusedIndex = -1;
+			updateClearButton();
+		}
+
+		// Search input handler
 		searchInput.addEventListener('input', (e) => {
 			const searchTerm = e.target.value.trim().toLowerCase();
+			searchInput.dataset.selected = 'false';
+			focusedIndex = -1;
 
 			// Clear previous timeout
 			clearTimeout(searchTimeout);
 
-			if (!searchTerm) {
-				resultsDiv.style.display = 'none';
-				return;
-			}
-
 			// Debounce search
 			searchTimeout = setTimeout(() => {
-				const results = geoData.features.filter(poi => {
-					const name = (poi.properties.name || '').toLowerCase();
-					const description = (poi.properties.description || '').toLowerCase();
-					return name.includes(searchTerm) || description.includes(searchTerm);
-				});
-
-				displaySearchResults(results);
+				searchPOIs(searchTerm);
 			}, 200);
+
+			updateClearButton();
 		});
 
-		// Close results when clicking outside
-		document.addEventListener('click', (e) => {
-			if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
-				resultsDiv.style.display = 'none';
+		// Show dropdown on focus
+		searchInput.addEventListener('focus', () => {
+			if (searchInput.dataset.selected === 'true' && selectedPOI) {
+				searchInput.select();
+			}
+			const searchTerm = searchInput.value.trim().toLowerCase();
+			if (searchTerm) {
+				searchPOIs(searchTerm);
 			}
 		});
-	}
 
-	function displaySearchResults(results) {
-		const resultsDiv = document.getElementById('poi-results');
+		// Keyboard navigation
+		searchInput.addEventListener('keydown', (e) => {
+			const options = Array.from(dropdown.querySelectorAll('.graetzl-option'));
 
-		if (results.length === 0) {
-			resultsDiv.innerHTML = '<div class="poi-result-empty">Keine POIs gefunden</div>';
-			resultsDiv.style.display = 'block';
-			return;
-		}
-
-		resultsDiv.innerHTML = results.slice(0, 10).map(poi => {
-			const category = categories[poi.properties.category];
-			const categoryLabel = category ? `${category.emoji} ${getTranslated(category.name)}` : poi.properties.category;
-
-			return `
-				<div class="poi-result-item" data-poi-id="${poi.properties.id}">
-					<div class="poi-result-name">${poi.properties.name}</div>
-					<div class="poi-result-category">${categoryLabel}</div>
-				</div>
-			`;
-		}).join('');
-
-		// Add click handlers
-		resultsDiv.querySelectorAll('.poi-result-item').forEach(item => {
-			item.addEventListener('click', () => {
-				const poiId = item.dataset.poiId;
-				const poi = geoData.features.find(p => p.properties.id === poiId);
-				if (poi) {
-					centerOnPOI(poi);
-					resultsDiv.style.display = 'none';
-					document.getElementById('poi-search').value = poi.properties.name;
+			if (e.key === 'ArrowDown') {
+				e.preventDefault();
+				focusedIndex = Math.min(focusedIndex + 1, options.length - 1);
+				updateFocusedOption(options);
+			} else if (e.key === 'ArrowUp') {
+				e.preventDefault();
+				focusedIndex = Math.max(focusedIndex - 1, -1);
+				updateFocusedOption(options);
+			} else if (e.key === 'Enter') {
+				e.preventDefault();
+				if (focusedIndex >= 0 && options[focusedIndex]) {
+					options[focusedIndex].click();
 				}
-			});
+			} else if (e.key === 'Escape') {
+				dropdown.style.display = 'none';
+				searchInput.blur();
+			}
 		});
 
-		resultsDiv.style.display = 'block';
+		function updateFocusedOption(options) {
+			options.forEach((opt, idx) => {
+				if (idx === focusedIndex) {
+					opt.classList.add('focused');
+					opt.scrollIntoView({ block: 'nearest' });
+				} else {
+					opt.classList.remove('focused');
+				}
+			});
+		}
+
+		// Clear button
+		clearButton.addEventListener('click', clearSelection);
+
+		// Close dropdown when clicking outside
+		document.addEventListener('click', (e) => {
+			if (!e.target.closest('.searchable-select')) {
+				dropdown.style.display = 'none';
+			}
+		});
 	}
 
 	function centerOnPOI(poi) {
@@ -851,6 +1004,60 @@ function createCategoryFilters() {
 		walkthroughArrows = [];
 	}
 
+	// Draw number markers for list POIs (without arrows)
+	function drawListNumbers(poiIds) {
+		// Clear existing markers
+		clearListMarkers();
+
+		if (!poiIds || poiIds.length === 0) return;
+
+		// Get POI coordinates
+		const coords = [];
+		poiIds.forEach(poiId => {
+			const poi = geoData.features.find(f => f.properties.id === poiId);
+			if (poi) {
+				const [lng, lat] = poi.geometry.coordinates;
+				coords.push([lat, lng]);
+			}
+		});
+
+		// Add number markers at each POI
+		coords.forEach((coord, index) => {
+			const numberMarker = L.marker(coord, {
+				icon: L.divIcon({
+					html: `<div style="
+						background: #2563eb;
+						color: white;
+						width: 24px;
+						height: 24px;
+						border-radius: 50%;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						font-weight: bold;
+						font-size: 12px;
+						border: 2px solid white;
+						box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+					">${index + 1}</div>`,
+					className: 'list-number',
+					iconSize: [24, 24],
+					iconAnchor: [12, 12]
+				}),
+				zIndexOffset: 1000
+			}).addTo(map);
+
+			listMarkers.push(numberMarker);
+		});
+	}
+
+	// Clear list markers
+	function clearListMarkers() {
+		listMarkers.forEach(marker => {
+			map.removeLayer(marker);
+		});
+		listMarkers = [];
+	}
+
 	// Zoom map to fit walkthrough POIs
 	function zoomToWalkthroughPOIs(poiIds) {
 		if (!poiIds || poiIds.length === 0) return;
@@ -872,16 +1079,39 @@ function createCategoryFilters() {
 		}
 	}
 
+	// Zoom map to fit list POIs
+	function zoomToListPOIs(poiIds) {
+		if (!poiIds || poiIds.length === 0) return;
+
+		const bounds = [];
+		poiIds.forEach(poiId => {
+			const poi = geoData.features.find(f => f.properties.id === poiId);
+			if (poi) {
+				const [lng, lat] = poi.geometry.coordinates;
+				bounds.push([lat, lng]);
+			}
+		});
+
+		if (bounds.length > 0) {
+			map.fitBounds(bounds, {
+				padding: [50, 350],
+				maxZoom: 16
+			});
+		}
+	}
+
 	// Walkthrough selector functionality
 	function setupWalkthroughSelector() {
 		const selectElement = document.getElementById('walkthrough-select');
-		const infoDiv = document.getElementById('walkthrough-info');
-		const descriptionP = document.getElementById('walkthrough-description');
-		const exitButton = document.getElementById('exit-walkthrough');
+		const sidebarDiv = document.getElementById('poi-sidebar');
+		const sidebarTitle = document.getElementById('poi-sidebar-title');
+		const sidebarDescription = document.getElementById('poi-sidebar-description');
+		const sidebarItems = document.getElementById('poi-sidebar-items');
+		const closeSidebar = document.getElementById('close-poi-sidebar');
 		const categoryToggle = document.getElementById('category-toggle');
 		const categoryDropdown = document.getElementById('category-dropdown');
 
-		if (!selectElement || !infoDiv || !descriptionP || !exitButton) {
+		if (!selectElement || !sidebarDiv) {
 			console.warn('Walkthrough UI elements not found');
 			return;
 		}
@@ -894,13 +1124,67 @@ function createCategoryFilters() {
 			walkthroughData.forEach(walkthrough => {
 				const option = document.createElement('option');
 				option.value = walkthrough.id;
-				option.textContent = walkthrough.title;
+				option.textContent = getTranslated(walkthrough.title);
 				selectElement.appendChild(option);
+			});
+		}
+
+		// Update sidebar with walkthrough POIs
+		function updateSidebarForWalkthrough(walkthrough) {
+			sidebarTitle.textContent = getTranslated(walkthrough.title);
+			const description = getTranslated(walkthrough.description);
+			sidebarDescription.textContent = description;
+			sidebarDescription.style.display = description ? 'block' : 'none';
+			sidebarItems.innerHTML = '';
+
+			walkthrough.pois.forEach((poiId, index) => {
+				const poi = geoData.features.find(f => f.properties.id === poiId);
+				if (!poi) return;
+
+				const category = categories[poi.properties.category];
+				const categoryIcon = category ? category.emoji : '';
+				const description = getTranslated(poi.properties.description);
+
+				const item = document.createElement('div');
+				item.className = 'poi-sidebar-item';
+				item.dataset.poiId = poiId;
+				item.innerHTML = `
+					<div class="list-item-number">${index + 1}</div>
+					<div class="list-item-content">
+						<div class="list-item-name">${categoryIcon} ${poi.properties.name}</div>
+						${description ? `<div class="list-item-description">${description}</div>` : ''}
+						${poi.properties.link ? `<a href="${poi.properties.link}" target="_blank" class="list-item-link">Webseite</a>` : ''}
+						${poi.properties.instagram ? `<a href="${poi.properties.instagram}" target="_blank" class="list-item-link">Instagram</a>` : ''}
+					</div>
+				`;
+
+				// Click handler to center map on POI
+				item.addEventListener('click', () => {
+					const coords = poi.geometry.coordinates;
+					const latLng = [coords[1], coords[0]];
+					map.setView(latLng, 17, { animate: true });
+
+					// Highlight the item
+					document.querySelectorAll('.poi-sidebar-item').forEach(el => el.classList.remove('active'));
+					item.classList.add('active');
+				});
+
+				sidebarItems.appendChild(item);
 			});
 		}
 
 		// Activate walkthrough
 		function activateWalkthrough(walkthroughId) {
+			// Deactivate list if active
+			if (currentList) {
+				const listSelect = document.getElementById('list-select');
+				if (listSelect) {
+					listSelect.value = '';
+				}
+				clearListMarkers();
+				currentList = null;
+			}
+
 			const walkthrough = walkthroughData.find(w => w.id === walkthroughId);
 			if (!walkthrough) {
 				console.warn('Walkthrough not found:', walkthroughId);
@@ -909,9 +1193,9 @@ function createCategoryFilters() {
 
 			currentWalkthrough = walkthrough;
 
-			// Show description and exit button
-			descriptionP.textContent = walkthrough.description || '';
-			infoDiv.style.display = 'block';
+			// Show sidebar with walkthrough details
+			updateSidebarForWalkthrough(walkthrough);
+			sidebarDiv.classList.add('active');
 
 			// Disable category filter toggle
 			if (categoryToggle) {
@@ -934,6 +1218,9 @@ function createCategoryFilters() {
 			// Draw arrows connecting the POIs
 			drawWalkthroughArrows(walkthrough.pois);
 
+			// Update URL
+			updateUrlForWalkthrough(walkthrough);
+
 			console.log('Walkthrough activated:', walkthrough.title);
 		}
 
@@ -941,8 +1228,8 @@ function createCategoryFilters() {
 		function deactivateWalkthrough() {
 			currentWalkthrough = null;
 
-			// Hide description and exit button
-			infoDiv.style.display = 'none';
+			// Hide sidebar
+			sidebarDiv.classList.remove('active');
 
 			// Re-enable category filter toggle
 			if (categoryToggle) {
@@ -960,6 +1247,9 @@ function createCategoryFilters() {
 			// Update markers to show filtered POIs
 			updateMarkers();
 
+			// Update URL (go back to root)
+			updateUrlForWalkthrough(null);
+
 			console.log('Walkthrough deactivated');
 		}
 
@@ -973,13 +1263,189 @@ function createCategoryFilters() {
 			}
 		});
 
-		// Handle exit button
-		exitButton.addEventListener('click', () => {
-			deactivateWalkthrough();
-		});
+		// Handle close button
+		if (closeSidebar) {
+			closeSidebar.addEventListener('click', () => {
+				deactivateWalkthrough();
+			});
+		}
 
 		// Initial population
 		populateWalkthroughs();
+	}
+
+	// List selector functionality
+	function setupListSelector() {
+		const selectElement = document.getElementById('list-select');
+		const sidebarDiv = document.getElementById('poi-sidebar');
+		const sidebarTitle = document.getElementById('poi-sidebar-title');
+		const sidebarDescription = document.getElementById('poi-sidebar-description');
+		const sidebarItems = document.getElementById('poi-sidebar-items');
+		const closeSidebar = document.getElementById('close-poi-sidebar');
+		const categoryToggle = document.getElementById('category-toggle');
+		const categoryDropdown = document.getElementById('category-dropdown');
+
+		if (!selectElement || !sidebarDiv) {
+			console.warn('List UI elements not found');
+			return;
+		}
+
+		// Populate list options
+		function populateLists() {
+			// Clear existing options except the first (default)
+			selectElement.innerHTML = '<option value="">Keine Liste ausgewählt</option>';
+
+			listData.forEach(list => {
+				const option = document.createElement('option');
+				option.value = list.id;
+				option.textContent = getTranslated(list.title);
+				selectElement.appendChild(option);
+			});
+		}
+
+		// Update sidebar with list POIs
+		function updateSidebar(list) {
+			sidebarTitle.textContent = getTranslated(list.title);
+			const description = getTranslated(list.description);
+			sidebarDescription.textContent = description;
+			sidebarDescription.style.display = description ? 'block' : 'none';
+			sidebarItems.innerHTML = '';
+
+			list.pois.forEach((poiId, index) => {
+				const poi = geoData.features.find(f => f.properties.id === poiId);
+				if (!poi) return;
+
+				const category = categories[poi.properties.category];
+				const categoryIcon = category ? category.emoji : '';
+				const description = getTranslated(poi.properties.description);
+
+				const item = document.createElement('div');
+				item.className = 'poi-sidebar-item';
+				item.dataset.poiId = poiId;
+				item.innerHTML = `
+					<div class="list-item-number">${index + 1}</div>
+					<div class="list-item-content">
+						<div class="list-item-name">${categoryIcon} ${poi.properties.name}</div>
+						${description ? `<div class="list-item-description">${description}</div>` : ''}
+						${poi.properties.link ? `<a href="${poi.properties.link}" target="_blank" class="list-item-link">Webseite</a>` : ''}
+						${poi.properties.instagram ? `<a href="${poi.properties.instagram}" target="_blank" class="list-item-link">Instagram</a>` : ''}
+					</div>
+				`;
+
+				// Click handler to center map on POI
+				item.addEventListener('click', () => {
+					const coords = poi.geometry.coordinates;
+					const latLng = [coords[1], coords[0]];
+					map.setView(latLng, 17, { animate: true });
+
+					// Highlight the item
+					document.querySelectorAll('.poi-sidebar-item').forEach(el => el.classList.remove('active'));
+					item.classList.add('active');
+				});
+
+				sidebarItems.appendChild(item);
+			});
+		}
+
+		// Activate list
+		function activateList(listId) {
+			// Deactivate walkthrough if active
+			if (currentWalkthrough) {
+				const walkthroughSelect = document.getElementById('walkthrough-select');
+				if (walkthroughSelect) {
+					walkthroughSelect.value = '';
+				}
+				clearWalkthroughArrows();
+				currentWalkthrough = null;
+			}
+
+			const list = listData.find(l => l.id === listId);
+			if (!list) {
+				console.warn('List not found:', listId);
+				return;
+			}
+
+			currentList = list;
+
+			// Show sidebar
+			updateSidebar(list);
+			sidebarDiv.classList.add('active');
+
+			// Disable category filter toggle
+			if (categoryToggle) {
+				categoryToggle.disabled = true;
+				categoryToggle.style.opacity = '0.5';
+				categoryToggle.style.cursor = 'not-allowed';
+			}
+
+			// Close category dropdown if open
+			if (categoryDropdown) {
+				categoryDropdown.style.display = 'none';
+			}
+
+			// Update markers to show only list POIs
+			updateMarkers();
+
+			// Zoom map to fit all list POIs
+			zoomToListPOIs(list.pois);
+
+			// Draw number markers
+			drawListNumbers(list.pois);
+
+			// Update URL
+			updateUrlForList(list);
+
+			console.log('List activated:', list.title);
+		}
+
+		// Deactivate list
+		function deactivateList() {
+			currentList = null;
+
+			// Hide sidebar
+			sidebarDiv.classList.remove('active');
+
+			// Re-enable category filter toggle
+			if (categoryToggle) {
+				categoryToggle.disabled = false;
+				categoryToggle.style.opacity = '1';
+				categoryToggle.style.cursor = 'pointer';
+			}
+
+			// Clear list markers
+			clearListMarkers();
+
+			// Reset select to default
+			selectElement.value = '';
+
+			// Update markers to show filtered POIs
+			updateMarkers();
+
+			// Update URL (go back to root)
+			updateUrlForList(null);
+
+			console.log('List deactivated');
+		}
+
+		// Handle select change
+		selectElement.addEventListener('change', (e) => {
+			const listId = e.target.value;
+			if (listId) {
+				activateList(listId);
+			} else {
+				deactivateList();
+			}
+		});
+
+		// Handle close button
+		if (closeSidebar) {
+			closeSidebar.addEventListener('click', () => {
+				deactivateList();
+			});
+		}
+
+		// Initial population
+		populateLists();
 	}
 
 	// Handle browser back/forward buttons

@@ -1,0 +1,22 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.370812297004612,
+      48.19501985953923
+    ]
+  },
+  "properties": {
+    "name": "Galerie Neuwirth",
+    "category": "gallery",
+    "description": {
+      "de": "",
+      "en": ""
+    },
+    "link": "https://www.galerie-neuwirth.com/",
+    "instagram": "https://www.instagram.com/galerieneuwirth/",
+    "tags": [],
+    "id": "poi_1765312209321_qvq2ogvhm"
+  }
+}

@@ -25,16 +25,24 @@
 
 	<div class="nav-section">
 		<h2>POI suchen</h2>
-		<div class="poi-search-container">
+		<div class="searchable-select">
 			<input
 				type="text"
 				id="poi-search"
-				class="poi-search-input"
+				class="graetzl-search-input"
 				placeholder="POI nach Name suchen..."
 				autocomplete="off"
+				data-selected="false"
 			/>
-			<div id="poi-results" class="poi-results" style="display: none;">
-				<!-- Search results will be populated dynamically -->
+			<button
+				id="clear-poi"
+				class="clear-button"
+				type="button"
+				style="display: none;"
+				title="Auswahl löschen"
+			>×</button>
+			<div id="poi-dropdown" class="graetzl-dropdown" style="display: none;">
+				<!-- Options will be populated dynamically -->
 			</div>
 		</div>
 	</div>
@@ -44,10 +52,13 @@
 		<select id="walkthrough-select" class="walkthrough-select">
 			<option value="">Kein Walk ausgewählt</option>
 		</select>
-		<div id="walkthrough-info" class="walkthrough-info" style="display: none;">
-			<p id="walkthrough-description" class="walkthrough-description"></p>
-			<button id="exit-walkthrough" class="exit-walkthrough-btn" type="button">Walk beenden</button>
-		</div>
+	</div>
+
+	<div class="nav-section">
+		<h2>Liste</h2>
+		<select id="list-select" class="list-select">
+			<option value="">Keine Liste ausgewählt</option>
+		</select>
 	</div>
 
 	<div class="nav-section">

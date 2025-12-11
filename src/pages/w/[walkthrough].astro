@@ -1,0 +1,12 @@
+---
+// This dynamic route handles /w/<walkthrough-slug> URLs
+// It simply returns the main page, which will handle the walkthrough selection client-side
+import Layout from '../../layouts/Layout.astro';
+
+// Use server-side rendering or fallback mode since walkthroughs are managed dynamically
+export const prerender = false;
+---
+
+<Layout>
+	<div id="map"></div>
+</Layout>
