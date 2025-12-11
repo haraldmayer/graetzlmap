@@ -1473,6 +1473,12 @@ function createCategoryFilters() {
 
 	// Function to update all UI text based on current language
 	function updateUILanguage() {
+		// Header
+		const headerSubtitle = document.getElementById('header-subtitle');
+		if (headerSubtitle) {
+			headerSubtitle.textContent = t('header.subtitle');
+		}
+
 		// Navigation sections
 		const navSections = {
 			'list-select': { parent: 'h2', text: t('nav.list') },
