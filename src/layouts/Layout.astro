@@ -23,6 +23,12 @@ const { title = 'Grätzlmap - Dein Guide durch Wiens Grätzln' } = Astro.props;
 	<body>
 		<div class="container">
 			<Header />
+
+			<!-- Language Switcher -->
+			<button id="language-switcher" class="language-switcher" type="button" title="Switch language">
+				<span id="language-switcher-text">EN</span>
+			</button>
+
 			<Navigation />
 			<main>
 				<slot />

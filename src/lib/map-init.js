@@ -12,6 +12,12 @@ import {
 	updateUrlForList,
 	updateUrlForWalkthrough
 } from './slug-utils.js';
+import {
+	initLanguage,
+	getCurrentLanguage,
+	setLanguage,
+	t
+} from './i18n.js';
 
 window.addEventListener('load', async function() {
 	// Initialize map centered on Vienna
@@ -51,14 +57,15 @@ window.addEventListener('load', async function() {
 	let listData = []; // Store list data
 	let listMarkers = []; // Store list number markers
 
-	// Language setting - defaults to German
-	const currentLanguage = 'de';
+	// Initialize language system
+	initLanguage();
 
 	// Helper function to get translated text
 	function getTranslated(text, fallbackLang = 'de') {
 		if (!text) return '';
 		if (typeof text === 'string') return text;
-		return text[currentLanguage] || text[fallbackLang] || Object.values(text)[0] || '';
+		const lang = getCurrentLanguage();
+		return text[lang] || text[fallbackLang] || Object.values(text)[0] || '';
 	}
 
 	// Function to load categories
@@ -1463,6 +1470,159 @@ function createCategoryFilters() {
 
 	// Setup POI search
 	setupPOISearch();
+
+	// Function to update all UI text based on current language
+	function updateUILanguage() {
+		// Navigation sections
+		const navSections = {
+			'list-select': { parent: 'h2', text: t('nav.list') },
+			'walkthrough-select': { parent: 'h2', text: t('nav.walkthrough') },
+			'graetzl-search': { parent: 'h2', text: t('nav.selectGraetzl') },
+			'poi-search': { parent: 'h2', text: t('nav.searchPOI') }
+		};
+
+		Object.entries(navSections).forEach(([id, config]) => {
+			const element = document.getElementById(id);
+			if (element) {
+				const heading = element.closest('.nav-section')?.querySelector('h2');
+				if (heading) {
+					heading.textContent = config.text;
+				}
+			}
+		});
+
+		// Placeholders
+		const listSelect = document.getElementById('list-select');
+		if (listSelect && listSelect.options[0]) {
+			listSelect.options[0].textContent = t('placeholder.noList');
+		}
+
+		const walkthroughSelect = document.getElementById('walkthrough-select');
+		if (walkthroughSelect && walkthroughSelect.options[0]) {
+			walkthroughSelect.options[0].textContent = t('placeholder.noWalk');
+		}
+
+		const graetzlSearch = document.getElementById('graetzl-search');
+		if (graetzlSearch) {
+			graetzlSearch.placeholder = t('placeholder.allGraetzl');
+		}
+
+		const poiSearch = document.getElementById('poi-search');
+		if (poiSearch) {
+			poiSearch.placeholder = t('placeholder.searchPOI');
+		}
+
+		const categorySearch = document.getElementById('category-search');
+		if (categorySearch) {
+			categorySearch.placeholder = t('placeholder.searchCategories');
+		}
+
+		// Category buttons
+		const categoryToggleText = document.querySelector('.category-toggle-text');
+		if (categoryToggleText) {
+			categoryToggleText.textContent = t('category.allCategories');
+		}
+
+		const selectAllBtn = document.getElementById('select-all-categories');
+		if (selectAllBtn) {
+			selectAllBtn.textContent = t('button.selectAll');
+		}
+
+		const deselectAllBtn = document.getElementById('deselect-all-categories');
+		if (deselectAllBtn) {
+			deselectAllBtn.textContent = t('button.deselectAll');
+		}
+
+		// Clear buttons
+		document.querySelectorAll('.clear-button').forEach(btn => {
+			btn.title = t('button.clearSelection');
+		});
+
+		// Language switcher button
+		const langSwitcherText = document.getElementById('language-switcher-text');
+		if (langSwitcherText) {
+			langSwitcherText.textContent = getCurrentLanguage() === 'de' ? 'EN' : 'DE';
+		}
+
+		// Update dropdowns if they have items
+		const walkthroughSelectEl = document.getElementById('walkthrough-select');
+		if (walkthroughSelectEl && walkthroughData.length > 0) {
+			const currentValue = walkthroughSelectEl.value;
+			walkthroughSelectEl.innerHTML = `<option value="">${t('placeholder.noWalk')}</option>`;
+			walkthroughData.forEach(walkthrough => {
+				const option = document.createElement('option');
+				option.value = walkthrough.id;
+				option.textContent = getTranslated(walkthrough.title);
+				walkthroughSelectEl.appendChild(option);
+			});
+			walkthroughSelectEl.value = currentValue;
+		}
+
+		const listSelectEl = document.getElementById('list-select');
+		if (listSelectEl && listData.length > 0) {
+			const currentValue = listSelectEl.value;
+			listSelectEl.innerHTML = `<option value="">${t('placeholder.noList')}</option>`;
+			listData.forEach(list => {
+				const option = document.createElement('option');
+				option.value = list.id;
+				option.textContent = getTranslated(list.title);
+				listSelectEl.appendChild(option);
+			});
+			listSelectEl.value = currentValue;
+		}
+
+		// Update sidebar if active
+		if (currentList) {
+			const sidebarTitle = document.getElementById('poi-sidebar-title');
+			const sidebarDescription = document.getElementById('poi-sidebar-description');
+			if (sidebarTitle) {
+				sidebarTitle.textContent = getTranslated(currentList.title);
+			}
+			if (sidebarDescription) {
+				const description = getTranslated(currentList.description);
+				sidebarDescription.textContent = description;
+			}
+		} else if (currentWalkthrough) {
+			const sidebarTitle = document.getElementById('poi-sidebar-title');
+			const sidebarDescription = document.getElementById('poi-sidebar-description');
+			if (sidebarTitle) {
+				sidebarTitle.textContent = getTranslated(currentWalkthrough.title);
+			}
+			if (sidebarDescription) {
+				const description = getTranslated(currentWalkthrough.description);
+				sidebarDescription.textContent = description;
+			}
+		}
+	}
+
+	// Setup language switcher
+	function setupLanguageSwitcher() {
+		const languageSwitcher = document.getElementById('language-switcher');
+		const languageSwitcherText = document.getElementById('language-switcher-text');
+
+		if (!languageSwitcher || !languageSwitcherText) {
+			console.warn('Language switcher elements not found');
+			return;
+		}
+
+		// Set initial text
+		languageSwitcherText.textContent = getCurrentLanguage() === 'de' ? 'EN' : 'DE';
+
+		// Handle click
+		languageSwitcher.addEventListener('click', () => {
+			const newLang = getCurrentLanguage() === 'de' ? 'en' : 'de';
+			setLanguage(newLang);
+		});
+
+		// Listen for language changes
+		window.addEventListener('languagechange', () => {
+			updateUILanguage();
+		});
+	}
+
+	// Setup language system
+	setupLanguageSwitcher();
+	updateUILanguage();
 
 	initialize();
 });

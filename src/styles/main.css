@@ -39,6 +39,34 @@ header h1 {
 	opacity: 0.9;
 }
 
+.language-switcher {
+	position: fixed;
+	top: 1.5rem;
+	right: 2rem;
+	background: rgba(255, 255, 255, 0.95);
+	color: #667eea;
+	border: 2px solid rgba(255, 255, 255, 0.3);
+	padding: 0.5rem 1rem;
+	border-radius: 8px;
+	font-size: 0.875rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	z-index: 1000;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.language-switcher:hover {
+	background: white;
+	border-color: white;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.language-switcher:active {
+	transform: translateY(0);
+}
+
 .graetzl-nav {
 	grid-area: nav;
 	background: white;
