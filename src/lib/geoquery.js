@@ -16,12 +16,24 @@ export async function loadGeoData() {
     return geoDataCache;
   }
 
-  const response = await fetch('/api/pois');
-  if (!response.ok) {
-    throw new Error('Failed to load POI data');
-  }
+  let features;
 
-  const features = await response.json();
+  // Try static file first (production), then API (development)
+  try {
+    const response = await fetch('/data/all-pois.json');
+    if (response.ok) {
+      features = await response.json();
+    } else {
+      throw new Error('Static file not found, trying API');
+    }
+  } catch (error) {
+    // Fallback to API endpoint (development mode)
+    const response = await fetch('/api/pois');
+    if (!response.ok) {
+      throw new Error('Failed to load POI data from both static file and API');
+    }
+    features = await response.json();
+  }
 
   // Wrap features in GeoJSON FeatureCollection format
   geoDataCache = {

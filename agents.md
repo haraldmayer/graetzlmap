@@ -2,87 +2,150 @@
 
 ## Project Overview
 
-Grätzlmap is an interactive guide to Vienna's neighborhoods (called "Grätzl" in Viennese dialect). The application features an interactive map where users can explore different neighborhoods and discover points of interest (POIs) within them.
+Grätzlmap is an interactive guide to Vienna's neighborhoods (called "Grätzl" in Viennese dialect). The application features an interactive map where users can explore different neighborhoods, discover points of interest (POIs), curate lists, and follow guided walks through the city.
 
 ## Tech Stack
 
-- **Framework**: Astro (v5.16.4) - Static site generator
+- **Framework**: Astro (v5.16.4) - Hybrid SSR/Static site generator
 - **Mapping**: Leaflet.js (v1.9.4) - Interactive map library
-- **Geo Database**: GeoJSON (file-based, no runtime required)
+- **Geo Database**: Individual JSON files (file-based, API endpoints in dev)
 - **Spatial Queries**: Turf.js (@turf/turf) - Client-side geospatial analysis
 - **Styling**: Vanilla CSS with CSS Grid layout
 - **Map Tiles**: CARTO Light (greyscale basemap)
-- **Language**: German (de) for user-facing content
+- **Languages**: German (de) and English (en) with i18n support
 
 ## Architecture
 
-### Single-Page Application
-The entire application is contained in `src/pages/index.astro` with:
-- HTML structure in the template section
-- Client-side JavaScript for map interactions (within `<script type="module">` tags)
-- Scoped styles (within `<style>` tags)
-- Geo query library (`src/lib/geoquery.js`) for data access
+### Hybrid Application
+
+The application runs in two modes:
+
+**Development Mode** (`npm run dev`):
+- Server-side rendering with Node.js
+- CMS available at `/cms` for managing POIs, walks, and lists
+- API endpoints at `/api/*` for data management
+- Hot reload during development
+
+**Production Mode** (`npm run build:prod`):
+- Static site generation for GitHub/Cloudflare Pages
+- CMS and API routes excluded from build
+- All data compiled to static JSON files
+- No server runtime required
 
 ### Data Structure
 
-**GeoJSON FeatureCollection** (public/data/geodata.geojson):
-All geographic data is stored in a single GeoJSON file containing:
+Data is stored in individual JSON files for better version control and management:
 
-1. **Grätzl Features** (Polygons):
-```json
-{
-  "type": "Feature",
-  "geometry": {
-    "type": "Polygon",
-    "coordinates": [[[lng, lat], [lng, lat], ...]]
-  },
-  "properties": {
-    "Graetzl_ID": 101,
-    "Graetzl_Name": "Innere Stadt",
-    "BEZIRK": 1
-  }
-}
-```
-
-2. **POI Features** (Points):
+**POI Files** (`public/data/pois/*.json`):
+Each POI is a separate GeoJSON Feature file:
 ```json
 {
   "type": "Feature",
   "geometry": {
     "type": "Point",
-    "coordinates": [lng, lat]
+    "coordinates": [16.3650, 48.1960]
   },
   "properties": {
+    "id": "unique-poi-id",
     "name": "POI Name",
     "category": "restaurant",
-    "description": "Description text",
-    "link": "https://example.com"
+    "description": {
+      "de": "Beschreibung auf Deutsch",
+      "en": "Description in English"
+    },
+    "link": "https://example.com",
+    "instagram": "https://instagram.com/handle",
+    "photo": "/uploads/image.jpg",
+    "tags": ["outdoor", "vegan"]
   }
 }
 ```
 
-**Note**: POIs are automatically associated with Grätzl through spatial queries (point-in-polygon tests) based on their coordinates.
+**Categories** (`public/data/categories.json`):
+```json
+{
+  "categories": {
+    "restaurant": {
+      "name": { "de": "Restaurant", "en": "Restaurant" },
+      "emoji": "🍽️",
+      "color": "#FFFFFF",
+      "icon": null
+    }
+  }
+}
+```
+
+**Tags** (`public/data/tags.json`):
+```json
+{
+  "tags": {
+    "outdoor": { "name": "Outdoor" },
+    "vegan": { "name": "Vegan" }
+  }
+}
+```
+
+**Walkthroughs** (`public/data/walkthroughs.json`):
+```json
+{
+  "id": "walk-id",
+  "slug": "walk-slug",
+  "title": { "de": "Titel", "en": "Title" },
+  "description": { "de": "Beschreibung", "en": "Description" },
+  "pois": ["poi-id-1", "poi-id-2", "poi-id-3"]
+}
+```
+
+**Lists** (`public/data/lists.json`):
+```json
+{
+  "id": "list-id",
+  "slug": "list-slug",
+  "title": { "de": "Titel", "en": "Title" },
+  "description": { "de": "Beschreibung", "en": "Description" },
+  "pois": ["poi-id-1", "poi-id-2"]
+}
+```
+
+**Grätzl Boundaries** (`public/data/graetzl_wien2025.json`):
+GeoJSON FeatureCollection with Vienna neighborhood polygons.
 
 **Important**: GeoJSON uses `[longitude, latitude]` order, while Leaflet uses `[latitude, longitude]`. The geoquery library handles conversions automatically.
 
-Data is loaded once via `geoquery.loadGeoData()` and cached in memory.
+### API Endpoints (Development Only)
 
-### Benefits of GeoJSON Architecture
+- `GET /api/pois` - List all POIs
+- `GET /api/pois/:id` - Get specific POI
+- `POST /api/pois` - Create new POI
+- `PUT /api/pois/:id` - Update POI
+- `DELETE /api/pois/:id` - Delete POI
+- `POST /api/upload` - Upload images
+- `GET /api/walkthroughs` - List all walkthroughs
+- `GET /api/lists` - List all lists
+- `POST /api/categories` - Create category
+- `POST /api/tags` - Create tag
 
-**Why GeoJSON?**
-- **Standard Format**: Industry-standard for geographic data
-- **No Runtime**: Pure text files, no database server required
-- **Version Control**: Git-friendly, easy to track changes
-- **Tool Support**: Works with QGIS, geojson.io, and other GIS tools
-- **Performance**: ~50-100KB for full dataset, <20KB gzipped
-- **Spatial Queries**: Turf.js enables advanced filtering without a database
+### Content Management System
 
-**Query Capabilities:**
-- Filter by neighborhood, category, or both
-- Point-in-polygon (find neighborhood for any coordinate)
-- Radius search (find POIs within distance)
-- Text search across names and descriptions
-- All operations run client-side in <1ms
+Access the CMS in development mode at `/cms`:
+
+**Features**:
+- Add, edit, and delete POIs
+- Upload photos for POIs
+- Manage categories and tags
+- Create and manage walkthroughs (guided walks with numbered POIs)
+- Create and manage lists (curated POI collections)
+- Filter POIs by category
+- Search POIs by name
+- Auto-generate category/tag keys from names
+
+**POI Form Fields**:
+- Coordinates (lat/lng or Google Maps paste)
+- Multilingual name and description (de/en)
+- Category (autocomplete with existing)
+- Tags (multiple selection)
+- Link and Instagram URL
+- Photo upload or URL
 
 ## Key Features
 
@@ -91,38 +154,60 @@ Data is loaded once via `geoquery.loadGeoData()` and cached in memory.
 - **Greyscale Styling**: CARTO Light basemap for clean, neutral appearance
 - **Neighborhood Highlighting**: Semi-transparent red overlay with outline
 - **Zoom Animation**: Smooth transition when selecting a Grätzl
+- **Category Filtering**: Multi-select dropdown to filter POIs by category
+- **POI Search**: Search POIs by name or description
+- **Walkthroughs**: Guided walks with numbered markers and connecting arrows
+- **Lists**: Curated POI collections with numbered markers
 
 ### Interactive Elements
-- **Navigation Sidebar**: List of Grätzl with active state management
-- **POI Markers**: Custom emoji icons with hover effects
-- **Popups**: Click markers to show detailed information
-- **Responsive Design**: Mobile-friendly with horizontal scrolling navigation
+- **Grätzl Selector**: Searchable dropdown with all Vienna neighborhoods
+- **POI Search**: Quick search across all POIs
+- **Category Filter**: Multi-select filter with search
+- **Walkthrough Selector**: Choose from pre-defined walks
+- **List Selector**: Browse curated POI lists
+- **POI Markers**: Custom emoji/SVG icons with tooltips
+- **Numbered Markers**: For walks and lists (clickable, with tooltips)
+- **Popups**: Click markers to show detailed information with photos
+- **Sidebar**: Shows walk/list details with clickable POI items
+- **Language Switcher**: Toggle between German and English
+- **Responsive Design**: Mobile-friendly with collapsible navigation
 
 ## Development Guidelines
 
 ### Adding POIs
 
-POIs are added as Point features in the `geodata.geojson` file:
+**Via CMS (Recommended)**:
+1. Run `npm run dev`
+2. Navigate to `http://localhost:4321/cms`
+3. Fill in the POI form
+4. Upload a photo or provide a URL
+5. Click "Create POI"
 
+**Manual Method** (if needed):
+Create a new file in `public/data/pois/` with a unique ID:
 ```json
 {
   "type": "Feature",
   "geometry": {
     "type": "Point",
-    "coordinates": [16.xxxx, 48.xxxx]
+    "coordinates": [16.3650, 48.1960]
   },
   "properties": {
+    "id": "unique-id-here",
     "name": "POI Name",
     "category": "cafe",
-    "description": "Detailed description of the location",
-    "link": "https://example.com/link"
+    "description": {
+      "de": "Beschreibung",
+      "en": "Description"
+    },
+    "link": "https://example.com",
+    "photo": "/uploads/photo.jpg",
+    "tags": ["tag1", "tag2"]
   }
 }
 ```
 
-**Note**: Coordinates in GeoJSON are `[longitude, latitude]` order. POIs are automatically associated with their Grätzl through spatial queries based on their coordinates.
-
-**Available Categories** (defined in `public/data/categories.json`):
+**Available Categories**:
 - `restaurant` - 🍽️ Restaurant
 - `cafe` - ☕ Café
 - `breakfast` - 🥐 Frühstück
@@ -138,107 +223,94 @@ POIs are added as Point features in the `geodata.geojson` file:
 - `park` - 🌳 Park
 - `culture` - 🎪 Kultur
 
-To add a new category, edit `public/data/categories.json`:
-```json
-"newcategory": {
-  "name": "Display Name",
-  "emoji": "🎯",
-  "image": null
-}
-```
+### Creating Walkthroughs
+
+**Via CMS**:
+1. Go to "Walkthrough Management" tab
+2. Enter title and description in both languages
+3. Search and add POIs in the desired order
+4. Drag to reorder POIs
+5. Click "Save Walkthrough"
+
+Walkthroughs automatically generate:
+- Numbered markers on POIs
+- Directional arrows between stops
+- Sidebar with walk details
+- URL slug for sharing
+
+### Creating Lists
+
+**Via CMS**:
+1. Go to "List Management" tab
+2. Enter title and description in both languages
+3. Search and add POIs
+4. Drag to reorder
+5. Click "Save List"
+
+Lists show numbered POIs without connecting arrows.
 
 ### Coordinate Tips
 
-**Finding Boundaries**:
-1. Use [geojson.io](http://geojson.io/) to draw neighborhood polygons
-2. Copy the entire Feature object from the GeoJSON output
-3. GeoJSON coordinates are already in correct `[lng, lat]` order
-4. The polygon is automatically closed (first point = last point)
+**Finding Coordinates**:
+1. Right-click location in Google Maps
+2. Copy coordinates (format: "48.1960, 16.3650")
+3. Paste into CMS "Google Maps Coordinates" field
+4. CMS auto-converts to proper format
 
-**POI Placement**:
-- Click on exact location in OpenStreetMap or geojson.io
-- GeoJSON coordinates are in `[longitude, latitude]` format
-- Vienna coordinates: ~48.1-48.3°N (lat), 16.2-16.5°E (lng)
-- Verify accuracy by testing in the application
+**Manual Format**:
+- GeoJSON: `[longitude, latitude]` = `[16.3650, 48.1960]`
+- Leaflet: `[latitude, longitude]` = `[48.1960, 16.3650]`
+- Vienna: ~48.1-48.3°N (lat), 16.2-16.5°E (lng)
 
 ## Code Conventions
 
 ### Naming
-- **Grätzl IDs**: lowercase, no spaces (e.g., `freihausviertel`)
+- **POI IDs**: UUID format (e.g., `poi-abc123`)
 - **CSS Classes**: kebab-case (e.g., `graetzl-btn`)
 - **Variables**: camelCase (e.g., `currentPolygon`)
+- **Slugs**: lowercase, hyphenated (e.g., `best-cafes-vienna`)
 
 ### Styling
 - **Colors**:
-  - Primary: `#667eea` (purple/blue)
-  - Accent: `#764ba2` (purple)
-  - Highlight: `#FF6B6B` (red for neighborhood overlay)
+  - Primary: `#667eea` (purple/blue) - Walkthroughs
+  - Secondary: `#2563eb` (blue) - Lists
+  - Highlight: `#FF6B6B` (red) - Grätzl overlay
   - Text: `#333` (dark gray)
   - Background: `#f5f5f5` (light gray)
 - **Spacing**: Use rem units (1rem = 16px)
 - **Borders**: 8px border-radius for modern look
 
 ### State Management
-- `currentPolygon`: Stores active neighborhood overlay
+- `currentPolygon`: Active neighborhood overlay
 - `currentMarkers`: Array of visible POI markers
-- Active button state managed via `.active` class
+- `currentWalkthrough`: Active walkthrough data
+- `currentList`: Active list data
+- `selectedCategories`: Set of active category filters
+- `walkthroughArrows`: Arrows and number markers for walks
+- `listMarkers`: Number markers for lists
 
-## Common Tasks
+## Deployment
 
-### Change Map Style
-Modify tile layer URL (src/pages/index.astro:39):
-```javascript
-// Current: CARTO Light (greyscale)
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {...})
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
 
-// Alternative: CARTO Dark
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {...})
+### Quick Start
 
-// Alternative: OpenStreetMap
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {...})
-```
-
-### Customize Neighborhood Overlay Color
-Edit polygon style (src/pages/index.astro:130-135):
-```javascript
-currentPolygon = L.polygon(graetzl.bounds, {
-  color: '#FF6B6B',        // Border color
-  fillColor: '#FF6B6B',    // Fill color
-  fillOpacity: 0.2,        // Transparency (0-1)
-  weight: 3                // Border width in pixels
-})
-```
-
-### Adjust Default Zoom Level
-Change initial view (src/pages/index.astro:36) or per-Grätzl zoom (in graetzlData):
-```javascript
-const map = L.map('map').setView([48.2082, 16.3738], 12); // Last param is zoom
-```
-
-### Modify Popup Styling
-Edit CSS (src/pages/index.astro:295-343) or popup options (src/pages/index.astro:156-159)
-
-## Vienna Districts Reference
-
-Vienna is divided into 23 districts (Bezirke). Common Grätzl by district:
-
-- **1st (Innere Stadt)**: Freihausviertel (current), Stubenviertiel
-- **2nd (Leopoldstadt)**: Karmeliterviertel, Stuwerviertel
-- **3rd (Landstraße)**: Weißgerber, Botschaftsviertel
-- **4th (Wieden)**: Freihausviertel (current)
-- **5th (Margareten)**: Hundsturm, Margareten
-- **6th (Mariahilf)**: Mariahilf, Gumpendorf
-- **7th (Neubau)**: Neubau, Spittelberg
-- **8th (Josefstadt)**: Josefstadt
-- **9th (Alsergrund)**: Alsergrund, Servitenviertel
-
-## Development Commands
-
+**GitHub Pages**:
 ```bash
-npm install          # Install dependencies
-npm run dev          # Start dev server (http://localhost:4321)
-npm run build        # Build for production
-npm run preview      # Preview production build
+npm run build:prod
+# Push to GitHub, enable GitHub Pages with Actions
+```
+
+**Cloudflare Pages**:
+```bash
+npm run build:prod
+# Deploy dist/ folder or connect GitHub repo
+```
+
+**Development (with CMS)**:
+```bash
+npm run dev
+# CMS at http://localhost:4321/cms
 ```
 
 ## File Structure
@@ -247,241 +319,224 @@ npm run preview      # Preview production build
 /graetzlmap
 ├── src/
 │   ├── lib/
-│   │   └── geoquery.js                # Geo query helper library
-│   ├── components/
-│   │   └── FilterExample.astro        # Example filter component
-│   └── pages/
-│       └── index.astro                # Main application file
+│   │   ├── geoquery.js              # Geo query library
+│   │   ├── slug-utils.js            # URL slug handling
+│   │   └── i18n.js                  # Internationalization
+│   ├── pages/
+│   │   ├── index.astro              # Main map application
+│   │   ├── cms.astro                # Content management system
+│   │   └── api/                     # API endpoints (dev only)
+│   │       ├── pois/
+│   │       ├── walkthroughs/
+│   │       ├── lists/
+│   │       ├── categories/
+│   │       ├── tags/
+│   │       └── upload.ts
+│   └── components/
 ├── public/
 │   ├── data/
-│   │   ├── geodata.geojson            # All geographic data (Grätzl + POIs)
-│   │   ├── categories.json            # POI category definitions (icons)
-│   │   └── graetzl/                   # Legacy JSON files (kept for reference)
-│   │       ├── freihausviertel.json
-│   │       ├── nibelungenviertel.json
-│   │       └── neutorviertel.json
-│   └── favicon.svg                    # Site icon
-├── package.json                       # Dependencies
-└── agents.md                          # This file (complete project documentation)
+│   │   ├── pois/                    # Individual POI files
+│   │   │   ├── poi-abc123.json
+│   │   │   └── ...
+│   │   ├── categories.json          # Category definitions
+│   │   ├── tags.json                # Tag definitions
+│   │   ├── walkthroughs.json        # Walkthrough data
+│   │   ├── lists.json               # List data
+│   │   └── graetzl_wien2025.json    # Vienna neighborhoods
+│   └── uploads/                     # Uploaded photos
+├── scripts/
+│   └── cleanup-cms.js               # Remove CMS from prod build
+├── .github/
+│   └── workflows/
+│       └── deploy.yml               # GitHub Pages deployment
+├── package.json
+├── astro.config.mjs
+├── DEPLOYMENT.md                    # Deployment guide
+└── agents.md                        # This file
 ```
 
 ## GeoQuery API Reference
 
-The `geoquery.js` library provides powerful spatial query capabilities using Turf.js. All queries run client-side in <1ms.
+The `geoquery.js` library provides spatial query capabilities using Turf.js.
 
 ### Loading Data
 
 ```javascript
 import geoquery from '/src/lib/geoquery.js';
 
-// Load and cache GeoJSON data
+// Load POI data (via API in dev, static in prod)
 const geoData = await geoquery.loadGeoData();
-// Returns: FeatureCollection with all Grätzl and POI features
+// Returns: FeatureCollection with all POI features
+
+// Load Grätzl boundaries
+const graetzlData = await geoquery.loadGraetzlData();
+// Returns: FeatureCollection with neighborhood polygons
 ```
 
 ### Basic Queries
 
 ```javascript
-// Get all Grätzl (neighborhood) features
-const graetzls = geoquery.getGraetzlFeatures(geoData);
-// Returns: Array of Polygon features
+// Get all Grätzl features
+const graetzls = geoquery.getGraetzlFeatures(graetzlData);
 
 // Get all POI features
-const allPOIs = geoquery.getPOIFeatures(geoData);
-// Returns: Array of Point features
+const allPOIs = geoData.features;
 
 // Get specific Grätzl by ID
-const freihausviertel = geoquery.getGraetzl(geoData, 'freihausviertel');
-// Returns: Single Polygon feature or undefined
+const graetzl = geoquery.getGraetzl(graetzlData, 101);
 ```
 
 ### Filtering POIs
 
 ```javascript
-// Get all POIs of a specific category (across all Grätzl)
-const restaurants = geoquery.getPOIsByCategory(geoData, 'restaurant');
+// Get POIs by category
+const restaurants = geoData.features.filter(
+  poi => poi.properties.category === 'restaurant'
+);
 
-// Get all POIs in a specific Grätzl (using spatial query)
-const graetzlData = await geoquery.loadGraetzlData();
-const fhvPOIs = geoquery.getPOIsInGraetzl(geoData, graetzlData, 101); // Using Graetzl_ID
+// Get POIs in a specific Grätzl (spatial query)
+const poisInGraetzl = geoquery.getPOIsInGraetzl(geoData, graetzlData, 101);
 
-// Combined filter: category + neighborhood using spatial queries
-const fhvRestaurants = geoquery.filterPOIsWithGraetzl(geoData, graetzlData, {
-  graetzlId: 101, // Graetzl_ID from graetzl_wien2025.json
-  categories: ['restaurant']
-});
-
-// Filter by multiple categories in a specific Grätzl
-const foodPlaces = geoquery.filterPOIsWithGraetzl(geoData, graetzlData, {
+// Combined filter: category + neighborhood
+const filtered = geoquery.filterPOIsWithGraetzl(geoData, graetzlData, {
   graetzlId: 101,
-  categories: ['restaurant', 'cafe', 'gasthaus']
+  categories: ['restaurant', 'cafe']
 });
 
-// Filter without specifying neighborhood (all Grätzl)
-const allCafes = geoquery.filterPOIsWithGraetzl(geoData, graetzlData, {
-  categories: ['cafe', 'breakfast']
-});
+// Get all categories
+const categories = geoquery.getAllCategories(geoData);
 ```
-
-**Filter Options:**
-- `graetzlId`: number (optional) - Filter by Grätzl using Graetzl_ID (spatial point-in-polygon test)
-- `categories`: string[] (optional) - Filter by multiple categories
 
 ### Spatial Queries
 
 ```javascript
 // Find which Grätzl contains a point
 const point = [16.3650, 48.1960]; // [lng, lat]
-const graetzl = geoquery.findGraetzlAtPoint(geoData, point);
-// Returns: Polygon feature or null
+const graetzl = geoquery.findGraetzlAtPoint(graetzlData, point);
 
-// Get POIs near a point (within radius)
-const nearby = geoquery.getPOIsNearPoint(geoData, point, 0.5); // 0.5km
-// Returns: Array of POI features within radius
-
-// Point-in-polygon validation (ensures POIs are actually inside boundary)
-const poisInside = geoquery.getPOIsInGraetzl(geoData, graetzlData, 101);
-// Returns: Array of POI features that are geometrically inside the polygon
-```
-
-### Text Search
-
-```javascript
-// Search POI names and descriptions
-const results = geoquery.searchPOIs(geoData, 'kaffee');
-// Returns: Array of POI features matching search text (case-insensitive)
-
-// Get all unique categories
-const categories = geoquery.getAllCategories(geoData);
-// Returns: ['bar', 'bookshop', 'breakfast', 'cafe', 'cinema', ...]
+// Search POI names/descriptions
+const results = geoquery.searchPOIs(geoData, 'coffee');
 ```
 
 ### Coordinate Conversion
 
-GeoJSON uses `[longitude, latitude]` order, while Leaflet uses `[latitude, longitude]`. The geoquery library handles conversions:
-
 ```javascript
-// Convert GeoJSON feature to Leaflet coordinates
+// GeoJSON to Leaflet (Point)
 const leafletCoords = geoquery.featureToLeafletCoords(poiFeature);
-// Point: [48.1960, 16.3650] (lat, lng)
-// Polygon: [[48.2025, 16.3685], [48.2024, 16.3695], ...]
+// Returns: [48.1960, 16.3650] (lat, lng)
 
-// Convert Leaflet coordinates to GeoJSON format
+// Leaflet to GeoJSON
 const geoCoords = geoquery.leafletCoordsToGeoJSON([48.1960, 16.3650]);
 // Returns: [16.3650, 48.1960] (lng, lat)
 ```
 
-### Complete Example: Building a Filter UI
+## i18n API Reference
+
+The `i18n.js` library handles multilingual content:
 
 ```javascript
-import geoquery from '/src/lib/geoquery.js';
+import { getCurrentLanguage, setLanguage, t } from '/src/lib/i18n.js';
 
-// Initialize
-const geoData = await geoquery.loadGeoData();
-const graetzlData = await geoquery.loadGraetzlData();
+// Get current language
+const lang = getCurrentLanguage(); // 'de' or 'en'
 
-// Get filter options for UI
-const neighborhoods = geoquery.getGraetzlFeatures(graetzlData).map(g => ({
-  id: g.properties.Graetzl_ID,
-  name: g.properties.Graetzl_Name
-}));
+// Change language
+setLanguage('en');
 
-const categories = geoquery.getAllCategories(geoData);
+// Translate key
+const text = t('header.subtitle');
 
-// Apply filters based on user selection
-function applyFilters(selectedNeighborhood, selectedCategories) {
-  const filters = {};
-
-  if (selectedNeighborhood) {
-    filters.graetzlId = selectedNeighborhood; // Graetzl_ID
-  }
-
-  if (selectedCategories.length > 0) {
-    filters.categories = selectedCategories;
-  }
-
-  return geoquery.filterPOIsWithGraetzl(geoData, graetzlData, filters);
-}
-
-// Usage
-const results = applyFilters(101, ['restaurant', 'cafe']); // 101 is Graetzl_ID
-// Display results on map...
+// Listen for language changes
+window.addEventListener('languagechange', () => {
+  // Update UI
+});
 ```
 
-### Performance Notes
+## Common Tasks
 
-- **First load**: ~50-100KB GeoJSON file (gzipped: ~15-20KB)
-- **Cached**: Instant subsequent loads (in-memory cache)
-- **Query speed**: All queries <1ms on modern browsers
-- **Turf.js**: ~90KB minified (loaded once, shared across queries)
+### Add New Category
 
-## Future Enhancement Ideas
+Via CMS or edit `public/data/categories.json`:
+```json
+"newcategory": {
+  "name": { "de": "Name DE", "en": "Name EN" },
+  "emoji": "🎯",
+  "color": "#FFFFFF",
+  "icon": null
+}
+```
 
-### Data Management
-- Create TypeScript types for type safety
-- Add GeoJSON schema validation
-- Spatial index for large datasets (>1000 POIs)
-- Tile-based data loading for better performance
+### Change Map Style
 
-### Features
-- ✅ **IMPLEMENTED**: GeoJSON-based geo database
-- ✅ **IMPLEMENTED**: Spatial query support (filtering, point-in-polygon, radius search)
-- ✅ **IMPLEMENTED**: Text search functionality
-- Filter UI by POI type (see FilterExample.astro)
-- User location/geolocation
-- Share links to specific Grätzl
-- Multi-language support (English, German)
-- User-submitted POIs
-- Photo galleries for POIs
-- Integration with real business data (Google Places, etc.)
+Edit `src/lib/map-init.js`:
+```javascript
+// CARTO Dark
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {...})
 
-### UX Improvements
-- Clustering for dense POI areas
-- Route planning between POIs
-- Distance calculations
-- Opening hours integration
-- User reviews/ratings
-- Favorites system
+// OpenStreetMap
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {...})
+```
 
-### Performance
-- Lazy load Grätzl data
-- Optimize marker rendering for many POIs
-- Service worker for offline support
-- Image optimization for POI photos
+### Customize Colors
+
+Edit variables in `src/lib/map-init.js`:
+- Walkthrough color: `#667eea` (purple)
+- List color: `#2563eb` (blue)
+- Grätzl overlay: `#FF6B6B` (red)
+
+### Add Translation Keys
+
+Edit `src/lib/i18n.js` to add new translation strings.
+
+## Development Commands
+
+```bash
+npm install           # Install dependencies
+npm run dev           # Dev server with CMS (http://localhost:4321)
+npm run build         # Build with CMS (for Node.js hosting)
+npm run build:prod    # Build without CMS (for static hosting)
+npm run preview       # Preview production build
+```
+
+## Performance Notes
+
+- **POI Loading**: Individual files loaded once, cached in memory
+- **Query Speed**: All spatial queries <1ms on modern browsers
+- **Production Build**: Fully static, no server required
+- **Image Optimization**: Photos stored in `/public/uploads/`
 
 ## Troubleshooting
 
+### CMS Not Working
+- Ensure running in dev mode: `npm run dev`
+- CMS requires Node.js server (not available in static build)
+- Check that API endpoints are accessible
+
+### POIs Not Appearing
+- Verify coordinates are valid GeoJSON format `[lng, lat]`
+- Check POI files are valid JSON
+- Ensure category exists in `categories.json`
+
 ### Map Not Displaying
-- Check Leaflet CSS is loaded before JavaScript
-- Verify container `#map` has explicit height
-- Check browser console for tile loading errors
-
-### Markers Not Appearing
-- Verify coordinates are [lat, lng] not [lng, lat]
-- Check coordinates are within bounds (Vienna: ~48.1-48.3°N, 16.2-16.5°E)
-- Ensure emoji icons render in browser
-
-### Navigation Not Working
-- Check `data-graetzl` attribute matches key in `graetzlData`
-- Verify event listeners are attached after DOM loads
-- Check for JavaScript errors in console
+- Check Leaflet CSS is loaded
+- Verify `#map` container has explicit height
+- Check browser console for errors
 
 ## Resources
 
-- [Leaflet Documentation](https://leafletjs.com/reference.html) - Map library
-- [Turf.js Documentation](https://turfjs.org/docs/) - Spatial analysis
-- [GeoJSON Specification](https://geojson.org/) - Data format standard
-- [Astro Documentation](https://docs.astro.build) - Framework
-- [OpenStreetMap](https://www.openstreetmap.org) - Map data source
+- [Leaflet Documentation](https://leafletjs.com/reference.html)
+- [Turf.js Documentation](https://turfjs.org/docs/)
+- [Astro Documentation](https://docs.astro.build)
+- [GeoJSON Specification](https://geojson.org/)
 - [GeoJSON.io](http://geojson.io) - Draw and edit GeoJSON
-- [CARTO Basemaps](https://github.com/CartoDB/basemap-styles) - Map styles
 
 ## Contact & Contributions
 
-When adding new Grätzl, consider:
-1. Historical/cultural significance
-2. Distinct character or identity
-3. Local business/POI density
-4. Community recognition of the name
+When adding POIs, consider:
+1. Accuracy of location and information
+2. Quality photos (upload via CMS)
+3. Multilingual descriptions (de/en)
+4. Appropriate categorization and tags
+5. Relevance to Vienna's Grätzl culture
 
-Keep descriptions concise, informative, and welcoming to both locals and tourists.
+Keep the map welcoming to both locals and tourists!
