@@ -10,7 +10,8 @@ import {
 	getListSlugFromPath,
 	getWalkthroughSlugFromPath,
 	updateUrlForList,
-	updateUrlForWalkthrough
+	updateUrlForWalkthrough,
+	nameToSlug
 } from './slug-utils.js';
 import {
 	initLanguage,
@@ -56,6 +57,10 @@ window.addEventListener('load', async function() {
 	let currentList = null; // Track currently active list
 	let listData = []; // Store list data
 	let listMarkers = []; // Store list number markers
+
+	// References to activate functions (set by setup functions)
+	let activateWalkthroughFn = null;
+	let activateListFn = null;
 
 	// Initialize language system
 	initLanguage();
@@ -686,28 +691,54 @@ function createCategoryFilters() {
 
 			if (walkthroughSlug) {
 				console.log('Walkthrough slug from URL:', walkthroughSlug);
-				const walkthrough = walkthroughData.find(w => w.slug === walkthroughSlug);
+				console.log('Available walkthroughs:', walkthroughData.map(w => ({ id: w.id, slug: w.slug, title: w.title })));
+				// Find walkthrough by slug, or generate slug from title if missing
+				const walkthrough = walkthroughData.find(w => {
+					const slug = w.slug || nameToSlug(w.title);
+					return slug === walkthroughSlug;
+				});
 				if (walkthrough) {
-					console.log('Found Walkthrough:', walkthrough.title);
+					console.log('Found Walkthrough:', walkthrough);
 					const walkthroughSelect = document.getElementById('walkthrough-select');
 					if (walkthroughSelect) {
 						walkthroughSelect.value = walkthrough.id;
 					}
-					activateWalkthrough(walkthrough.id);
+					// Wait for next tick to ensure everything is ready
+					requestAnimationFrame(() => {
+						requestAnimationFrame(() => {
+							console.log('Activating walkthrough with', walkthrough.pois.length, 'POIs');
+							if (activateWalkthroughFn) {
+								activateWalkthroughFn(walkthrough.id);
+							}
+						});
+					});
 				} else {
 					console.warn('Walkthrough not found for slug:', walkthroughSlug);
+					console.warn('Available slugs:', walkthroughData.map(w => w.slug || nameToSlug(w.title)));
 					showAllPOIs();
 				}
 			} else if (listSlug) {
 				console.log('List slug from URL:', listSlug);
-				const list = listData.find(l => l.slug === listSlug);
+				// Find list by slug, or generate slug from title if missing
+				const list = listData.find(l => {
+					const slug = l.slug || nameToSlug(l.title);
+					return slug === listSlug;
+				});
 				if (list) {
-					console.log('Found List:', list.title);
+					console.log('Found List:', list);
 					const listSelect = document.getElementById('list-select');
 					if (listSelect) {
 						listSelect.value = list.id;
 					}
-					activateList(list.id);
+					// Wait for next tick to ensure everything is ready
+					requestAnimationFrame(() => {
+						requestAnimationFrame(() => {
+							console.log('Activating list with', list.pois.length, 'POIs');
+							if (activateListFn) {
+								activateListFn(list.id);
+							}
+						});
+					});
 				} else {
 					console.warn('List not found for slug:', listSlug);
 					showAllPOIs();
@@ -1286,6 +1317,9 @@ function createCategoryFilters() {
 
 		// Initial population
 		populateWalkthroughs();
+
+		// Store reference to activate function for URL initialization
+		activateWalkthroughFn = activateWalkthrough;
 	}
 
 	// List selector functionality
@@ -1460,6 +1494,9 @@ function createCategoryFilters() {
 
 		// Initial population
 		populateLists();
+
+		// Store reference to activate function for URL initialization
+		activateListFn = activateList;
 	}
 
 	// Handle browser back/forward buttons
