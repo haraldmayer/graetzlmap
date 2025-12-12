@@ -13,11 +13,19 @@ body {
 .container {
 	display: grid;
 	grid-template-areas:
-		"header header"
-		"nav main";
-	grid-template-columns: 250px 1fr;
+		"header header header"
+		"nav main main";
+	grid-template-columns: 250px 1fr 0;
 	grid-template-rows: auto 1fr;
 	height: 100vh;
+	transition: grid-template-columns 0.3s ease;
+}
+
+.container.sidebar-active {
+	grid-template-areas:
+		"header header header"
+		"nav main sidebar";
+	grid-template-columns: 250px 1fr 350px;
 }
 
 header {
@@ -434,21 +442,12 @@ header h1 {
 }
 
 .poi-sidebar {
-	position: fixed;
-	top: 0;
-	right: -350px;
-	width: 350px;
-	height: 100vh;
+	grid-area: sidebar;
 	background: white;
 	box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
-	transition: right 0.3s ease;
-	z-index: 1000;
 	display: flex;
 	flex-direction: column;
-}
-
-.poi-sidebar.active {
-	right: 0;
+	height: 100%;
 }
 
 .poi-sidebar-header {
@@ -604,9 +603,11 @@ main {
 	filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2));
 }
 
-.custom-marker:hover {
+.custom-marker:hover,
+.custom-marker.marker-highlighted {
 	transform: scale(1.2);
 	box-shadow: 0 4px 12px rgba(0,0,0,0.35), 0 0 0 2px rgba(255,255,255,0.9);
+	z-index: 1000 !important;
 }
 
 .poi-popup {
@@ -643,6 +644,14 @@ main {
 	background: #f3f4f6;
 	border-radius: 6px;
 	display: inline-block;
+}
+
+.poi-popup .poi-photo {
+	width: 100%;
+	max-height: 200px;
+	object-fit: cover;
+	border-radius: 8px;
+	margin-bottom: 0.75rem;
 }
 
 .poi-popup p {

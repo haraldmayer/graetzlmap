@@ -593,6 +593,22 @@ const title = "POI Management System";
             <label>Instagram</label>
             <input id="instagram" type="url" placeholder="https://instagram.com/username" />
           </div>
+
+          <div class="full">
+            <label>Photo</label>
+            <div id="photoPreview" style="margin-bottom: 8px; display: none;">
+              <img id="photoPreviewImg" src="" alt="Current photo" style="max-width: 200px; max-height: 150px; border-radius: 8px; object-fit: cover;" />
+              <button type="button" id="removePhoto" style="display: block; margin-top: 4px; padding: 4px 8px; font-size: 12px; background: #dc2626; color: white;">Remove Photo</button>
+            </div>
+            <input id="photoFile" type="file" accept="image/*" />
+            <div class="hint">Upload a photo (will be saved to /public/uploads/)</div>
+          </div>
+
+          <div class="full">
+            <label>OR Photo URL</label>
+            <input id="photo" type="url" placeholder="https://example.com/photo.jpg" />
+            <div class="hint">Alternatively, provide a direct photo URL</div>
+          </div>
         </div>
 
         <div class="button-group">
@@ -1147,10 +1163,30 @@ const title = "POI Management System";
       document.getElementById('formTitle').textContent = 'Add New POI';
       document.getElementById('submitBtn').textContent = 'Create POI';
       document.getElementById('cancelBtn').style.display = 'none';
+      document.getElementById('photoPreview').style.display = 'none';
       selectedTags = [];
       renderTags();
       currentEditId = null;
     }
+
+    // Handle remove photo button
+    document.getElementById('removePhoto').addEventListener('click', () => {
+      document.getElementById('photo').value = '';
+      document.getElementById('photoPreview').style.display = 'none';
+    });
+
+    // Show preview when file is selected
+    document.getElementById('photoFile').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          document.getElementById('photoPreviewImg').src = e.target.result;
+          document.getElementById('photoPreview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
 
     // Edit POI
     window.editPOI = async function(id) {
@@ -1177,6 +1213,17 @@ const title = "POI Management System";
 
         document.getElementById('link').value = poi.properties.link || '';
         document.getElementById('instagram').value = poi.properties.instagram || '';
+        document.getElementById('photo').value = poi.properties.photo || '';
+
+        // Show photo preview if exists
+        const photoPreview = document.getElementById('photoPreview');
+        const photoPreviewImg = document.getElementById('photoPreviewImg');
+        if (poi.properties.photo) {
+          photoPreviewImg.src = poi.properties.photo;
+          photoPreview.style.display = 'block';
+        } else {
+          photoPreview.style.display = 'none';
+        }
 
         // Load tags
         selectedTags = poi.properties.tags || [];
@@ -1268,6 +1315,33 @@ const title = "POI Management System";
         return; // User cancelled category creation
       }
 
+      // Handle photo upload if file is selected
+      let photoUrl = document.getElementById('photo').value;
+      const photoFile = document.getElementById('photoFile').files[0];
+
+      if (photoFile) {
+        try {
+          const formData = new FormData();
+          formData.append('file', photoFile);
+
+          const uploadResponse = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+          });
+
+          if (!uploadResponse.ok) {
+            throw new Error('Upload failed');
+          }
+
+          const uploadData = await uploadResponse.json();
+          photoUrl = uploadData.url;
+        } catch (error) {
+          showToast('Photo upload failed', 'error');
+          console.error('Upload error:', error);
+          return;
+        }
+      }
+
       const poi = {
         type: 'Feature',
         geometry: {
@@ -1283,6 +1357,7 @@ const title = "POI Management System";
           },
           link: document.getElementById('link').value,
           instagram: document.getElementById('instagram').value,
+          photo: photoUrl,
           tags: selectedTags
         }
       };

@@ -3,21 +3,21 @@
   "geometry": {
     "type": "Point",
     "coordinates": [
-      16.45578456261896,
-      48.20405419149171
+      16.395316226392474,
+      48.24456539018753
     ]
   },
   "properties": {
-    "name": "Schillerwasser",
+    "name": "Neue Donau",
     "category": "schwimmen",
     "description": {
-      "de": "",
+      "de": "Treffpunkt für Eisschwimmer",
       "en": ""
     },
     "link": "",
     "instagram": "",
-    "photo": "/uploads/poi_1765522606936.jpg",
+    "photo": "",
     "tags": [],
-    "id": "poi_1765478155056_yvvfbq634"
+    "id": "poi_1765522425743_qcw0sa33r"
   }
 }

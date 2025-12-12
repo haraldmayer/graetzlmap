@@ -422,6 +422,9 @@ function createCategoryFilters() {
 				icon: createCustomIcon(poi.category, map.getZoom())
 			}).addTo(map);
 
+			// Store POI ID on marker for later reference
+			marker.poiId = poi.id;
+
 			// Add tooltip with POI name
 			marker.bindTooltip(poi.name, {
 				direction: 'top',
@@ -443,11 +446,17 @@ function createCategoryFilters() {
 				? `<div class="poi-tags">${tags.map(tag => `<span class="poi-tag">${tag}</span>`).join('')}</div>`
 				: '';
 
+			// Format photo if available
+			const photoHtml = poi.photo
+				? `<img src="${poi.photo}" alt="${poi.name}" class="poi-photo" />`
+				: '';
+
 			const popupContent = `
 				<div class="poi-popup">
 					<div class="poi-icon">${icon}</div>
 					<h3>${poi.name}</h3>
 					${categoryName ? `<div class="poi-category-label">${categoryName}</div>` : ''}
+					${photoHtml}
 					<p>${getTranslated(poi.description)}</p>
 					${tagsHtml}
 					<div class="poi-actions">
@@ -1207,11 +1216,47 @@ function createCategoryFilters() {
 				item.addEventListener('click', () => {
 					const coords = poi.geometry.coordinates;
 					const latLng = [coords[1], coords[0]];
-					map.setView(latLng, 17, { animate: true });
+
+					// Ensure we're at the right zoom level
+					if (map.getZoom() !== 17) {
+						map.setView(latLng, 17, { animate: true });
+					} else {
+						// Pan to center exactly on the POI
+						map.panTo(latLng, { animate: true, duration: 0.5 });
+					}
+
+					// Find and open the marker popup after animation
+					setTimeout(() => {
+						const marker = currentMarkers.find(m => m.poiId === poiId);
+						if (marker) {
+							marker.openPopup();
+						}
+					}, 300);
 
 					// Highlight the item
 					document.querySelectorAll('.poi-sidebar-item').forEach(el => el.classList.remove('active'));
 					item.classList.add('active');
+				});
+
+				// Add hover effect to highlight corresponding marker
+				item.addEventListener('mouseenter', () => {
+					const marker = currentMarkers.find(m => m.poiId === poiId);
+					if (marker && marker._icon) {
+						const markerElement = marker._icon.querySelector('.custom-marker');
+						if (markerElement) {
+							markerElement.classList.add('marker-highlighted');
+						}
+					}
+				});
+
+				item.addEventListener('mouseleave', () => {
+					const marker = currentMarkers.find(m => m.poiId === poiId);
+					if (marker && marker._icon) {
+						const markerElement = marker._icon.querySelector('.custom-marker');
+						if (markerElement) {
+							markerElement.classList.remove('marker-highlighted');
+						}
+					}
 				});
 
 				sidebarItems.appendChild(item);
@@ -1240,7 +1285,7 @@ function createCategoryFilters() {
 
 			// Show sidebar with walkthrough details
 			updateSidebarForWalkthrough(walkthrough);
-			sidebarDiv.classList.add('active');
+			document.querySelector('.container').classList.add('sidebar-active');
 
 			// Disable category filter toggle
 			if (categoryToggle) {
@@ -1274,7 +1319,7 @@ function createCategoryFilters() {
 			currentWalkthrough = null;
 
 			// Hide sidebar
-			sidebarDiv.classList.remove('active');
+			document.querySelector('.container').classList.remove('sidebar-active');
 
 			// Re-enable category filter toggle
 			if (categoryToggle) {
@@ -1384,11 +1429,47 @@ function createCategoryFilters() {
 				item.addEventListener('click', () => {
 					const coords = poi.geometry.coordinates;
 					const latLng = [coords[1], coords[0]];
-					map.setView(latLng, 17, { animate: true });
+
+					// Ensure we're at the right zoom level
+					if (map.getZoom() !== 17) {
+						map.setView(latLng, 17, { animate: true });
+					} else {
+						// Pan to center exactly on the POI
+						map.panTo(latLng, { animate: true, duration: 0.5 });
+					}
+
+					// Find and open the marker popup after animation
+					setTimeout(() => {
+						const marker = currentMarkers.find(m => m.poiId === poiId);
+						if (marker) {
+							marker.openPopup();
+						}
+					}, 300);
 
 					// Highlight the item
 					document.querySelectorAll('.poi-sidebar-item').forEach(el => el.classList.remove('active'));
 					item.classList.add('active');
+				});
+
+				// Add hover effect to highlight corresponding marker
+				item.addEventListener('mouseenter', () => {
+					const marker = currentMarkers.find(m => m.poiId === poiId);
+					if (marker && marker._icon) {
+						const markerElement = marker._icon.querySelector('.custom-marker');
+						if (markerElement) {
+							markerElement.classList.add('marker-highlighted');
+						}
+					}
+				});
+
+				item.addEventListener('mouseleave', () => {
+					const marker = currentMarkers.find(m => m.poiId === poiId);
+					if (marker && marker._icon) {
+						const markerElement = marker._icon.querySelector('.custom-marker');
+						if (markerElement) {
+							markerElement.classList.remove('marker-highlighted');
+						}
+					}
 				});
 
 				sidebarItems.appendChild(item);
@@ -1417,7 +1498,7 @@ function createCategoryFilters() {
 
 			// Show sidebar
 			updateSidebar(list);
-			sidebarDiv.classList.add('active');
+			document.querySelector('.container').classList.add('sidebar-active');
 
 			// Disable category filter toggle
 			if (categoryToggle) {
@@ -1451,7 +1532,7 @@ function createCategoryFilters() {
 			currentList = null;
 
 			// Hide sidebar
-			sidebarDiv.classList.remove('active');
+			document.querySelector('.container').classList.remove('sidebar-active');
 
 			// Re-enable category filter toggle
 			if (categoryToggle) {
