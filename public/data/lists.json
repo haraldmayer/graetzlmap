@@ -1,13 +1,42 @@
 {
   "lists": [
     {
-      "title": "Die besten im 4.",
-      "description": "",
+      "title": {
+        "de": "Vom Naschmarkt ins Freihausviertel",
+        "en": "From Naschmarkt to Freihausviertel"
+      },
+      "description": {
+        "de": "Wir starten bei der U4 Station Kettenbrückengasse....",
+        "en": "We start at the U4 station Kettenbrückengasse...."
+      },
+      "slug": "vom-naschmarkt-ins-freihausviertel",
+      "pois": [
+        "poi_1765279262983_996c7qpf5",
+        "poi_1765274869130_0002",
+        "poi_1765274869131_0014",
+        "poi_1765274869130_0010",
+        "poi_1765274869131_0015",
+        "poi_1765280402823_mhddqn0al"
+      ],
+      "showAsWalk": true,
+      "id": "walk_1765279436525_vvtzw0cv9"
+    },
+    {
+      "title": {
+        "de": "Die besten im 4.",
+        "en": "The best in the 4th district"
+      },
+      "description": {
+        "de": "",
+        "en": ""
+      },
+      "slug": "die-besten-im-4",
       "pois": [
         "poi_1765274869131_0014",
         "poi_1765274869130_0003",
         "poi_1765280402823_mhddqn0al"
       ],
+      "showAsWalk": false,
       "id": "list_1765469098673_jjs7cp57i"
     },
     {
@@ -28,6 +57,7 @@
         "poi_1765275205509_w5p13bcym",
         "poi_1765274869130_0009"
       ],
+      "showAsWalk": false,
       "id": "list_1765475474952_ojsmqc88l"
     },
     {
@@ -45,8 +75,11 @@
         "poi_1765478229869_9xiwjr661",
         "poi_1765478155056_yvvfbq634",
         "poi_1765478275765_wwofztipq",
-        "poi_1765478475573_a16us2z0h"
+        "poi_1765478475573_a16us2z0h",
+        "poi_1765558124347_1ak7chzav",
+        "poi_1765558092176_k3gye9w99"
       ],
+      "showAsWalk": false,
       "id": "list_1765478372407_o59hbz5bs"
     }
   ]

@@ -1,0 +1,23 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.31229958351273,
+      48.22185101370678
+    ]
+  },
+  "properties": {
+    "name": "Kongressbad",
+    "category": "schwimmen",
+    "description": {
+      "de": "",
+      "en": ""
+    },
+    "link": "",
+    "instagram": "",
+    "photo": "",
+    "tags": [],
+    "id": "poi_1765558124347_1ak7chzav"
+  }
+}

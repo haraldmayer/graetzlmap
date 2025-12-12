@@ -93,19 +93,11 @@ export function getListSlugFromPath() {
   return match ? match[1] : null;
 }
 
-/**
- * Get the current walkthrough slug from the URL path
- * Returns null if not on a /w/<slug> path
- */
-export function getWalkthroughSlugFromPath() {
-  const path = window.location.pathname;
-  const match = path.match(/^\/w\/([^\/]+)\/?$/);
-  return match ? match[1] : null;
-}
 
 /**
- * Update the browser URL to reflect the selected list
+ * Update the browser URL to reflect the selected list or walk
  * Uses history.pushState to avoid page reload
+ * Always uses /l/ prefix for both lists and walks
  */
 export function updateUrlForList(list) {
   if (list) {
@@ -124,26 +116,6 @@ export function updateUrlForList(list) {
   }
 }
 
-/**
- * Update the browser URL to reflect the selected walkthrough
- * Uses history.pushState to avoid page reload
- */
-export function updateUrlForWalkthrough(walkthrough) {
-  if (walkthrough) {
-    const slug = walkthrough.slug || nameToSlug(walkthrough.title);
-    const newUrl = `/w/${slug}`;
-
-    // Only push if URL is different
-    if (window.location.pathname !== newUrl) {
-      window.history.pushState({ walkthrough: slug }, '', newUrl);
-    }
-  } else {
-    // No walkthrough selected, go back to root
-    if (window.location.pathname !== '/') {
-      window.history.pushState({ walkthrough: null }, '', '/');
-    }
-  }
-}
 
 export default {
   nameToSlug,
@@ -152,7 +124,5 @@ export default {
   getGraetzlSlugFromPath,
   updateUrlForGraetzl,
   getListSlugFromPath,
-  getWalkthroughSlugFromPath,
-  updateUrlForList,
-  updateUrlForWalkthrough
+  updateUrlForList
 };

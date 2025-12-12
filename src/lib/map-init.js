@@ -8,9 +8,7 @@ import {
 	getGraetzlSlugFromPath,
 	updateUrlForGraetzl,
 	getListSlugFromPath,
-	getWalkthroughSlugFromPath,
 	updateUrlForList,
-	updateUrlForWalkthrough,
 	nameToSlug
 } from './slug-utils.js';
 import {
@@ -51,15 +49,12 @@ window.addEventListener('load', async function() {
 	let currentMarkers = [];
 	let currentGraetzlId = null; // Track currently selected Grätzl
 	let selectedCategories = new Set(); // Track selected categories
-	let currentWalkthrough = null; // Track currently active walkthrough
-	let walkthroughData = []; // Store walkthrough data
 	let walkthroughArrows = []; // Store walkthrough arrow layers
 	let currentList = null; // Track currently active list
-	let listData = []; // Store list data
+	let listData = []; // Store list data (includes walks with showAsWalk flag)
 	let listMarkers = []; // Store list number markers
 
 	// References to activate functions (set by setup functions)
-	let activateWalkthroughFn = null;
 	let activateListFn = null;
 
 	// Initialize language system
@@ -87,21 +82,6 @@ window.addEventListener('load', async function() {
 		}
 	}
 
-	// Function to load walkthroughs
-	async function loadWalkthroughs() {
-		try {
-			const response = await fetch('/api/walkthroughs');
-			if (!response.ok) {
-				throw new Error('Failed to load walkthroughs');
-			}
-			walkthroughData = await response.json();
-			console.log('Walkthroughs loaded:', walkthroughData.length);
-		} catch (error) {
-			console.error('Error loading walkthroughs:', error);
-			walkthroughData = [];
-		}
-	}
-
 	// Function to load lists
 	async function loadLists() {
 		try {
@@ -110,7 +90,12 @@ window.addEventListener('load', async function() {
 				throw new Error('Failed to load lists');
 			}
 			listData = await response.json();
-			console.log('Lists loaded:', listData.length);
+			console.log('Lists loaded:', listData.length, listData);
+
+			// Debug: log each list
+			listData.forEach((list, i) => {
+				console.log(`List ${i}:`, list.id, getTranslated(list.title), 'showAsWalk:', list.showAsWalk);
+			});
 		} catch (error) {
 			console.error('Error loading lists:', error);
 			listData = [];
@@ -387,14 +372,9 @@ function createCategoryFilters() {
 
 		let poiFeatures = [];
 
-		// If in walkthrough mode, only show walkthrough POIs
-		if (currentWalkthrough && currentWalkthrough.pois && currentWalkthrough.pois.length > 0) {
-			// Filter to only show POIs in the walkthrough
-			poiFeatures = geoData.features.filter(feature =>
-				currentWalkthrough.pois.includes(feature.properties.id)
-			);
-		} else if (currentList && currentList.pois && currentList.pois.length > 0) {
-			// If in list mode, only show list POIs
+		// If in list/walk mode, only show list POIs
+		if (currentList && currentList.pois && currentList.pois.length > 0) {
+			// Filter to only show POIs in the list/walk
 			poiFeatures = geoData.features.filter(feature =>
 				currentList.pois.includes(feature.properties.id)
 			);
@@ -675,10 +655,7 @@ function createCategoryFilters() {
 			await loadCategories();
 			console.log('Categories loaded:', Object.keys(categories).length);
 
-			console.log('Loading walkthroughs...');
-			await loadWalkthroughs();
-
-			console.log('Loading lists...');
+			console.log('Loading lists and walks...');
 			await loadLists();
 
 			// Populate Grätzl dropdown
@@ -687,46 +664,18 @@ function createCategoryFilters() {
 			// Create category filter UI
 			createCategoryFilters();
 
-			// Setup walkthrough selector
-			setupWalkthroughSelector();
-
-			// Setup list selector
+			// Setup list selector (now handles both lists and walks)
 			setupListSelector();
 
-			// Check URL for Grätzl, Walkthrough, or List
+			// Ensure sidebar is hidden by default
+			document.querySelector('.container').classList.remove('sidebar-active');
+
+			// Check URL for Grätzl or List
 			const graetzlSlug = getGraetzlSlugFromPath();
-			const walkthroughSlug = getWalkthroughSlugFromPath();
 			const listSlug = getListSlugFromPath();
 
-			if (walkthroughSlug) {
-				console.log('Walkthrough slug from URL:', walkthroughSlug);
-				console.log('Available walkthroughs:', walkthroughData.map(w => ({ id: w.id, slug: w.slug, title: w.title })));
-				// Find walkthrough by slug, or generate slug from title if missing
-				const walkthrough = walkthroughData.find(w => {
-					const slug = w.slug || nameToSlug(w.title);
-					return slug === walkthroughSlug;
-				});
-				if (walkthrough) {
-					console.log('Found Walkthrough:', walkthrough);
-					const walkthroughSelect = document.getElementById('walkthrough-select');
-					if (walkthroughSelect) {
-						walkthroughSelect.value = walkthrough.id;
-					}
-					// Wait for next tick to ensure everything is ready
-					requestAnimationFrame(() => {
-						requestAnimationFrame(() => {
-							console.log('Activating walkthrough with', walkthrough.pois.length, 'POIs');
-							if (activateWalkthroughFn) {
-								activateWalkthroughFn(walkthrough.id);
-							}
-						});
-					});
-				} else {
-					console.warn('Walkthrough not found for slug:', walkthroughSlug);
-					console.warn('Available slugs:', walkthroughData.map(w => w.slug || nameToSlug(w.title)));
-					showAllPOIs();
-				}
-			} else if (listSlug) {
+			// Check for /l/ (list/walk) URL
+			if (listSlug) {
 				console.log('List slug from URL:', listSlug);
 				// Find list by slug, or generate slug from title if missing
 				const list = listData.find(l => {
@@ -1222,27 +1171,6 @@ function createCategoryFilters() {
 		listMarkers = [];
 	}
 
-	// Zoom map to fit walkthrough POIs
-	function zoomToWalkthroughPOIs(poiIds) {
-		if (!poiIds || poiIds.length === 0) return;
-
-		const bounds = [];
-		poiIds.forEach(poiId => {
-			const poi = geoData.features.find(f => f.properties.id === poiId);
-			if (poi) {
-				const [lng, lat] = poi.geometry.coordinates;
-				bounds.push([lat, lng]);
-			}
-		});
-
-		if (bounds.length > 0) {
-			map.fitBounds(bounds, {
-				padding: [50, 50],
-				maxZoom: 16
-			});
-		}
-	}
-
 	// Zoom map to fit list POIs
 	function zoomToListPOIs(poiIds) {
 		if (!poiIds || poiIds.length === 0) return;
@@ -1264,219 +1192,6 @@ function createCategoryFilters() {
 		}
 	}
 
-	// Walkthrough selector functionality
-	function setupWalkthroughSelector() {
-		const selectElement = document.getElementById('walkthrough-select');
-		const sidebarDiv = document.getElementById('poi-sidebar');
-		const sidebarTitle = document.getElementById('poi-sidebar-title');
-		const sidebarDescription = document.getElementById('poi-sidebar-description');
-		const sidebarItems = document.getElementById('poi-sidebar-items');
-		const closeSidebar = document.getElementById('close-poi-sidebar');
-		const categoryToggle = document.getElementById('category-toggle');
-		const categoryDropdown = document.getElementById('category-dropdown');
-
-		if (!selectElement || !sidebarDiv) {
-			console.warn('Walkthrough UI elements not found');
-			return;
-		}
-
-		// Populate walkthrough options
-		function populateWalkthroughs() {
-			// Clear existing options except the first (default)
-			selectElement.innerHTML = '<option value="">Kein Walk ausgewählt</option>';
-
-			walkthroughData.forEach(walkthrough => {
-				const option = document.createElement('option');
-				option.value = walkthrough.id;
-				option.textContent = getTranslated(walkthrough.title);
-				selectElement.appendChild(option);
-			});
-		}
-
-		// Update sidebar with walkthrough POIs
-		function updateSidebarForWalkthrough(walkthrough) {
-			sidebarTitle.textContent = getTranslated(walkthrough.title);
-			const description = getTranslated(walkthrough.description);
-			sidebarDescription.textContent = description;
-			sidebarDescription.style.display = description ? 'block' : 'none';
-			sidebarItems.innerHTML = '';
-
-			walkthrough.pois.forEach((poiId, index) => {
-				const poi = geoData.features.find(f => f.properties.id === poiId);
-				if (!poi) return;
-
-				const category = categories[poi.properties.category];
-				const categoryIcon = category ? category.emoji : '';
-				const description = getTranslated(poi.properties.description);
-
-				const item = document.createElement('div');
-				item.className = 'poi-sidebar-item';
-				item.dataset.poiId = poiId;
-				item.innerHTML = `
-					<div class="list-item-number">${index + 1}</div>
-					<div class="list-item-content">
-						<div class="list-item-name">${categoryIcon} ${poi.properties.name}</div>
-						${description ? `<div class="list-item-description">${description}</div>` : ''}
-						${poi.properties.link ? `<a href="${poi.properties.link}" target="_blank" class="list-item-link">Webseite</a>` : ''}
-						${poi.properties.instagram ? `<a href="${poi.properties.instagram}" target="_blank" class="list-item-link">Instagram</a>` : ''}
-					</div>
-				`;
-
-				// Click handler to center map on POI
-				item.addEventListener('click', () => {
-					const coords = poi.geometry.coordinates;
-					const latLng = [coords[1], coords[0]];
-
-					// Ensure we're at the right zoom level
-					if (map.getZoom() !== 17) {
-						map.setView(latLng, 17, { animate: true });
-					} else {
-						// Pan to center exactly on the POI
-						map.panTo(latLng, { animate: true, duration: 0.5 });
-					}
-
-					// Find and open the marker popup after animation
-					setTimeout(() => {
-						const marker = currentMarkers.find(m => m.poiId === poiId);
-						if (marker) {
-							marker.openPopup();
-						}
-					}, 300);
-
-					// Highlight the item
-					document.querySelectorAll('.poi-sidebar-item').forEach(el => el.classList.remove('active'));
-					item.classList.add('active');
-				});
-
-				// Add hover effect to highlight corresponding marker
-				item.addEventListener('mouseenter', () => {
-					const marker = currentMarkers.find(m => m.poiId === poiId);
-					if (marker && marker._icon) {
-						const markerElement = marker._icon.querySelector('.custom-marker');
-						if (markerElement) {
-							markerElement.classList.add('marker-highlighted');
-						}
-					}
-				});
-
-				item.addEventListener('mouseleave', () => {
-					const marker = currentMarkers.find(m => m.poiId === poiId);
-					if (marker && marker._icon) {
-						const markerElement = marker._icon.querySelector('.custom-marker');
-						if (markerElement) {
-							markerElement.classList.remove('marker-highlighted');
-						}
-					}
-				});
-
-				sidebarItems.appendChild(item);
-			});
-		}
-
-		// Activate walkthrough
-		function activateWalkthrough(walkthroughId) {
-			// Deactivate list if active
-			if (currentList) {
-				const listSelect = document.getElementById('list-select');
-				if (listSelect) {
-					listSelect.value = '';
-				}
-				clearListMarkers();
-				currentList = null;
-			}
-
-			const walkthrough = walkthroughData.find(w => w.id === walkthroughId);
-			if (!walkthrough) {
-				console.warn('Walkthrough not found:', walkthroughId);
-				return;
-			}
-
-			currentWalkthrough = walkthrough;
-
-			// Show sidebar with walkthrough details
-			updateSidebarForWalkthrough(walkthrough);
-			document.querySelector('.container').classList.add('sidebar-active');
-
-			// Disable category filter toggle
-			if (categoryToggle) {
-				categoryToggle.disabled = true;
-				categoryToggle.style.opacity = '0.5';
-				categoryToggle.style.cursor = 'not-allowed';
-			}
-
-			// Close category dropdown if open
-			if (categoryDropdown) {
-				categoryDropdown.style.display = 'none';
-			}
-
-			// Update markers to show only walkthrough POIs
-			updateMarkers();
-
-			// Zoom map to fit all walkthrough POIs
-			zoomToWalkthroughPOIs(walkthrough.pois);
-
-			// Draw arrows connecting the POIs
-			drawWalkthroughArrows(walkthrough.pois);
-
-			// Update URL
-			updateUrlForWalkthrough(walkthrough);
-
-			console.log('Walkthrough activated:', walkthrough.title);
-		}
-
-		// Deactivate walkthrough
-		function deactivateWalkthrough() {
-			currentWalkthrough = null;
-
-			// Hide sidebar
-			document.querySelector('.container').classList.remove('sidebar-active');
-
-			// Re-enable category filter toggle
-			if (categoryToggle) {
-				categoryToggle.disabled = false;
-				categoryToggle.style.opacity = '1';
-				categoryToggle.style.cursor = 'pointer';
-			}
-
-			// Clear walkthrough arrows
-			clearWalkthroughArrows();
-
-			// Reset select to default
-			selectElement.value = '';
-
-			// Update markers to show filtered POIs
-			updateMarkers();
-
-			// Update URL (go back to root)
-			updateUrlForWalkthrough(null);
-
-			console.log('Walkthrough deactivated');
-		}
-
-		// Handle select change
-		selectElement.addEventListener('change', (e) => {
-			const walkthroughId = e.target.value;
-			if (walkthroughId) {
-				activateWalkthrough(walkthroughId);
-			} else {
-				deactivateWalkthrough();
-			}
-		});
-
-		// Handle close button
-		if (closeSidebar) {
-			closeSidebar.addEventListener('click', () => {
-				deactivateWalkthrough();
-			});
-		}
-
-		// Initial population
-		populateWalkthroughs();
-
-		// Store reference to activate function for URL initialization
-		activateWalkthroughFn = activateWalkthrough;
-	}
-
 	// List selector functionality
 	function setupListSelector() {
 		const selectElement = document.getElementById('list-select');
@@ -1496,12 +1211,14 @@ function createCategoryFilters() {
 		// Populate list options
 		function populateLists() {
 			// Clear existing options except the first (default)
-			selectElement.innerHTML = '<option value="">Keine Liste ausgewählt</option>';
+			selectElement.innerHTML = '<option value="">Keine Liste/Walk ausgewählt</option>';
 
 			listData.forEach(list => {
 				const option = document.createElement('option');
 				option.value = list.id;
-				option.textContent = getTranslated(list.title);
+				// Add icon to indicate if it's a walk
+				const prefix = list.showAsWalk ? '🚶 ' : '📋 ';
+				option.textContent = prefix + getTranslated(list.title);
 				selectElement.appendChild(option);
 			});
 		}
@@ -1588,22 +1305,22 @@ function createCategoryFilters() {
 
 		// Activate list
 		function activateList(listId) {
-			// Deactivate walkthrough if active
-			if (currentWalkthrough) {
-				const walkthroughSelect = document.getElementById('walkthrough-select');
-				if (walkthroughSelect) {
-					walkthroughSelect.value = '';
-				}
-				clearWalkthroughArrows();
-				currentWalkthrough = null;
-			}
+			console.log('=== Activating list ===');
+			console.log('List ID:', listId);
+			console.log('Available lists:', listData.length);
+
+			// Clear any existing arrows/numbers
+			clearWalkthroughArrows();
+			clearListMarkers();
 
 			const list = listData.find(l => l.id === listId);
 			if (!list) {
-				console.warn('List not found:', listId);
+				console.error('List not found:', listId);
+				console.error('Available list IDs:', listData.map(l => l.id));
 				return;
 			}
 
+			console.log('Found list:', getTranslated(list.title), 'POIs:', list.pois.length, 'showAsWalk:', list.showAsWalk);
 			currentList = list;
 
 			// Show sidebar
@@ -1628,21 +1345,34 @@ function createCategoryFilters() {
 			// Zoom map to fit all list POIs
 			zoomToListPOIs(list.pois);
 
-			// Draw number markers
-			drawListNumbers(list.pois);
+			// Draw arrows if showAsWalk is true, otherwise just numbers
+			if (list.showAsWalk) {
+				drawWalkthroughArrows(list.pois);
+			} else {
+				drawListNumbers(list.pois);
+			}
 
 			// Update URL
 			updateUrlForList(list);
 
-			console.log('List activated:', list.title);
+			console.log('List activated:', list.title, 'showAsWalk:', list.showAsWalk);
 		}
 
 		// Deactivate list
 		function deactivateList() {
+			console.log('=== Deactivating list ===');
 			currentList = null;
 
 			// Hide sidebar
 			document.querySelector('.container').classList.remove('sidebar-active');
+
+			// Clear sidebar content
+			if (sidebarTitle) sidebarTitle.textContent = '';
+			if (sidebarDescription) {
+				sidebarDescription.textContent = '';
+				sidebarDescription.style.display = 'none';
+			}
+			if (sidebarItems) sidebarItems.innerHTML = '';
 
 			// Re-enable category filter toggle
 			if (categoryToggle) {
@@ -1651,8 +1381,9 @@ function createCategoryFilters() {
 				categoryToggle.style.cursor = 'pointer';
 			}
 
-			// Clear list markers
+			// Clear both list markers and walkthrough arrows
 			clearListMarkers();
+			clearWalkthroughArrows();
 
 			// Reset select to default
 			selectElement.value = '';
@@ -1738,11 +1469,6 @@ function createCategoryFilters() {
 			listSelect.options[0].textContent = t('placeholder.noList');
 		}
 
-		const walkthroughSelect = document.getElementById('walkthrough-select');
-		if (walkthroughSelect && walkthroughSelect.options[0]) {
-			walkthroughSelect.options[0].textContent = t('placeholder.noWalk');
-		}
-
 		const graetzlSearch = document.getElementById('graetzl-search');
 		if (graetzlSearch) {
 			graetzlSearch.placeholder = t('placeholder.allGraetzl');
@@ -1785,20 +1511,7 @@ function createCategoryFilters() {
 			langSwitcherText.textContent = getCurrentLanguage() === 'de' ? 'EN' : 'DE';
 		}
 
-		// Update dropdowns if they have items
-		const walkthroughSelectEl = document.getElementById('walkthrough-select');
-		if (walkthroughSelectEl && walkthroughData.length > 0) {
-			const currentValue = walkthroughSelectEl.value;
-			walkthroughSelectEl.innerHTML = `<option value="">${t('placeholder.noWalk')}</option>`;
-			walkthroughData.forEach(walkthrough => {
-				const option = document.createElement('option');
-				option.value = walkthrough.id;
-				option.textContent = getTranslated(walkthrough.title);
-				walkthroughSelectEl.appendChild(option);
-			});
-			walkthroughSelectEl.value = currentValue;
-		}
-
+		// Update list/walk dropdown
 		const listSelectEl = document.getElementById('list-select');
 		if (listSelectEl && listData.length > 0) {
 			const currentValue = listSelectEl.value;
@@ -1806,7 +1519,8 @@ function createCategoryFilters() {
 			listData.forEach(list => {
 				const option = document.createElement('option');
 				option.value = list.id;
-				option.textContent = getTranslated(list.title);
+				const prefix = list.showAsWalk ? '🚶 ' : '📋 ';
+				option.textContent = prefix + getTranslated(list.title);
 				listSelectEl.appendChild(option);
 			});
 			listSelectEl.value = currentValue;
@@ -1821,16 +1535,6 @@ function createCategoryFilters() {
 			}
 			if (sidebarDescription) {
 				const description = getTranslated(currentList.description);
-				sidebarDescription.textContent = description;
-			}
-		} else if (currentWalkthrough) {
-			const sidebarTitle = document.getElementById('poi-sidebar-title');
-			const sidebarDescription = document.getElementById('poi-sidebar-description');
-			if (sidebarTitle) {
-				sidebarTitle.textContent = getTranslated(currentWalkthrough.title);
-			}
-			if (sidebarDescription) {
-				const description = getTranslated(currentWalkthrough.description);
 				sidebarDescription.textContent = description;
 			}
 		}

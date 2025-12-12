@@ -2,1096 +2,1139 @@
 const title = "POI Management System";
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>{title}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      font-family: system-ui, sans-serif;
-      background: #f5f7fa;
-      margin: 0;
-      padding: 20px;
-    }
-
-    .layout {
-      max-width: 1400px;
-      margin: auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-
-    .panel {
-      background: #fff;
-      padding: 24px;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    }
-
-    h1 {
-      margin: 0 0 24px 0;
-      font-size: 24px;
-    }
-
-    h2 {
-      margin: 0 0 16px 0;
-      font-size: 18px;
-      color: #374151;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .full {
-      grid-column: span 2;
-    }
-
-    label {
-      font-weight: 600;
-      font-size: 13px;
-      margin-bottom: 4px;
-      display: block;
-      color: #374151;
-    }
-
-    input, textarea, select {
-      width: 100%;
-      padding: 8px 10px;
-      border-radius: 6px;
-      border: 1px solid #d1d5db;
-      font-size: 14px;
-      font-family: inherit;
-    }
-
-    textarea {
-      min-height: 60px;
-      resize: vertical;
-    }
-
-    .hint {
-      font-size: 11px;
-      color: #6b7280;
-      margin-top: 2px;
-    }
-
-    button {
-      padding: 10px 16px;
-      border-radius: 6px;
-      border: none;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      background: #2563eb;
-      color: white;
-      transition: background 0.2s;
-    }
-
-    button:hover {
-      background: #1d4ed8;
-    }
-
-    button.secondary {
-      background: #6b7280;
-    }
-
-    button.secondary:hover {
-      background: #4b5563;
-    }
-
-    button.danger {
-      background: #dc2626;
-    }
-
-    button.danger:hover {
-      background: #b91c1c;
-    }
-
-    button.small {
-      padding: 6px 12px;
-      font-size: 12px;
-    }
-
-    .button-group {
-      display: flex;
-      gap: 8px;
-      margin-top: 16px;
-    }
-
-    .poi-list {
-      max-height: 600px;
-      overflow-y: auto;
-    }
-
-    .poi-item {
-      padding: 12px;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: background 0.2s;
-    }
-
-    .poi-item:hover {
-      background: #f9fafb;
-    }
-
-    .poi-info {
-      flex: 1;
-    }
-
-    .poi-name {
-      font-weight: 600;
-      color: #111827;
-      margin-bottom: 4px;
-    }
-
-    .poi-category {
-      font-size: 12px;
-      color: #6b7280;
-      display: inline-block;
-      padding: 2px 8px;
-      background: #f3f4f6;
-      border-radius: 4px;
-      margin-right: 8px;
-    }
-
-    .poi-coords {
-      font-size: 11px;
-      color: #9ca3af;
-    }
-
-    .poi-actions {
-      display: flex;
-      gap: 6px;
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      background: #10b981;
-      color: white;
-      padding: 12px 20px;
-      border-radius: 8px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      font-size: 14px;
-      font-weight: 600;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.3s ease, transform 0.3s ease;
-      pointer-events: none;
-      z-index: 1000;
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .toast.error {
-      background: #dc2626;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 40px;
-      color: #9ca3af;
-    }
-
-    .tags-input-container {
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      padding: 6px;
-      background: white;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      align-items: center;
-    }
-
-    .tags-input-container:focus-within {
-      border-color: #2563eb;
-      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
-    }
-
-    .selected-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .tag-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      background: #e0e7ff;
-      color: #3730a3;
-      border-radius: 4px;
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .tag-chip .remove-tag {
-      cursor: pointer;
-      font-weight: bold;
-      color: #6366f1;
-      background: none;
-      border: none;
-      padding: 0;
-      font-size: 16px;
-      line-height: 1;
-    }
-
-    .tag-chip .remove-tag:hover {
-      color: #4f46e5;
-    }
-
-    #tagInput {
-      border: none;
-      outline: none;
-      padding: 4px;
-      flex: 1;
-      min-width: 120px;
-      font-size: 14px;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 8px;
-      background: white;
-      padding: 12px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 12px 20px;
-      background: #f3f4f6;
-      color: #6b7280;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .tab-btn:hover {
-      background: #e5e7eb;
-    }
-
-    .tab-btn.active {
-      background: #2563eb;
-      color: white;
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    .poi-selector {
-      position: relative;
-    }
-
-    .poi-selector-input-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .poi-selector-input-wrapper input {
-      padding-right: 36px;
-    }
-
-    .poi-selector-clear-btn {
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: #e5e7eb;
-      border: none;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      font-size: 16px;
-      line-height: 1;
-      cursor: pointer;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      color: #6b7280;
-      transition: all 0.2s;
-    }
-
-    .poi-selector-clear-btn:hover {
-      background: #d1d5db;
-      color: #111827;
-    }
-
-    .poi-search-results {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: white;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      margin-top: 4px;
-      max-height: 200px;
-      overflow-y: auto;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      z-index: 10;
-      display: none;
-    }
-
-    .poi-search-results.show {
-      display: block;
-    }
-
-    .poi-search-result-item {
-      padding: 8px 12px;
-      cursor: pointer;
-      border-bottom: 1px solid #f3f4f6;
-      transition: background 0.15s;
-    }
-
-    .poi-search-result-item:hover,
-    .poi-search-result-item.focused {
-      background: #f9fafb;
-    }
-
-    .poi-search-result-item:last-child {
-      border-bottom: none;
-    }
-
-    .poi-search-result-name {
-      font-weight: 600;
-      font-size: 13px;
-      color: #111827;
-    }
-
-    .poi-search-result-category {
-      font-size: 11px;
-      color: #6b7280;
-    }
-
-    .selected-pois-container {
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      padding: 8px;
-      min-height: 100px;
-      background: #f9fafb;
-    }
-
-    .selected-poi-item {
-      background: white;
-      padding: 10px 12px;
-      margin-bottom: 6px;
-      border-radius: 6px;
-      border: 1px solid #e5e7eb;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: move;
-      transition: all 0.2s;
-    }
-
-    .selected-poi-item:last-child {
-      margin-bottom: 0;
-    }
-
-    .selected-poi-item:hover {
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    .selected-poi-item.dragging {
-      opacity: 0.5;
-    }
-
-    .selected-poi-info {
-      flex: 1;
-    }
-
-    .selected-poi-name {
-      font-weight: 600;
-      font-size: 13px;
-      color: #111827;
-    }
-
-    .selected-poi-category {
-      font-size: 11px;
-      color: #6b7280;
-    }
-
-    .selected-poi-actions {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
-
-    .drag-handle {
-      color: #9ca3af;
-      cursor: move;
-      font-size: 18px;
-      padding: 0 8px;
-    }
-
-    .remove-poi-btn {
-      background: #dc2626;
-      color: white;
-      border: none;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    .remove-poi-btn:hover {
-      background: #b91c1c;
-    }
-
-    .header {
-      max-width: 1400px;
-      margin: 0 auto 20px auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-
-    .header h1 {
-      margin: 0;
-      font-size: 28px;
-      color: #111827;
-    }
-
-    .view-map-btn {
-      padding: 12px 24px;
-      background: #667eea;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 16px;
-      transition: all 0.2s;
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-    }
-
-    .view-map-btn:hover {
-      background: #764ba2;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
-    }
-  </style>
-</head>
-<body>
-
-  <div class="header">
-    <h1>POI Management System</h1>
-    <a href="/" class="view-map-btn">🗺️ View Map</a>
-  </div>
-
-  <div style="max-width: 1400px; margin: 0 auto 20px auto;">
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="pois">POI Management</button>
-      <button class="tab-btn" data-tab="walkthroughs">Walkthrough Management</button>
-      <button class="tab-btn" data-tab="lists">List Management</button>
+  <head>
+    <meta charset="utf-8" />
+    <title>{title}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: system-ui, sans-serif;
+        background: #f5f7fa;
+        margin: 0;
+        padding: 20px;
+      }
+
+      .layout {
+        max-width: 1400px;
+        margin: auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      .panel {
+        background: #fff;
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      }
+
+      h1 {
+        margin: 0 0 24px 0;
+        font-size: 24px;
+      }
+
+      h2 {
+        margin: 0 0 16px 0;
+        font-size: 18px;
+        color: #374151;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .full {
+        grid-column: span 2;
+      }
+
+      label {
+        font-weight: 600;
+        font-size: 13px;
+        margin-bottom: 4px;
+        display: block;
+        color: #374151;
+      }
+
+      input,
+      textarea,
+      select {
+        width: 100%;
+        padding: 8px 10px;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        font-size: 14px;
+        font-family: inherit;
+      }
+
+      textarea {
+        min-height: 60px;
+        resize: vertical;
+      }
+
+      .hint {
+        font-size: 11px;
+        color: #6b7280;
+        margin-top: 2px;
+      }
+
+      button {
+        padding: 10px 16px;
+        border-radius: 6px;
+        border: none;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        background: #2563eb;
+        color: white;
+        transition: background 0.2s;
+      }
+
+      button:hover {
+        background: #1d4ed8;
+      }
+
+      button.secondary {
+        background: #6b7280;
+      }
+
+      button.secondary:hover {
+        background: #4b5563;
+      }
+
+      button.danger {
+        background: #dc2626;
+      }
+
+      button.danger:hover {
+        background: #b91c1c;
+      }
+
+      button.small {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 8px;
+        margin-top: 16px;
+      }
+
+      .poi-list {
+        max-height: 600px;
+        overflow-y: auto;
+      }
+
+      .poi-item {
+        padding: 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background 0.2s;
+      }
+
+      .poi-item:hover {
+        background: #f9fafb;
+      }
+
+      .poi-info {
+        flex: 1;
+      }
+
+      .poi-name {
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 4px;
+      }
+
+      .poi-category {
+        font-size: 12px;
+        color: #6b7280;
+        display: inline-block;
+        padding: 2px 8px;
+        background: #f3f4f6;
+        border-radius: 4px;
+        margin-right: 8px;
+      }
+
+      .poi-coords {
+        font-size: 11px;
+        color: #9ca3af;
+      }
+
+      .poi-actions {
+        display: flex;
+        gap: 6px;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: #10b981;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        font-size: 14px;
+        font-weight: 600;
+        opacity: 0;
+        transform: translateY(20px);
+        transition:
+          opacity 0.3s ease,
+          transform 0.3s ease;
+        pointer-events: none;
+        z-index: 1000;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .toast.error {
+        background: #dc2626;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #9ca3af;
+      }
+
+      .tags-input-container {
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        padding: 6px;
+        background: white;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+      }
+
+      .tags-input-container:focus-within {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+      }
+
+      .selected-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .tag-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        background: #e0e7ff;
+        color: #3730a3;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      .tag-chip .remove-tag {
+        cursor: pointer;
+        font-weight: bold;
+        color: #6366f1;
+        background: none;
+        border: none;
+        padding: 0;
+        font-size: 16px;
+        line-height: 1;
+      }
+
+      .tag-chip .remove-tag:hover {
+        color: #4f46e5;
+      }
+
+      #tagInput {
+        border: none;
+        outline: none;
+        padding: 4px;
+        flex: 1;
+        min-width: 120px;
+        font-size: 14px;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 8px;
+        background: white;
+        padding: 12px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      .tab-btn {
+        flex: 1;
+        padding: 12px 20px;
+        background: #f3f4f6;
+        color: #6b7280;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .tab-btn:hover {
+        background: #e5e7eb;
+      }
+
+      .tab-btn.active {
+        background: #2563eb;
+        color: white;
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .poi-selector {
+        position: relative;
+      }
+
+      .poi-selector-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .poi-selector-input-wrapper input {
+        padding-right: 36px;
+      }
+
+      .poi-selector-clear-btn {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #e5e7eb;
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        font-size: 16px;
+        line-height: 1;
+        cursor: pointer;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        color: #6b7280;
+        transition: all 0.2s;
+      }
+
+      .poi-selector-clear-btn:hover {
+        background: #d1d5db;
+        color: #111827;
+      }
+
+      .poi-search-results {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        margin-top: 4px;
+        max-height: 200px;
+        overflow-y: auto;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 10;
+        display: none;
+      }
+
+      .poi-search-results.show {
+        display: block;
+      }
+
+      .poi-search-result-item {
+        padding: 8px 12px;
+        cursor: pointer;
+        border-bottom: 1px solid #f3f4f6;
+        transition: background 0.15s;
+      }
+
+      .poi-search-result-item:hover,
+      .poi-search-result-item.focused {
+        background: #f9fafb;
+      }
+
+      .poi-search-result-item:last-child {
+        border-bottom: none;
+      }
+
+      .poi-search-result-name {
+        font-weight: 600;
+        font-size: 13px;
+        color: #111827;
+      }
+
+      .poi-search-result-category {
+        font-size: 11px;
+        color: #6b7280;
+      }
+
+      .selected-pois-container {
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        padding: 8px;
+        min-height: 100px;
+        background: #f9fafb;
+      }
+
+      .selected-poi-item {
+        background: white;
+        padding: 10px 12px;
+        margin-bottom: 6px;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: move;
+        transition: all 0.2s;
+      }
+
+      .selected-poi-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .selected-poi-item:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .selected-poi-item.dragging {
+        opacity: 0.5;
+      }
+
+      .selected-poi-info {
+        flex: 1;
+      }
+
+      .selected-poi-name {
+        font-weight: 600;
+        font-size: 13px;
+        color: #111827;
+      }
+
+      .selected-poi-category {
+        font-size: 11px;
+        color: #6b7280;
+      }
+
+      .selected-poi-actions {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+
+      .drag-handle {
+        color: #9ca3af;
+        cursor: move;
+        font-size: 18px;
+        padding: 0 8px;
+      }
+
+      .remove-poi-btn {
+        background: #dc2626;
+        color: white;
+        border: none;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .remove-poi-btn:hover {
+        background: #b91c1c;
+      }
+
+      .header {
+        max-width: 1400px;
+        margin: 0 auto 20px auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      .header h1 {
+        margin: 0;
+        font-size: 28px;
+        color: #111827;
+      }
+
+      .view-map-btn {
+        padding: 12px 24px;
+        background: #667eea;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 16px;
+        transition: all 0.2s;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      }
+
+      .view-map-btn:hover {
+        background: #764ba2;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>POI Management System</h1>
+      <a href="/" class="view-map-btn">🗺️ View Map</a>
     </div>
-  </div>
 
-  <!-- POI Management Tab -->
-  <div class="tab-content active" id="pois-tab">
-    <div class="layout">
-      <!-- POI Form Panel -->
-      <div class="panel">
-      <h1 id="formTitle">Add New POI</h1>
+    <div style="max-width: 1400px; margin: 0 auto 20px auto;">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="pois">POI Management</button>
+        <button class="tab-btn" data-tab="lists">Lists & Walks</button>
+      </div>
+    </div>
 
-      <form id="poiForm">
-        <input type="hidden" id="editingId" value="">
+    <!-- POI Management Tab -->
+    <div class="tab-content active" id="pois-tab">
+      <div class="layout">
+        <!-- POI Form Panel -->
+        <div class="panel">
+          <h1 id="formTitle">Add New POI</h1>
 
-        <div class="grid">
-          <div>
-            <label>Latitude</label>
-            <input id="lat" type="number" step="any" placeholder="48.1979108" />
+          <form id="poiForm">
+            <input type="hidden" id="editingId" value="" />
+
+            <div class="grid">
+              <div>
+                <label>Latitude</label>
+                <input
+                  id="lat"
+                  type="number"
+                  step="any"
+                  placeholder="48.1979108"
+                />
+              </div>
+
+              <div>
+                <label>Longitude</label>
+                <input
+                  id="lng"
+                  type="number"
+                  step="any"
+                  placeholder="16.3658069"
+                />
+              </div>
+
+              <div class="full">
+                <label>OR Google Maps Coordinates</label>
+                <input
+                  id="gmaps"
+                  type="text"
+                  placeholder="48.1959801840249, 16.36017068166236"
+                />
+                <div class="hint">
+                  Paste coordinates directly from Google Maps
+                </div>
+              </div>
+
+              <div class="full">
+                <label>Name *</label>
+                <input id="name" type="text" placeholder="POI Name" required />
+              </div>
+
+              <div class="full">
+                <label>Category *</label>
+                <input
+                  id="category"
+                  type="text"
+                  list="categories"
+                  placeholder="Type or select a category..."
+                  required
+                />
+                <datalist id="categories"></datalist>
+                <div class="hint">
+                  Select existing or type new category name
+                </div>
+              </div>
+
+              <div class="full">
+                <label>Tags</label>
+                <div class="tags-input-container">
+                  <div class="selected-tags" id="selectedTags"></div>
+                  <input
+                    id="tagInput"
+                    type="text"
+                    list="tagSuggestions"
+                    placeholder="Add tags..."
+                    autocomplete="off"
+                  />
+                  <datalist id="tagSuggestions"></datalist>
+                </div>
+                <div class="hint">Type and press Enter to add tags</div>
+              </div>
+
+              <div class="full">
+                <label>Description (German)</label>
+                <textarea
+                  id="description-de"
+                  placeholder="Beschreibung des Ortes (Deutsch)"></textarea>
+              </div>
+
+              <div class="full">
+                <label>Description (English)</label>
+                <textarea
+                  id="description-en"
+                  placeholder="Description of the place (English)"></textarea>
+              </div>
+
+              <div class="full">
+                <label>Link</label>
+                <input id="link" type="url" placeholder="https://example.com" />
+              </div>
+
+              <div class="full">
+                <label>Instagram</label>
+                <input
+                  id="instagram"
+                  type="url"
+                  placeholder="https://instagram.com/username"
+                />
+              </div>
+
+              <div class="full">
+                <label>Photo</label>
+                <div
+                  id="photoPreview"
+                  style="margin-bottom: 8px; display: none;"
+                >
+                  <img
+                    id="photoPreviewImg"
+                    src=""
+                    alt="Current photo"
+                    style="max-width: 200px; max-height: 150px; border-radius: 8px; object-fit: cover;"
+                  />
+                  <button
+                    type="button"
+                    id="removePhoto"
+                    style="display: block; margin-top: 4px; padding: 4px 8px; font-size: 12px; background: #dc2626; color: white;"
+                    >Remove Photo</button
+                  >
+                </div>
+                <input id="photoFile" type="file" accept="image/*" />
+                <div class="hint">
+                  Upload a photo (will be saved to /public/uploads/)
+                </div>
+              </div>
+
+              <div class="full">
+                <label>OR Photo URL</label>
+                <input
+                  id="photo"
+                  type="url"
+                  placeholder="https://example.com/photo.jpg"
+                />
+                <div class="hint">
+                  Alternatively, provide a direct photo URL
+                </div>
+              </div>
+            </div>
+
+            <div class="button-group">
+              <button type="submit" id="submitBtn">Create POI</button>
+              <button
+                type="button"
+                class="secondary"
+                id="cancelBtn"
+                style="display: none;">Cancel</button
+              >
+            </div>
+          </form>
+        </div>
+
+        <!-- POI List Panel -->
+        <div class="panel">
+          <h2>Existing POIs (<span id="poiCount">0</span>)</h2>
+
+          <!-- Filters -->
+          <div style="margin-bottom: 16px;">
+            <input
+              id="searchPOI"
+              type="text"
+              placeholder="🔍 Search POIs by name..."
+              style="margin-bottom: 8px;"
+            />
+            <select id="filterCategory" style="margin-bottom: 8px;">
+              <option value="">All Categories</option>
+            </select>
           </div>
 
-          <div>
-            <label>Longitude</label>
-            <input id="lng" type="number" step="any" placeholder="16.3658069" />
+          <div class="poi-list" id="poiList">
+            <div class="empty-state">Loading POIs...</div>
           </div>
+        </div>
+      </div>
+    </div>
 
-          <div class="full">
-            <label>OR Google Maps Coordinates</label>
-            <input id="gmaps" type="text" placeholder="48.1959801840249, 16.36017068166236" />
-            <div class="hint">Paste coordinates directly from Google Maps</div>
-          </div>
+    <!-- List Management Tab -->
+    <div class="tab-content" id="lists-tab" style="display: none;">
+      <div class="layout">
+        <!-- List Form Panel -->
+        <div class="panel">
+          <h1 id="listFormTitle">Add New List or Walk</h1>
 
-          <div class="full">
-            <label>Name *</label>
-            <input id="name" type="text" placeholder="POI Name" required />
-          </div>
+          <form id="listForm">
+            <input type="hidden" id="listEditingId" value="" />
 
-          <div class="full">
-            <label>Category *</label>
-            <input id="category" type="text" list="categories" placeholder="Type or select a category..." required />
-            <datalist id="categories"></datalist>
-            <div class="hint">Select existing or type new category name</div>
-          </div>
-
-          <div class="full">
-            <label>Tags</label>
-            <div class="tags-input-container">
-              <div class="selected-tags" id="selectedTags"></div>
+            <div class="full">
+              <label>Title (German) *</label>
               <input
-                id="tagInput"
+                id="listTitle-de"
                 type="text"
-                list="tagSuggestions"
-                placeholder="Add tags..."
-                autocomplete="off"
+                placeholder="Titel der Liste/des Walks (Deutsch)"
+                required
               />
-              <datalist id="tagSuggestions"></datalist>
             </div>
-            <div class="hint">Type and press Enter to add tags</div>
-          </div>
 
-          <div class="full">
-            <label>Description (German)</label>
-            <textarea id="description-de" placeholder="Beschreibung des Ortes (Deutsch)"></textarea>
-          </div>
-
-          <div class="full">
-            <label>Description (English)</label>
-            <textarea id="description-en" placeholder="Description of the place (English)"></textarea>
-          </div>
-
-          <div class="full">
-            <label>Link</label>
-            <input id="link" type="url" placeholder="https://example.com" />
-          </div>
-
-          <div class="full">
-            <label>Instagram</label>
-            <input id="instagram" type="url" placeholder="https://instagram.com/username" />
-          </div>
-
-          <div class="full">
-            <label>Photo</label>
-            <div id="photoPreview" style="margin-bottom: 8px; display: none;">
-              <img id="photoPreviewImg" src="" alt="Current photo" style="max-width: 200px; max-height: 150px; border-radius: 8px; object-fit: cover;" />
-              <button type="button" id="removePhoto" style="display: block; margin-top: 4px; padding: 4px 8px; font-size: 12px; background: #dc2626; color: white;">Remove Photo</button>
+            <div class="full">
+              <label>Title (English) *</label>
+              <input
+                id="listTitle-en"
+                type="text"
+                placeholder="List/Walk Title (English)"
+                required
+              />
             </div>
-            <input id="photoFile" type="file" accept="image/*" />
-            <div class="hint">Upload a photo (will be saved to /public/uploads/)</div>
-          </div>
 
-          <div class="full">
-            <label>OR Photo URL</label>
-            <input id="photo" type="url" placeholder="https://example.com/photo.jpg" />
-            <div class="hint">Alternatively, provide a direct photo URL</div>
-          </div>
-        </div>
+            <div class="full">
+              <label>Description (German)</label>
+              <textarea
+                id="listDescription-de"
+                placeholder="Beschreibung der Liste/des Walks (Deutsch)"
+              ></textarea>
+            </div>
 
-        <div class="button-group">
-          <button type="submit" id="submitBtn">Create POI</button>
-          <button type="button" class="secondary" id="cancelBtn" style="display: none;">Cancel</button>
-        </div>
-      </form>
-    </div>
+            <div class="full">
+              <label>Description (English)</label>
+              <textarea
+                id="listDescription-en"
+                placeholder="Description of the list/walk (English)"></textarea>
+            </div>
 
-    <!-- POI List Panel -->
-    <div class="panel">
-      <h2>Existing POIs (<span id="poiCount">0</span>)</h2>
-
-      <!-- Filters -->
-      <div style="margin-bottom: 16px;">
-        <input
-          id="searchPOI"
-          type="text"
-          placeholder="🔍 Search POIs by name..."
-          style="margin-bottom: 8px;"
-        />
-        <select id="filterCategory" style="margin-bottom: 8px;">
-          <option value="">All Categories</option>
-        </select>
-      </div>
-
-      <div class="poi-list" id="poiList">
-        <div class="empty-state">Loading POIs...</div>
-      </div>
-    </div>
-  </div>
-  </div>
-
-  <!-- Walkthrough Management Tab -->
-  <div class="tab-content" id="walkthroughs-tab" style="display: none;">
-    <div class="layout">
-      <!-- Walkthrough Form Panel -->
-      <div class="panel">
-        <h1 id="walkthroughFormTitle">Add New Walkthrough</h1>
-
-        <form id="walkthroughForm">
-          <input type="hidden" id="walkthroughEditingId" value="">
-
-          <div class="full">
-            <label>Title (German) *</label>
-            <input id="walkthroughTitle-de" type="text" placeholder="Titel des Walks (Deutsch)" required />
-          </div>
-
-          <div class="full">
-            <label>Title (English) *</label>
-            <input id="walkthroughTitle-en" type="text" placeholder="Walkthrough Title (English)" required />
-          </div>
-
-          <div class="full">
-            <label>Description (German) *</label>
-            <textarea id="walkthroughDescription-de" placeholder="Beschreibung des Walks (Deutsch)" required></textarea>
-          </div>
-
-          <div class="full">
-            <label>Description (English) *</label>
-            <textarea id="walkthroughDescription-en" placeholder="Description of the walkthrough (English)" required></textarea>
-          </div>
-
-          <div class="full">
-            <label>Select POIs</label>
-            <div class="poi-selector">
-              <div class="poi-selector-input-wrapper">
+            <div class="full">
+              <label
+                style="display: flex; align-items: center; gap: 8px; cursor: pointer;"
+              >
                 <input
-                  id="poiSearchWalkthrough"
-                  type="text"
-                  placeholder="Search POIs to add..."
-                  autocomplete="off"
-                  data-selected="false"
+                  type="checkbox"
+                  id="listShowAsWalk"
+                  style="width: auto; margin: 0;"
                 />
-                <button
-                  id="clearPoiSearchWalkthrough"
-                  class="poi-selector-clear-btn"
-                  type="button"
-                  title="Clear search"
-                >×</button>
+                <span>Show as walk (connects POIs with arrows)</span>
+              </label>
+            </div>
+
+            <div class="full">
+              <label>Select POIs</label>
+              <div class="poi-selector">
+                <div class="poi-selector-input-wrapper">
+                  <input
+                    id="poiSearchList"
+                    type="text"
+                    placeholder="Search POIs to add..."
+                    autocomplete="off"
+                    data-selected="false"
+                  />
+                  <button
+                    id="clearPoiSearchList"
+                    class="poi-selector-clear-btn"
+                    type="button"
+                    title="Clear search">×</button
+                  >
+                </div>
+                <div id="poiSearchResultsList" class="poi-search-results"></div>
               </div>
-              <div id="poiSearchResults" class="poi-search-results"></div>
             </div>
-          </div>
 
-          <div class="full">
-            <label>Selected POIs (drag to reorder)</label>
-            <div id="selectedPOIsContainer" class="selected-pois-container">
-              <div class="empty-state" style="padding: 20px;">No POIs selected yet</div>
+            <div class="full">
+              <label>Selected POIs (drag to reorder)</label>
+              <div
+                id="selectedPOIsContainerList"
+                class="selected-pois-container"
+              >
+                <div class="empty-state" style="padding: 20px;">
+                  No POIs selected yet
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div class="button-group">
-            <button type="submit">Save Walkthrough</button>
-            <button type="button" class="secondary" id="walkthroughCancelBtn">Cancel</button>
-          </div>
-        </form>
-      </div>
+            <div class="button-group">
+              <button type="submit">Save List/Walk</button>
+              <button type="button" class="secondary" id="listCancelBtn"
+                >Cancel</button
+              >
+            </div>
+          </form>
+        </div>
 
-      <!-- Walkthrough List Panel -->
-      <div class="panel">
-        <h2>Existing Walkthroughs</h2>
-        <div class="poi-list" id="walkthroughList">
-          <div class="empty-state">Loading walkthroughs...</div>
+        <!-- List List Panel -->
+        <div class="panel">
+          <h2>Existing Lists & Walks</h2>
+          <div class="poi-list" id="listList">
+            <div class="empty-state">Loading lists...</div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- List Management Tab -->
-  <div class="tab-content" id="lists-tab" style="display: none;">
-    <div class="layout">
-      <!-- List Form Panel -->
-      <div class="panel">
-        <h1 id="listFormTitle">Add New List</h1>
+    <div id="toast" class="toast"></div>
 
-        <form id="listForm">
-          <input type="hidden" id="listEditingId" value="">
+    <script is:inline>
+      let currentEditId = null;
+      let categoriesData = {};
+      let tagsData = {};
+      let selectedTags = [];
+      let allPOIs = [];
+      let currentSearchTerm = "";
+      let currentCategoryFilter = "";
 
-          <div class="full">
-            <label>Title (German) *</label>
-            <input id="listTitle-de" type="text" placeholder="Titel der Liste (Deutsch)" required />
-          </div>
+      // Load tags
+      async function loadTags() {
+        try {
+          const response = await fetch("/data/tags.json");
+          const data = await response.json();
+          tagsData = data.tags;
+          const datalist = document.getElementById("tagSuggestions");
 
-          <div class="full">
-            <label>Title (English) *</label>
-            <input id="listTitle-en" type="text" placeholder="List Title (English)" required />
-          </div>
-
-          <div class="full">
-            <label>Description (German)</label>
-            <textarea id="listDescription-de" placeholder="Beschreibung der Liste (Deutsch)"></textarea>
-          </div>
-
-          <div class="full">
-            <label>Description (English)</label>
-            <textarea id="listDescription-en" placeholder="Description of the list (English)"></textarea>
-          </div>
-
-          <div class="full">
-            <label>Select POIs</label>
-            <div class="poi-selector">
-              <div class="poi-selector-input-wrapper">
-                <input
-                  id="poiSearchList"
-                  type="text"
-                  placeholder="Search POIs to add..."
-                  autocomplete="off"
-                  data-selected="false"
-                />
-                <button
-                  id="clearPoiSearchList"
-                  class="poi-selector-clear-btn"
-                  type="button"
-                  title="Clear search"
-                >×</button>
-              </div>
-              <div id="poiSearchResultsList" class="poi-search-results"></div>
-            </div>
-          </div>
-
-          <div class="full">
-            <label>Selected POIs (drag to reorder)</label>
-            <div id="selectedPOIsContainerList" class="selected-pois-container">
-              <div class="empty-state" style="padding: 20px;">No POIs selected yet</div>
-            </div>
-          </div>
-
-          <div class="button-group">
-            <button type="submit">Save List</button>
-            <button type="button" class="secondary" id="listCancelBtn">Cancel</button>
-          </div>
-        </form>
-      </div>
-
-      <!-- List List Panel -->
-      <div class="panel">
-        <h2>Existing Lists</h2>
-        <div class="poi-list" id="listList">
-          <div class="empty-state">Loading lists...</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="toast" class="toast"></div>
-
-  <script is:inline>
-    let currentEditId = null;
-    let categoriesData = {};
-    let tagsData = {};
-    let selectedTags = [];
-    let allPOIs = [];
-    let currentSearchTerm = '';
-    let currentCategoryFilter = '';
-
-    // Load tags
-    async function loadTags() {
-      try {
-        const response = await fetch('/data/tags.json');
-        const data = await response.json();
-        tagsData = data.tags;
-        const datalist = document.getElementById('tagSuggestions');
-
-        Object.entries(data.tags).forEach(([key, value]) => {
-          const option = document.createElement('option');
-          option.value = key;
-          option.label = value.name;
-          datalist.appendChild(option);
-        });
-      } catch (error) {
-        console.error('Failed to load tags:', error);
-      }
-    }
-
-    // Load categories
-    async function loadCategories() {
-      try {
-        const response = await fetch('/data/categories.json');
-        const data = await response.json();
-        categoriesData = data.categories;
-        const datalist = document.getElementById('categories');
-        const filterSelect = document.getElementById('filterCategory');
-
-        Object.entries(data.categories).forEach(([key, value]) => {
-          // Handle multilingual names
-          const name = typeof value.name === 'object' ? value.name.de : value.name;
-
-          // Add to input datalist
-          const option = document.createElement('option');
-          option.value = key;
-          option.label = `${value.emoji} ${name}`;
-          datalist.appendChild(option);
-
-          // Add to filter dropdown
-          const filterOption = document.createElement('option');
-          filterOption.value = key;
-          filterOption.textContent = `${value.emoji} ${name}`;
-          filterSelect.appendChild(filterOption);
-        });
-      } catch (error) {
-        console.error('Failed to load categories:', error);
-      }
-    }
-
-    // Check if category exists, create if not
-    async function ensureCategoryExists(categoryKey) {
-      // Check if it's an existing category
-      if (categoriesData[categoryKey]) {
-        return true;
-      }
-
-      // It's a new category - ask for confirmation and create it
-      const categoryName = categoryKey.split('-').map(word =>
-        word.charAt(0).toUpperCase() + word.slice(1)
-      ).join(' ');
-
-      if (!confirm(`Create new category "${categoryName}"?`)) {
-        return false;
-      }
-
-      try {
-        const response = await fetch('/api/categories', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            key: categoryKey,
-            name: categoryName
-          })
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          categoriesData[categoryKey] = result.category;
-
-          // Add to datalist
-          const datalist = document.getElementById('categories');
-          const option = document.createElement('option');
-          option.value = categoryKey;
-          option.label = `${result.category.emoji} ${result.category.name}`;
-          datalist.appendChild(option);
-
-          showToast(`Category "${categoryName}" created`);
-          return true;
-        } else {
-          throw new Error('Failed to create category');
+          Object.entries(data.tags).forEach(([key, value]) => {
+            const option = document.createElement("option");
+            option.value = key;
+            option.label = value.name;
+            datalist.appendChild(option);
+          });
+        } catch (error) {
+          console.error("Failed to load tags:", error);
         }
-      } catch (error) {
-        showToast('Failed to create category', 'error');
-        console.error(error);
-        return false;
       }
-    }
 
-    // Convert category name to key
-    function categoryToKey(category) {
-      return category.toLowerCase()
-        .replace(/ä/g, 'ae')
-        .replace(/ö/g, 'oe')
-        .replace(/ü/g, 'ue')
-        .replace(/ß/g, 'ss')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-    }
+      // Load categories
+      async function loadCategories() {
+        try {
+          const response = await fetch("/data/categories.json");
+          const data = await response.json();
+          categoriesData = data.categories;
+          const datalist = document.getElementById("categories");
+          const filterSelect = document.getElementById("filterCategory");
 
-    // Tag management functions
-    function renderTags() {
-      const container = document.getElementById('selectedTags');
-      container.innerHTML = selectedTags.map(tagKey => {
-        const tag = tagsData[tagKey] || { name: tagKey };
-        return `
+          Object.entries(data.categories).forEach(([key, value]) => {
+            // Handle multilingual names
+            const name =
+              typeof value.name === "object" ? value.name.de : value.name;
+
+            // Add to input datalist
+            const option = document.createElement("option");
+            option.value = key;
+            option.label = `${value.emoji} ${name}`;
+            datalist.appendChild(option);
+
+            // Add to filter dropdown
+            const filterOption = document.createElement("option");
+            filterOption.value = key;
+            filterOption.textContent = `${value.emoji} ${name}`;
+            filterSelect.appendChild(filterOption);
+          });
+        } catch (error) {
+          console.error("Failed to load categories:", error);
+        }
+      }
+
+      // Check if category exists, create if not
+      async function ensureCategoryExists(categoryKey) {
+        // Check if it's an existing category
+        if (categoriesData[categoryKey]) {
+          return true;
+        }
+
+        // It's a new category - ask for confirmation and create it
+        const categoryName = categoryKey
+          .split("-")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ");
+
+        if (!confirm(`Create new category "${categoryName}"?`)) {
+          return false;
+        }
+
+        try {
+          const response = await fetch("/api/categories", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              key: categoryKey,
+              name: categoryName,
+            }),
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            categoriesData[categoryKey] = result.category;
+
+            // Add to datalist
+            const datalist = document.getElementById("categories");
+            const option = document.createElement("option");
+            option.value = categoryKey;
+            option.label = `${result.category.emoji} ${result.category.name}`;
+            datalist.appendChild(option);
+
+            showToast(`Category "${categoryName}" created`);
+            return true;
+          } else {
+            throw new Error("Failed to create category");
+          }
+        } catch (error) {
+          showToast("Failed to create category", "error");
+          console.error(error);
+          return false;
+        }
+      }
+
+      // Convert category name to key
+      function categoryToKey(category) {
+        return category
+          .toLowerCase()
+          .replace(/ä/g, "ae")
+          .replace(/ö/g, "oe")
+          .replace(/ü/g, "ue")
+          .replace(/ß/g, "ss")
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+      }
+
+      // Tag management functions
+      function renderTags() {
+        const container = document.getElementById("selectedTags");
+        container.innerHTML = selectedTags
+          .map((tagKey) => {
+            const tag = tagsData[tagKey] || { name: tagKey };
+            return `
           <div class="tag-chip">
             <span>${tag.name}</span>
             <button class="remove-tag" onclick="removeTag('${tagKey}')" type="button">×</button>
           </div>
         `;
-      }).join('');
-    }
-
-    function addTag(tagKey) {
-      if (!tagKey) return;
-
-      // Normalize tag key
-      tagKey = categoryToKey(tagKey);
-
-      // Check if already added
-      if (selectedTags.includes(tagKey)) {
-        return;
-      }
-
-      // Add tag
-      selectedTags.push(tagKey);
-
-      // Ensure tag exists in tags.json
-      ensureTagExists(tagKey);
-
-      renderTags();
-    }
-
-    window.removeTag = function(tagKey) {
-      selectedTags = selectedTags.filter(t => t !== tagKey);
-      renderTags();
-    };
-
-    async function ensureTagExists(tagKey) {
-      // Check if it's an existing tag
-      if (tagsData[tagKey]) {
-        return true;
-      }
-
-      // It's a new tag - create it
-      const tagName = tagKey.split('-').map(word =>
-        word.charAt(0).toUpperCase() + word.slice(1)
-      ).join(' ');
-
-      try {
-        const response = await fetch('/api/tags', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            key: tagKey,
-            name: tagName
           })
-        });
+          .join("");
+      }
 
-        if (response.ok) {
-          const result = await response.json();
-          tagsData[tagKey] = result.tag;
+      function addTag(tagKey) {
+        if (!tagKey) return;
 
-          // Add to datalist
-          const datalist = document.getElementById('tagSuggestions');
-          const option = document.createElement('option');
-          option.value = tagKey;
-          option.label = result.tag.name;
-          datalist.appendChild(option);
+        // Normalize tag key
+        tagKey = categoryToKey(tagKey);
 
+        // Check if already added
+        if (selectedTags.includes(tagKey)) {
+          return;
+        }
+
+        // Add tag
+        selectedTags.push(tagKey);
+
+        // Ensure tag exists in tags.json
+        ensureTagExists(tagKey);
+
+        renderTags();
+      }
+
+      window.removeTag = function (tagKey) {
+        selectedTags = selectedTags.filter((t) => t !== tagKey);
+        renderTags();
+      };
+
+      async function ensureTagExists(tagKey) {
+        // Check if it's an existing tag
+        if (tagsData[tagKey]) {
           return true;
         }
-      } catch (error) {
-        console.error('Failed to create tag:', error);
+
+        // It's a new tag - create it
+        const tagName = tagKey
+          .split("-")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ");
+
+        try {
+          const response = await fetch("/api/tags", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              key: tagKey,
+              name: tagName,
+            }),
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            tagsData[tagKey] = result.tag;
+
+            // Add to datalist
+            const datalist = document.getElementById("tagSuggestions");
+            const option = document.createElement("option");
+            option.value = tagKey;
+            option.label = result.tag.name;
+            datalist.appendChild(option);
+
+            return true;
+          }
+        } catch (error) {
+          console.error("Failed to create tag:", error);
+        }
       }
-    }
 
-    function setupTagInput() {
-      const input = document.getElementById('tagInput');
+      function setupTagInput() {
+        const input = document.getElementById("tagInput");
 
-      // Add tag on Enter or comma
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ',') {
-          e.preventDefault();
+        // Add tag on Enter or comma
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === ",") {
+            e.preventDefault();
+            const value = input.value.trim();
+            if (value) {
+              addTag(value);
+              input.value = "";
+            }
+          }
+        });
+
+        // Add tag on blur if there's a value
+        input.addEventListener("blur", () => {
           const value = input.value.trim();
           if (value) {
             addTag(value);
-            input.value = '';
+            input.value = "";
           }
-        }
-      });
-
-      // Add tag on blur if there's a value
-      input.addEventListener('blur', () => {
-        const value = input.value.trim();
-        if (value) {
-          addTag(value);
-          input.value = '';
-        }
-      });
-    }
-
-    // Load all POIs
-    async function loadPOIs() {
-      try {
-        const response = await fetch('/api/pois');
-        allPOIs = await response.json();
-        renderPOIs();
-      } catch (error) {
-        showToast('Failed to load POIs', 'error');
-        console.error(error);
-      }
-    }
-
-    // Render POIs with current filters
-    function renderPOIs() {
-      const listEl = document.getElementById('poiList');
-      const countEl = document.getElementById('poiCount');
-
-      // Apply filters
-      let filteredPOIs = allPOIs;
-
-      // Filter by search term
-      if (currentSearchTerm) {
-        const searchLower = currentSearchTerm.toLowerCase();
-        filteredPOIs = filteredPOIs.filter(poi => {
-          const name = (poi.properties.name || '').toLowerCase();
-          // Handle multilingual description
-          const description = poi.properties.description || {};
-          const descriptionText = typeof description === 'string'
-            ? description
-            : (description.de || '') + ' ' + (description.en || '');
-          return name.includes(searchLower) || descriptionText.toLowerCase().includes(searchLower);
         });
       }
 
-      // Filter by category
-      if (currentCategoryFilter) {
-        filteredPOIs = filteredPOIs.filter(poi =>
-          poi.properties.category === currentCategoryFilter
-        );
-      }
-
-      // Update count
-      countEl.textContent = `${filteredPOIs.length}${filteredPOIs.length !== allPOIs.length ? ' / ' + allPOIs.length : ''}`;
-
-      // Render
-      if (filteredPOIs.length === 0) {
-        if (allPOIs.length === 0) {
-          listEl.innerHTML = '<div class="empty-state">No POIs yet. Add your first one!</div>';
-        } else {
-          listEl.innerHTML = '<div class="empty-state">No POIs match your filters.</div>';
+      // Load all POIs
+      async function loadPOIs() {
+        try {
+          const response = await fetch("/api/pois");
+          allPOIs = await response.json();
+          renderPOIs();
+        } catch (error) {
+          showToast("Failed to load POIs", "error");
+          console.error(error);
         }
-        return;
       }
 
-      listEl.innerHTML = filteredPOIs.map(poi => {
-        const id = poi.properties.id;
-        const name = poi.properties.name || 'Unnamed';
-        const category = poi.properties.category || 'uncategorized';
-        const coords = poi.geometry.coordinates;
-        const categoryInfo = categoriesData[category] || { emoji: '📍', name: category };
-        // Handle multilingual category names
-        const categoryName = typeof categoryInfo.name === 'object' ? categoryInfo.name.de : categoryInfo.name;
-        const tags = poi.properties.tags || [];
-        const tagsHtml = tags.length > 0
-          ? `<div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">${tags.map(t => {
-              const tag = tagsData[t] || { name: t };
-              return tag.name;
-            }).join(', ')}</div>`
-          : '';
+      // Render POIs with current filters
+      function renderPOIs() {
+        const listEl = document.getElementById("poiList");
+        const countEl = document.getElementById("poiCount");
 
-        return `
+        // Apply filters
+        let filteredPOIs = allPOIs;
+
+        // Filter by search term
+        if (currentSearchTerm) {
+          const searchLower = currentSearchTerm.toLowerCase();
+          filteredPOIs = filteredPOIs.filter((poi) => {
+            const name = (poi.properties.name || "").toLowerCase();
+            // Handle multilingual description
+            const description = poi.properties.description || {};
+            const descriptionText =
+              typeof description === "string"
+                ? description
+                : (description.de || "") + " " + (description.en || "");
+            return (
+              name.includes(searchLower) ||
+              descriptionText.toLowerCase().includes(searchLower)
+            );
+          });
+        }
+
+        // Filter by category
+        if (currentCategoryFilter) {
+          filteredPOIs = filteredPOIs.filter(
+            (poi) => poi.properties.category === currentCategoryFilter
+          );
+        }
+
+        // Update count
+        countEl.textContent = `${filteredPOIs.length}${filteredPOIs.length !== allPOIs.length ? " / " + allPOIs.length : ""}`;
+
+        // Render
+        if (filteredPOIs.length === 0) {
+          if (allPOIs.length === 0) {
+            listEl.innerHTML =
+              '<div class="empty-state">No POIs yet. Add your first one!</div>';
+          } else {
+            listEl.innerHTML =
+              '<div class="empty-state">No POIs match your filters.</div>';
+          }
+          return;
+        }
+
+        listEl.innerHTML = filteredPOIs
+          .map((poi) => {
+            const id = poi.properties.id;
+            const name = poi.properties.name || "Unnamed";
+            const category = poi.properties.category || "uncategorized";
+            const coords = poi.geometry.coordinates;
+            const categoryInfo = categoriesData[category] || {
+              emoji: "📍",
+              name: category,
+            };
+            // Handle multilingual category names
+            const categoryName =
+              typeof categoryInfo.name === "object"
+                ? categoryInfo.name.de
+                : categoryInfo.name;
+            const tags = poi.properties.tags || [];
+            const tagsHtml =
+              tags.length > 0
+                ? `<div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">${tags
+                    .map((t) => {
+                      const tag = tagsData[t] || { name: t };
+                      return tag.name;
+                    })
+                    .join(", ")}</div>`
+                : "";
+
+            return `
           <div class="poi-item">
             <div class="poi-info">
               <div class="poi-name">${name}</div>
@@ -1105,768 +1148,403 @@ const title = "POI Management System";
             </div>
           </div>
         `;
-      }).join('');
-    }
-
-    // Filter event handlers
-    function setupFilters() {
-      const searchInput = document.getElementById('searchPOI');
-      const categorySelect = document.getElementById('filterCategory');
-
-      searchInput.addEventListener('input', (e) => {
-        currentSearchTerm = e.target.value.trim();
-        renderPOIs();
-      });
-
-      categorySelect.addEventListener('change', (e) => {
-        currentCategoryFilter = e.target.value;
-        renderPOIs();
-      });
-    }
-
-    // Parse Google Maps coordinates
-    function parseGoogleMapsCoords(input) {
-      const simpleMatch = input.match(/^\s*(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)\s*$/);
-      if (simpleMatch) {
-        return {
-          lat: parseFloat(simpleMatch[1]),
-          lng: parseFloat(simpleMatch[2])
-        };
+          })
+          .join("");
       }
 
-      const urlMatch = input.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
-      if (urlMatch) {
-        return {
-          lat: parseFloat(urlMatch[1]),
-          lng: parseFloat(urlMatch[2])
-        };
-      }
+      // Filter event handlers
+      function setupFilters() {
+        const searchInput = document.getElementById("searchPOI");
+        const categorySelect = document.getElementById("filterCategory");
 
-      return null;
-    }
-
-    // Show toast notification
-    function showToast(message, type = 'success') {
-      const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.className = 'toast show' + (type === 'error' ? ' error' : '');
-
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 2000);
-    }
-
-    // Reset form
-    function resetForm() {
-      document.getElementById('poiForm').reset();
-      document.getElementById('editingId').value = '';
-      document.getElementById('formTitle').textContent = 'Add New POI';
-      document.getElementById('submitBtn').textContent = 'Create POI';
-      document.getElementById('cancelBtn').style.display = 'none';
-      document.getElementById('photoPreview').style.display = 'none';
-      selectedTags = [];
-      renderTags();
-      currentEditId = null;
-    }
-
-    // Handle remove photo button
-    document.getElementById('removePhoto').addEventListener('click', () => {
-      document.getElementById('photo').value = '';
-      document.getElementById('photoPreview').style.display = 'none';
-    });
-
-    // Show preview when file is selected
-    document.getElementById('photoFile').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          document.getElementById('photoPreviewImg').src = e.target.result;
-          document.getElementById('photoPreview').style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    // Edit POI
-    window.editPOI = async function(id) {
-      try {
-        const response = await fetch(`/api/pois/${id}`);
-        const poi = await response.json();
-
-        document.getElementById('editingId').value = id;
-        document.getElementById('lat').value = poi.geometry.coordinates[1];
-        document.getElementById('lng').value = poi.geometry.coordinates[0];
-        document.getElementById('name').value = poi.properties.name || '';
-        document.getElementById('category').value = poi.properties.category || '';
-
-        // Handle multilingual descriptions
-        const description = poi.properties.description || {};
-        if (typeof description === 'string') {
-          // Legacy format - treat as German
-          document.getElementById('description-de').value = description;
-          document.getElementById('description-en').value = '';
-        } else {
-          document.getElementById('description-de').value = description.de || '';
-          document.getElementById('description-en').value = description.en || '';
-        }
-
-        document.getElementById('link').value = poi.properties.link || '';
-        document.getElementById('instagram').value = poi.properties.instagram || '';
-        document.getElementById('photo').value = poi.properties.photo || '';
-
-        // Show photo preview if exists
-        const photoPreview = document.getElementById('photoPreview');
-        const photoPreviewImg = document.getElementById('photoPreviewImg');
-        if (poi.properties.photo) {
-          photoPreviewImg.src = poi.properties.photo;
-          photoPreview.style.display = 'block';
-        } else {
-          photoPreview.style.display = 'none';
-        }
-
-        // Load tags
-        selectedTags = poi.properties.tags || [];
-        renderTags();
-
-        document.getElementById('formTitle').textContent = 'Edit POI';
-        document.getElementById('submitBtn').textContent = 'Update POI';
-        document.getElementById('cancelBtn').style.display = 'inline-block';
-        currentEditId = id;
-
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } catch (error) {
-        showToast('Failed to load POI', 'error');
-        console.error(error);
-      }
-    };
-
-    // Delete POI
-    window.deletePOI = async function(id) {
-      if (!confirm('Are you sure you want to delete this POI?')) {
-        return;
-      }
-
-      try {
-        const response = await fetch(`/api/pois/${id}`, {
-          method: 'DELETE'
+        searchInput.addEventListener("input", (e) => {
+          currentSearchTerm = e.target.value.trim();
+          renderPOIs();
         });
 
-        if (response.ok) {
-          showToast('POI deleted successfully');
-          loadPOIs();
-          if (currentEditId === id) {
-            resetForm();
-          }
-        } else {
-          throw new Error('Delete failed');
+        categorySelect.addEventListener("change", (e) => {
+          currentCategoryFilter = e.target.value;
+          renderPOIs();
+        });
+      }
+
+      // Parse Google Maps coordinates
+      function parseGoogleMapsCoords(input) {
+        const simpleMatch = input.match(
+          /^\s*(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)\s*$/
+        );
+        if (simpleMatch) {
+          return {
+            lat: parseFloat(simpleMatch[1]),
+            lng: parseFloat(simpleMatch[2]),
+          };
         }
-      } catch (error) {
-        showToast('Failed to delete POI', 'error');
-        console.error(error);
-      }
-    };
 
-    // Handle form submission
-    document.getElementById('poiForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+        const urlMatch = input.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+        if (urlMatch) {
+          return {
+            lat: parseFloat(urlMatch[1]),
+            lng: parseFloat(urlMatch[2]),
+          };
+        }
 
-      let lat = parseFloat(document.getElementById('lat').value);
-      let lng = parseFloat(document.getElementById('lng').value);
-
-      const gmaps = document.getElementById('gmaps').value.trim();
-
-      // Check if either method is provided
-      if (!gmaps && (isNaN(lat) || isNaN(lng))) {
-        showToast('Please enter coordinates using lat/lng fields OR paste Google Maps coordinates', 'error');
-        return;
+        return null;
       }
 
-      // If Google Maps coords provided, use those
-      if (gmaps) {
-        const coords = parseGoogleMapsCoords(gmaps);
-        if (!coords) {
-          showToast('Invalid coordinates format', 'error');
+      // Show toast notification
+      function showToast(message, type = "success") {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = "toast show" + (type === "error" ? " error" : "");
+
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 2000);
+      }
+
+      // Reset form
+      function resetForm() {
+        document.getElementById("poiForm").reset();
+        document.getElementById("editingId").value = "";
+        document.getElementById("formTitle").textContent = "Add New POI";
+        document.getElementById("submitBtn").textContent = "Create POI";
+        document.getElementById("cancelBtn").style.display = "none";
+        document.getElementById("photoPreview").style.display = "none";
+        selectedTags = [];
+        renderTags();
+        currentEditId = null;
+      }
+
+      // Handle remove photo button
+      document.getElementById("removePhoto").addEventListener("click", () => {
+        document.getElementById("photo").value = "";
+        document.getElementById("photoPreview").style.display = "none";
+      });
+
+      // Show preview when file is selected
+      document.getElementById("photoFile").addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            document.getElementById("photoPreviewImg").src = e.target.result;
+            document.getElementById("photoPreview").style.display = "block";
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Edit POI
+      window.editPOI = async function (id) {
+        try {
+          const response = await fetch(`/api/pois/${id}`);
+          const poi = await response.json();
+
+          document.getElementById("editingId").value = id;
+          document.getElementById("lat").value = poi.geometry.coordinates[1];
+          document.getElementById("lng").value = poi.geometry.coordinates[0];
+          document.getElementById("name").value = poi.properties.name || "";
+          document.getElementById("category").value =
+            poi.properties.category || "";
+
+          // Handle multilingual descriptions
+          const description = poi.properties.description || {};
+          if (typeof description === "string") {
+            // Legacy format - treat as German
+            document.getElementById("description-de").value = description;
+            document.getElementById("description-en").value = "";
+          } else {
+            document.getElementById("description-de").value =
+              description.de || "";
+            document.getElementById("description-en").value =
+              description.en || "";
+          }
+
+          document.getElementById("link").value = poi.properties.link || "";
+          document.getElementById("instagram").value =
+            poi.properties.instagram || "";
+          document.getElementById("photo").value = poi.properties.photo || "";
+
+          // Show photo preview if exists
+          const photoPreview = document.getElementById("photoPreview");
+          const photoPreviewImg = document.getElementById("photoPreviewImg");
+          if (poi.properties.photo) {
+            photoPreviewImg.src = poi.properties.photo;
+            photoPreview.style.display = "block";
+          } else {
+            photoPreview.style.display = "none";
+          }
+
+          // Load tags
+          selectedTags = poi.properties.tags || [];
+          renderTags();
+
+          document.getElementById("formTitle").textContent = "Edit POI";
+          document.getElementById("submitBtn").textContent = "Update POI";
+          document.getElementById("cancelBtn").style.display = "inline-block";
+          currentEditId = id;
+
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } catch (error) {
+          showToast("Failed to load POI", "error");
+          console.error(error);
+        }
+      };
+
+      // Delete POI
+      window.deletePOI = async function (id) {
+        if (!confirm("Are you sure you want to delete this POI?")) {
           return;
         }
-        lat = coords.lat;
-        lng = coords.lng;
-      }
 
-      // Final validation
-      if (isNaN(lat) || isNaN(lng)) {
-        showToast('Please enter valid coordinates', 'error');
-        return;
-      }
-
-      // Get and normalize category
-      let categoryInput = document.getElementById('category').value.trim();
-      if (!categoryInput) {
-        showToast('Please enter a category', 'error');
-        return;
-      }
-
-      // Convert to key format
-      const categoryKey = categoryToKey(categoryInput);
-
-      // Ensure category exists (create if new)
-      const categoryExists = await ensureCategoryExists(categoryKey);
-      if (!categoryExists) {
-        return; // User cancelled category creation
-      }
-
-      // Handle photo upload if file is selected
-      let photoUrl = document.getElementById('photo').value;
-      const photoFile = document.getElementById('photoFile').files[0];
-
-      if (photoFile) {
         try {
-          const formData = new FormData();
-          formData.append('file', photoFile);
-
-          const uploadResponse = await fetch('/api/upload', {
-            method: 'POST',
-            body: formData
+          const response = await fetch(`/api/pois/${id}`, {
+            method: "DELETE",
           });
 
-          if (!uploadResponse.ok) {
-            throw new Error('Upload failed');
+          if (response.ok) {
+            showToast("POI deleted successfully");
+            loadPOIs();
+            if (currentEditId === id) {
+              resetForm();
+            }
+          } else {
+            throw new Error("Delete failed");
+          }
+        } catch (error) {
+          showToast("Failed to delete POI", "error");
+          console.error(error);
+        }
+      };
+
+      // Handle form submission
+      document
+        .getElementById("poiForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          let lat = parseFloat(document.getElementById("lat").value);
+          let lng = parseFloat(document.getElementById("lng").value);
+
+          const gmaps = document.getElementById("gmaps").value.trim();
+
+          // Check if either method is provided
+          if (!gmaps && (isNaN(lat) || isNaN(lng))) {
+            showToast(
+              "Please enter coordinates using lat/lng fields OR paste Google Maps coordinates",
+              "error"
+            );
+            return;
           }
 
-          const uploadData = await uploadResponse.json();
-          photoUrl = uploadData.url;
+          // If Google Maps coords provided, use those
+          if (gmaps) {
+            const coords = parseGoogleMapsCoords(gmaps);
+            if (!coords) {
+              showToast("Invalid coordinates format", "error");
+              return;
+            }
+            lat = coords.lat;
+            lng = coords.lng;
+          }
+
+          // Final validation
+          if (isNaN(lat) || isNaN(lng)) {
+            showToast("Please enter valid coordinates", "error");
+            return;
+          }
+
+          // Get and normalize category
+          let categoryInput = document.getElementById("category").value.trim();
+          if (!categoryInput) {
+            showToast("Please enter a category", "error");
+            return;
+          }
+
+          // Convert to key format
+          const categoryKey = categoryToKey(categoryInput);
+
+          // Ensure category exists (create if new)
+          const categoryExists = await ensureCategoryExists(categoryKey);
+          if (!categoryExists) {
+            return; // User cancelled category creation
+          }
+
+          // Handle photo upload if file is selected
+          let photoUrl = document.getElementById("photo").value;
+          const photoFile = document.getElementById("photoFile").files[0];
+
+          if (photoFile) {
+            try {
+              const formData = new FormData();
+              formData.append("file", photoFile);
+
+              const uploadResponse = await fetch("/api/upload", {
+                method: "POST",
+                body: formData,
+              });
+
+              if (!uploadResponse.ok) {
+                throw new Error("Upload failed");
+              }
+
+              const uploadData = await uploadResponse.json();
+              photoUrl = uploadData.url;
+            } catch (error) {
+              showToast("Photo upload failed", "error");
+              console.error("Upload error:", error);
+              return;
+            }
+          }
+
+          const poi = {
+            type: "Feature",
+            geometry: {
+              type: "Point",
+              coordinates: [lng, lat],
+            },
+            properties: {
+              name: document.getElementById("name").value,
+              category: categoryKey,
+              description: {
+                de: document.getElementById("description-de").value,
+                en: document.getElementById("description-en").value,
+              },
+              link: document.getElementById("link").value,
+              instagram: document.getElementById("instagram").value,
+              photo: photoUrl,
+              tags: selectedTags,
+            },
+          };
+
+          try {
+            const editingId = document.getElementById("editingId").value;
+            const url = editingId ? `/api/pois/${editingId}` : "/api/pois";
+            const method = editingId ? "PUT" : "POST";
+
+            const response = await fetch(url, {
+              method,
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(poi),
+            });
+
+            if (response.ok) {
+              showToast(
+                editingId
+                  ? "POI updated successfully"
+                  : "POI created successfully"
+              );
+              resetForm();
+              loadPOIs();
+            } else {
+              throw new Error("Save failed");
+            }
+          } catch (error) {
+            showToast("Failed to save POI", "error");
+            console.error(error);
+          }
+        });
+
+      // Cancel editing
+      document.getElementById("cancelBtn").addEventListener("click", resetForm);
+
+      // Initialize
+      loadCategories();
+      loadTags();
+      loadPOIs();
+      setupFilters();
+      setupTagInput();
+
+      // ============ LIST & WALK MANAGEMENT ============
+
+      let lists = [];
+      let selectedListPOIs = []; // Array of POI IDs in order
+      let currentListId = null;
+      let draggedElement = null;
+
+      // Slug generation function
+      function generateSlug(name) {
+        if (!name) return "";
+
+        // Handle multilingual objects
+        if (typeof name === "object") {
+          name = name.de || name.en || "";
+        }
+
+        return name
+          .toLowerCase()
+          .replace(/ä/g, "ae")
+          .replace(/ö/g, "oe")
+          .replace(/ü/g, "ue")
+          .replace(/ß/g, "ss")
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+      }
+
+      // Tab switching
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const tabId = btn.dataset.tab;
+
+          // Update active tab button
+          document
+            .querySelectorAll(".tab-btn")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+
+          // Update visible tab content
+          document.querySelectorAll(".tab-content").forEach((content) => {
+            content.classList.remove("active");
+            content.style.display = "none";
+          });
+
+          const activeTab = document.getElementById(`${tabId}-tab`);
+          activeTab.classList.add("active");
+          activeTab.style.display = "block";
+
+          // Load lists when switching to that tab
+          if (tabId === "lists" && lists.length === 0) {
+            loadLists();
+          }
+        });
+      });
+
+      // ============ LIST MANAGEMENT ============
+
+      // Load lists
+      async function loadLists() {
+        try {
+          const response = await fetch("/api/lists");
+          lists = await response.json();
+          renderLists();
         } catch (error) {
-          showToast('Photo upload failed', 'error');
-          console.error('Upload error:', error);
+          console.error("Failed to load lists:", error);
+          showToast("Failed to load lists", "error");
+        }
+      }
+
+      // Render list list
+      function renderLists() {
+        const container = document.getElementById("listList");
+
+        if (lists.length === 0) {
+          container.innerHTML =
+            '<div class="empty-state">No lists yet. Create your first one!</div>';
           return;
         }
-      }
 
-      const poi = {
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [lng, lat]
-        },
-        properties: {
-          name: document.getElementById('name').value,
-          category: categoryKey,
-          description: {
-            de: document.getElementById('description-de').value,
-            en: document.getElementById('description-en').value
-          },
-          link: document.getElementById('link').value,
-          instagram: document.getElementById('instagram').value,
-          photo: photoUrl,
-          tags: selectedTags
-        }
-      };
-
-      try {
-        const editingId = document.getElementById('editingId').value;
-        const url = editingId ? `/api/pois/${editingId}` : '/api/pois';
-        const method = editingId ? 'PUT' : 'POST';
-
-        const response = await fetch(url, {
-          method,
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(poi)
-        });
-
-        if (response.ok) {
-          showToast(editingId ? 'POI updated successfully' : 'POI created successfully');
-          resetForm();
-          loadPOIs();
-        } else {
-          throw new Error('Save failed');
-        }
-      } catch (error) {
-        showToast('Failed to save POI', 'error');
-        console.error(error);
-      }
-    });
-
-    // Cancel editing
-    document.getElementById('cancelBtn').addEventListener('click', resetForm);
-
-    // Initialize
-    loadCategories();
-    loadTags();
-    loadPOIs();
-    setupFilters();
-    setupTagInput();
-
-    // ============ WALKTHROUGH MANAGEMENT ============
-
-    let walkthroughs = [];
-    let selectedWalkthroughPOIs = []; // Array of POI IDs in order
-    let currentWalkthroughId = null;
-    let lists = [];
-    let selectedListPOIs = []; // Array of POI IDs in order
-    let currentListId = null;
-    let draggedElement = null;
-
-    // Slug generation function
-    function generateSlug(name) {
-      if (!name) return '';
-
-      // Handle multilingual objects
-      if (typeof name === 'object') {
-        name = name.de || name.en || '';
-      }
-
-      return name
-        .toLowerCase()
-        .replace(/ä/g, 'ae')
-        .replace(/ö/g, 'oe')
-        .replace(/ü/g, 'ue')
-        .replace(/ß/g, 'ss')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-    }
-
-    // Tab switching
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const tabId = btn.dataset.tab;
-
-        // Update active tab button
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-
-        // Update visible tab content
-        document.querySelectorAll('.tab-content').forEach(content => {
-          content.classList.remove('active');
-          content.style.display = 'none';
-        });
-
-        const activeTab = document.getElementById(`${tabId}-tab`);
-        activeTab.classList.add('active');
-        activeTab.style.display = 'block';
-
-        // Load walkthroughs when switching to that tab
-        if (tabId === 'walkthroughs' && walkthroughs.length === 0) {
-          loadWalkthroughs();
-        }
-
-        // Load lists when switching to that tab
-        if (tabId === 'lists' && lists.length === 0) {
-          loadLists();
-        }
-      });
-    });
-
-    // Load walkthroughs
-    async function loadWalkthroughs() {
-      try {
-        const response = await fetch('/api/walkthroughs');
-        walkthroughs = await response.json();
-        renderWalkthroughs();
-      } catch (error) {
-        console.error('Failed to load walkthroughs:', error);
-        showToast('Failed to load walkthroughs', 'error');
-      }
-    }
-
-    // Render walkthrough list
-    function renderWalkthroughs() {
-      const container = document.getElementById('walkthroughList');
-
-      if (walkthroughs.length === 0) {
-        container.innerHTML = '<div class="empty-state">No walkthroughs yet. Create your first one!</div>';
-        return;
-      }
-
-      container.innerHTML = walkthroughs.map(walkthrough => {
-        // Handle multilingual titles
-        const title = walkthrough.title || {};
-        const displayTitle = typeof title === 'string' ? title : (title.de || title.en || 'Untitled');
-
-        return `
-          <div class="poi-item">
-            <div class="poi-info">
-              <div class="poi-name">${displayTitle}</div>
-              <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
-                ${walkthrough.pois ? walkthrough.pois.length : 0} POIs
-              </div>
-            </div>
-            <div class="poi-actions">
-              <button class="small secondary" onclick="editWalkthrough('${walkthrough.id}')">Edit</button>
-              <button class="small danger" onclick="deleteWalkthrough('${walkthrough.id}')">Delete</button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    // POI Search for walkthrough
-    const poiSearchWalkthrough = document.getElementById('poiSearchWalkthrough');
-    const poiSearchResults = document.getElementById('poiSearchResults');
-    const clearPoiSearchWalkthrough = document.getElementById('clearPoiSearchWalkthrough');
-    let focusedWalkthroughIndex = -1;
-
-    function updateClearButtonWalkthrough() {
-      if (poiSearchWalkthrough.value) {
-        clearPoiSearchWalkthrough.style.display = 'flex';
-      } else {
-        clearPoiSearchWalkthrough.style.display = 'none';
-      }
-    }
-
-    poiSearchWalkthrough.addEventListener('input', (e) => {
-      const searchTerm = e.target.value.trim().toLowerCase();
-      focusedWalkthroughIndex = -1;
-
-      if (!searchTerm) {
-        poiSearchResults.classList.remove('show');
-        updateClearButtonWalkthrough();
-        return;
-      }
-
-      const filtered = allPOIs.filter(poi => {
-        const name = poi.properties.name.toLowerCase();
-        const category = poi.properties.category.toLowerCase();
-        return (name.includes(searchTerm) || category.includes(searchTerm)) &&
-               !selectedWalkthroughPOIs.includes(poi.properties.id);
-      });
-
-      if (filtered.length === 0) {
-        poiSearchResults.innerHTML = '<div class="empty-state" style="padding: 12px;">No POIs found</div>';
-        poiSearchResults.classList.add('show');
-        updateClearButtonWalkthrough();
-        return;
-      }
-
-      poiSearchResults.innerHTML = filtered.slice(0, 10).map(poi => `
-        <div class="poi-search-result-item" data-poi-id="${poi.properties.id}">
-          <div class="poi-search-result-name">${poi.properties.name}</div>
-          <div class="poi-search-result-category">${poi.properties.category}</div>
-        </div>
-      `).join('');
-
-      poiSearchResults.querySelectorAll('.poi-search-result-item').forEach(item => {
-        item.addEventListener('click', () => {
-          const poiId = item.dataset.poiId;
-          addPOIToWalkthrough(poiId);
-          poiSearchWalkthrough.value = '';
-          poiSearchResults.classList.remove('show');
-          updateClearButtonWalkthrough();
-        });
-      });
-
-      poiSearchResults.classList.add('show');
-      updateClearButtonWalkthrough();
-    });
-
-    // Keyboard navigation for walkthrough POI search
-    poiSearchWalkthrough.addEventListener('keydown', (e) => {
-      const items = Array.from(poiSearchResults.querySelectorAll('.poi-search-result-item'));
-
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        focusedWalkthroughIndex = Math.min(focusedWalkthroughIndex + 1, items.length - 1);
-        updateFocusedItemWalkthrough(items);
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        focusedWalkthroughIndex = Math.max(focusedWalkthroughIndex - 1, -1);
-        updateFocusedItemWalkthrough(items);
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        if (focusedWalkthroughIndex >= 0 && items[focusedWalkthroughIndex]) {
-          items[focusedWalkthroughIndex].click();
-        }
-      } else if (e.key === 'Escape') {
-        poiSearchResults.classList.remove('show');
-      }
-    });
-
-    function updateFocusedItemWalkthrough(items) {
-      items.forEach((item, idx) => {
-        if (idx === focusedWalkthroughIndex) {
-          item.classList.add('focused');
-          item.scrollIntoView({ block: 'nearest' });
-        } else {
-          item.classList.remove('focused');
-        }
-      });
-    }
-
-    // Clear button
-    clearPoiSearchWalkthrough.addEventListener('click', () => {
-      poiSearchWalkthrough.value = '';
-      poiSearchResults.classList.remove('show');
-      updateClearButtonWalkthrough();
-      poiSearchWalkthrough.focus();
-    });
-
-    // Close search results when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.poi-selector')) {
-        poiSearchResults.classList.remove('show');
-      }
-    });
-
-    // Add POI to walkthrough
-    function addPOIToWalkthrough(poiId) {
-      if (!selectedWalkthroughPOIs.includes(poiId)) {
-        selectedWalkthroughPOIs.push(poiId);
-        renderSelectedPOIs();
-      }
-    }
-
-    // Render selected POIs with drag-and-drop
-    function renderSelectedPOIs() {
-      const container = document.getElementById('selectedPOIsContainer');
-
-      if (selectedWalkthroughPOIs.length === 0) {
-        container.innerHTML = '<div class="empty-state" style="padding: 20px;">No POIs selected yet</div>';
-        return;
-      }
-
-      container.innerHTML = selectedWalkthroughPOIs.map((poiId, index) => {
-        const poi = allPOIs.find(p => p.properties.id === poiId);
-        if (!poi) return '';
-
-        return `
-          <div class="selected-poi-item" draggable="true" data-poi-id="${poiId}" data-index="${index}">
-            <div class="drag-handle">☰</div>
-            <div class="selected-poi-info">
-              <div class="selected-poi-name">${poi.properties.name}</div>
-              <div class="selected-poi-category">${poi.properties.category}</div>
-            </div>
-            <div class="selected-poi-actions">
-              <button class="remove-poi-btn" onclick="removePOIFromWalkthrough('${poiId}')">Remove</button>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      // Setup drag and drop
-      setupDragAndDrop();
-    }
-
-    // Remove POI from walkthrough
-    window.removePOIFromWalkthrough = function(poiId) {
-      selectedWalkthroughPOIs = selectedWalkthroughPOIs.filter(id => id !== poiId);
-      renderSelectedPOIs();
-    };
-
-    // Drag and drop functionality
-    function setupDragAndDrop() {
-      const items = document.querySelectorAll('.selected-poi-item');
-
-      items.forEach(item => {
-        item.addEventListener('dragstart', handleDragStart);
-        item.addEventListener('dragover', handleDragOver);
-        item.addEventListener('drop', handleDrop);
-        item.addEventListener('dragend', handleDragEnd);
-      });
-    }
-
-    function handleDragStart(e) {
-      draggedElement = this;
-      this.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/html', this.innerHTML);
-    }
-
-    function handleDragOver(e) {
-      if (e.preventDefault) {
-        e.preventDefault();
-      }
-      e.dataTransfer.dropEffect = 'move';
-      return false;
-    }
-
-    function handleDrop(e) {
-      if (e.stopPropagation) {
-        e.stopPropagation();
-      }
-
-      if (draggedElement !== this) {
-        const draggedIndex = parseInt(draggedElement.dataset.index);
-        const droppedIndex = parseInt(this.dataset.index);
-
-        // Reorder array
-        const [removed] = selectedWalkthroughPOIs.splice(draggedIndex, 1);
-        selectedWalkthroughPOIs.splice(droppedIndex, 0, removed);
-
-        renderSelectedPOIs();
-      }
-
-      return false;
-    }
-
-    function handleDragEnd(e) {
-      this.classList.remove('dragging');
-    }
-
-    // Edit walkthrough
-    window.editWalkthrough = async function(id) {
-      try {
-        const response = await fetch(`/api/walkthroughs/${id}`);
-        const walkthrough = await response.json();
-
-        currentWalkthroughId = id;
-        document.getElementById('walkthroughEditingId').value = id;
-        document.getElementById('walkthroughFormTitle').textContent = 'Edit Walkthrough';
-
-        // Handle multilingual titles
-        const title = walkthrough.title || {};
-        if (typeof title === 'string') {
-          // Legacy format - treat as German
-          document.getElementById('walkthroughTitle-de').value = title;
-          document.getElementById('walkthroughTitle-en').value = '';
-        } else {
-          document.getElementById('walkthroughTitle-de').value = title.de || '';
-          document.getElementById('walkthroughTitle-en').value = title.en || '';
-        }
-
-        // Handle multilingual descriptions
-        const description = walkthrough.description || {};
-        if (typeof description === 'string') {
-          // Legacy format - treat as German
-          document.getElementById('walkthroughDescription-de').value = description;
-          document.getElementById('walkthroughDescription-en').value = '';
-        } else {
-          document.getElementById('walkthroughDescription-de').value = description.de || '';
-          document.getElementById('walkthroughDescription-en').value = description.en || '';
-        }
-
-        selectedWalkthroughPOIs = walkthrough.pois || [];
-        renderSelectedPOIs();
-
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } catch (error) {
-        showToast('Failed to load walkthrough', 'error');
-        console.error(error);
-      }
-    };
-
-    // Delete walkthrough
-    window.deleteWalkthrough = async function(id) {
-      if (!confirm('Are you sure you want to delete this walkthrough?')) {
-        return;
-      }
-
-      try {
-        const response = await fetch(`/api/walkthroughs/${id}`, {
-          method: 'DELETE'
-        });
-
-        if (response.ok) {
-          showToast('Walkthrough deleted successfully');
-          loadWalkthroughs();
-        } else {
-          throw new Error('Delete failed');
-        }
-      } catch (error) {
-        showToast('Failed to delete walkthrough', 'error');
-        console.error(error);
-      }
-    };
-
-    // Reset walkthrough form
-    function resetWalkthroughForm() {
-      currentWalkthroughId = null;
-      document.getElementById('walkthroughForm').reset();
-      document.getElementById('walkthroughEditingId').value = '';
-      document.getElementById('walkthroughFormTitle').textContent = 'Add New Walkthrough';
-      document.getElementById('walkthroughTitle-de').value = '';
-      document.getElementById('walkthroughTitle-en').value = '';
-      document.getElementById('walkthroughDescription-de').value = '';
-      document.getElementById('walkthroughDescription-en').value = '';
-      selectedWalkthroughPOIs = [];
-      renderSelectedPOIs();
-    }
-
-    // Save walkthrough
-    document.getElementById('walkthroughForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const titleDe = document.getElementById('walkthroughTitle-de').value.trim();
-      const titleEn = document.getElementById('walkthroughTitle-en').value.trim();
-      const descriptionDe = document.getElementById('walkthroughDescription-de').value.trim();
-      const descriptionEn = document.getElementById('walkthroughDescription-en').value.trim();
-      const editingId = document.getElementById('walkthroughEditingId').value;
-
-      if (!titleDe || !titleEn || !descriptionDe || !descriptionEn) {
-        showToast('Please fill in all required fields in both languages', 'error');
-        return;
-      }
-
-      const walkthrough = {
-        title: {
-          de: titleDe,
-          en: titleEn
-        },
-        description: {
-          de: descriptionDe,
-          en: descriptionEn
-        },
-        slug: generateSlug(titleDe), // Generate slug from German title
-        pois: selectedWalkthroughPOIs
-      };
-
-      try {
-        const url = editingId ? `/api/walkthroughs/${editingId}` : '/api/walkthroughs';
-        const method = editingId ? 'PUT' : 'POST';
-
-        const response = await fetch(url, {
-          method,
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(walkthrough)
-        });
-
-        if (response.ok) {
-          showToast(editingId ? 'Walkthrough updated successfully' : 'Walkthrough created successfully');
-          resetWalkthroughForm();
-          loadWalkthroughs();
-        } else {
-          throw new Error('Save failed');
-        }
-      } catch (error) {
-        showToast('Failed to save walkthrough', 'error');
-        console.error(error);
-      }
-    });
-
-    // Cancel walkthrough editing
-    document.getElementById('walkthroughCancelBtn').addEventListener('click', resetWalkthroughForm);
-
-    // ============ LIST MANAGEMENT ============
-
-    // Load lists
-    async function loadLists() {
-      try {
-        const response = await fetch('/api/lists');
-        lists = await response.json();
-        renderLists();
-      } catch (error) {
-        console.error('Failed to load lists:', error);
-        showToast('Failed to load lists', 'error');
-      }
-    }
-
-    // Render list list
-    function renderLists() {
-      const container = document.getElementById('listList');
-
-      if (lists.length === 0) {
-        container.innerHTML = '<div class="empty-state">No lists yet. Create your first one!</div>';
-        return;
-      }
-
-      container.innerHTML = lists.map(list => {
-        // Handle multilingual titles
-        const title = list.title || {};
-        const displayTitle = typeof title === 'string' ? title : (title.de || title.en || 'Untitled');
-
-        return `
+        container.innerHTML = lists
+          .map((list) => {
+            // Handle multilingual titles
+            const title = list.title || {};
+            const displayTitle =
+              typeof title === "string"
+                ? title
+                : title.de || title.en || "Untitled";
+
+            return `
           <div class="poi-item">
             <div class="poi-info">
               <div class="poi-name">${displayTitle}</div>
@@ -1878,335 +1556,382 @@ const title = "POI Management System";
             </div>
           </div>
         `;
-      }).join('');
-    }
-
-    // Edit list
-    window.editList = async function(id) {
-      currentListId = id;
-      const list = lists.find(l => l.id === id);
-      if (!list) return;
-
-      document.getElementById('listFormTitle').textContent = 'Edit List';
-      document.getElementById('listEditingId').value = id;
-
-      // Handle multilingual titles
-      const title = list.title || {};
-      if (typeof title === 'string') {
-        // Legacy format - treat as German
-        document.getElementById('listTitle-de').value = title;
-        document.getElementById('listTitle-en').value = '';
-      } else {
-        document.getElementById('listTitle-de').value = title.de || '';
-        document.getElementById('listTitle-en').value = title.en || '';
+          })
+          .join("");
       }
 
-      // Handle multilingual descriptions
-      const description = list.description || {};
-      if (typeof description === 'string') {
-        // Legacy format - treat as German
-        document.getElementById('listDescription-de').value = description;
-        document.getElementById('listDescription-en').value = '';
-      } else {
-        document.getElementById('listDescription-de').value = description.de || '';
-        document.getElementById('listDescription-en').value = description.en || '';
-      }
+      // Edit list
+      window.editList = async function (id) {
+        currentListId = id;
+        const list = lists.find((l) => l.id === id);
+        if (!list) return;
 
-      selectedListPOIs = [...list.pois];
-      renderSelectedListPOIs();
-    };
+        document.getElementById("listFormTitle").textContent = list.showAsWalk
+          ? "Edit Walk"
+          : "Edit List";
+        document.getElementById("listEditingId").value = id;
 
-    // Delete list
-    window.deleteList = async function(id) {
-      if (!confirm('Are you sure you want to delete this list?')) return;
-
-      try {
-        const response = await fetch(`/api/lists/${id}`, {
-          method: 'DELETE'
-        });
-
-        if (response.ok) {
-          showToast('List deleted successfully');
-          loadLists();
+        // Handle multilingual titles
+        const title = list.title || {};
+        if (typeof title === "string") {
+          // Legacy format - treat as German
+          document.getElementById("listTitle-de").value = title;
+          document.getElementById("listTitle-en").value = "";
         } else {
-          throw new Error('Delete failed');
+          document.getElementById("listTitle-de").value = title.de || "";
+          document.getElementById("listTitle-en").value = title.en || "";
         }
-      } catch (error) {
-        showToast('Failed to delete list', 'error');
-        console.error(error);
+
+        // Handle multilingual descriptions
+        const description = list.description || {};
+        if (typeof description === "string") {
+          // Legacy format - treat as German
+          document.getElementById("listDescription-de").value = description;
+          document.getElementById("listDescription-en").value = "";
+        } else {
+          document.getElementById("listDescription-de").value =
+            description.de || "";
+          document.getElementById("listDescription-en").value =
+            description.en || "";
+        }
+
+        // Set showAsWalk checkbox
+        document.getElementById("listShowAsWalk").checked =
+          list.showAsWalk || false;
+
+        selectedListPOIs = [...list.pois];
+        renderSelectedListPOIs();
+      };
+
+      // Delete list
+      window.deleteList = async function (id) {
+        if (!confirm("Are you sure you want to delete this list?")) return;
+
+        try {
+          const response = await fetch(`/api/lists/${id}`, {
+            method: "DELETE",
+          });
+
+          if (response.ok) {
+            showToast("List deleted successfully");
+            loadLists();
+          } else {
+            throw new Error("Delete failed");
+          }
+        } catch (error) {
+          showToast("Failed to delete list", "error");
+          console.error(error);
+        }
+      };
+
+      // POI search for lists
+      const poiSearchListInput = document.getElementById("poiSearchList");
+      const poiSearchListResults = document.getElementById(
+        "poiSearchResultsList"
+      );
+      const clearPoiSearchList = document.getElementById("clearPoiSearchList");
+      let focusedListIndex = -1;
+
+      function updateClearButtonList() {
+        if (poiSearchListInput.value) {
+          clearPoiSearchList.style.display = "flex";
+        } else {
+          clearPoiSearchList.style.display = "none";
+        }
       }
-    };
 
-    // POI search for lists
-    const poiSearchListInput = document.getElementById('poiSearchList');
-    const poiSearchListResults = document.getElementById('poiSearchResultsList');
-    const clearPoiSearchList = document.getElementById('clearPoiSearchList');
-    let focusedListIndex = -1;
+      poiSearchListInput.addEventListener("input", (e) => {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        focusedListIndex = -1;
 
-    function updateClearButtonList() {
-      if (poiSearchListInput.value) {
-        clearPoiSearchList.style.display = 'flex';
-      } else {
-        clearPoiSearchList.style.display = 'none';
-      }
-    }
+        if (searchTerm.length < 2) {
+          poiSearchListResults.innerHTML = "";
+          poiSearchListResults.style.display = "none";
+          updateClearButtonList();
+          return;
+        }
 
-    poiSearchListInput.addEventListener('input', (e) => {
-      const searchTerm = e.target.value.toLowerCase().trim();
-      focusedListIndex = -1;
+        const filtered = allPOIs
+          .filter(
+            (poi) =>
+              !selectedListPOIs.includes(poi.properties.id) &&
+              poi.properties.name.toLowerCase().includes(searchTerm)
+          )
+          .slice(0, 10);
 
-      if (searchTerm.length < 2) {
-        poiSearchListResults.innerHTML = '';
-        poiSearchListResults.style.display = 'none';
-        updateClearButtonList();
-        return;
-      }
+        if (filtered.length === 0) {
+          poiSearchListResults.innerHTML =
+            '<div class="poi-search-result-item">No POIs found</div>';
+          poiSearchListResults.style.display = "block";
+          updateClearButtonList();
+          return;
+        }
 
-      const filtered = allPOIs.filter(poi =>
-        !selectedListPOIs.includes(poi.properties.id) &&
-        poi.properties.name.toLowerCase().includes(searchTerm)
-      ).slice(0, 10);
-
-      if (filtered.length === 0) {
-        poiSearchListResults.innerHTML = '<div class="poi-search-result-item">No POIs found</div>';
-        poiSearchListResults.style.display = 'block';
-        updateClearButtonList();
-        return;
-      }
-
-      poiSearchListResults.innerHTML = filtered.map(poi => {
-        const category = categoriesData[poi.properties.category];
-        return `
+        poiSearchListResults.innerHTML = filtered
+          .map((poi) => {
+            const category = categoriesData[poi.properties.category];
+            return `
           <div class="poi-search-result-item" data-poi-id="${poi.properties.id}">
             <div class="poi-search-result-name">${poi.properties.name}</div>
             <div class="poi-search-result-category">
-              ${category ? category.emoji + ' ' + category.name.de : poi.properties.category}
+              ${category ? category.emoji + " " + category.name.de : poi.properties.category}
             </div>
           </div>
         `;
-      }).join('');
+          })
+          .join("");
 
-      poiSearchListResults.style.display = 'block';
+        poiSearchListResults.style.display = "block";
 
-      poiSearchListResults.querySelectorAll('.poi-search-result-item').forEach(result => {
-        result.addEventListener('click', () => {
-          const poiId = result.dataset.poiId;
-          selectedListPOIs.push(poiId);
-          renderSelectedListPOIs();
-          poiSearchListInput.value = '';
-          poiSearchListResults.innerHTML = '';
-          poiSearchListResults.style.display = 'none';
-          updateClearButtonList();
+        poiSearchListResults
+          .querySelectorAll(".poi-search-result-item")
+          .forEach((result) => {
+            result.addEventListener("click", () => {
+              const poiId = result.dataset.poiId;
+              selectedListPOIs.push(poiId);
+              renderSelectedListPOIs();
+              poiSearchListInput.value = "";
+              poiSearchListResults.innerHTML = "";
+              poiSearchListResults.style.display = "none";
+              updateClearButtonList();
+            });
+          });
+
+        updateClearButtonList();
+      });
+
+      // Keyboard navigation for list POI search
+      poiSearchListInput.addEventListener("keydown", (e) => {
+        const items = Array.from(
+          poiSearchListResults.querySelectorAll(".poi-search-result-item")
+        );
+
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          focusedListIndex = Math.min(focusedListIndex + 1, items.length - 1);
+          updateFocusedItemList(items);
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          focusedListIndex = Math.max(focusedListIndex - 1, -1);
+          updateFocusedItemList(items);
+        } else if (e.key === "Enter") {
+          e.preventDefault();
+          if (focusedListIndex >= 0 && items[focusedListIndex]) {
+            items[focusedListIndex].click();
+          }
+        } else if (e.key === "Escape") {
+          poiSearchListResults.style.display = "none";
+        }
+      });
+
+      function updateFocusedItemList(items) {
+        items.forEach((item, idx) => {
+          if (idx === focusedListIndex) {
+            item.classList.add("focused");
+            item.scrollIntoView({ block: "nearest" });
+          } else {
+            item.classList.remove("focused");
+          }
         });
-      });
-
-      updateClearButtonList();
-    });
-
-    // Keyboard navigation for list POI search
-    poiSearchListInput.addEventListener('keydown', (e) => {
-      const items = Array.from(poiSearchListResults.querySelectorAll('.poi-search-result-item'));
-
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        focusedListIndex = Math.min(focusedListIndex + 1, items.length - 1);
-        updateFocusedItemList(items);
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        focusedListIndex = Math.max(focusedListIndex - 1, -1);
-        updateFocusedItemList(items);
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        if (focusedListIndex >= 0 && items[focusedListIndex]) {
-          items[focusedListIndex].click();
-        }
-      } else if (e.key === 'Escape') {
-        poiSearchListResults.style.display = 'none';
-      }
-    });
-
-    function updateFocusedItemList(items) {
-      items.forEach((item, idx) => {
-        if (idx === focusedListIndex) {
-          item.classList.add('focused');
-          item.scrollIntoView({ block: 'nearest' });
-        } else {
-          item.classList.remove('focused');
-        }
-      });
-    }
-
-    // Clear button
-    clearPoiSearchList.addEventListener('click', () => {
-      poiSearchListInput.value = '';
-      poiSearchListResults.innerHTML = '';
-      poiSearchListResults.style.display = 'none';
-      updateClearButtonList();
-      poiSearchListInput.focus();
-    });
-
-    // Render selected POIs for lists
-    function renderSelectedListPOIs() {
-      const container = document.getElementById('selectedPOIsContainerList');
-
-      if (selectedListPOIs.length === 0) {
-        container.innerHTML = '<div class="empty-state" style="padding: 20px;">No POIs selected yet</div>';
-        return;
       }
 
-      container.innerHTML = selectedListPOIs.map((poiId, index) => {
-        const poi = allPOIs.find(p => p.properties.id === poiId);
-        if (!poi) return '';
+      // Clear button
+      clearPoiSearchList.addEventListener("click", () => {
+        poiSearchListInput.value = "";
+        poiSearchListResults.innerHTML = "";
+        poiSearchListResults.style.display = "none";
+        updateClearButtonList();
+        poiSearchListInput.focus();
+      });
 
-        const category = categoriesData[poi.properties.category];
+      // Render selected POIs for lists
+      function renderSelectedListPOIs() {
+        const container = document.getElementById("selectedPOIsContainerList");
 
-        return `
+        if (selectedListPOIs.length === 0) {
+          container.innerHTML =
+            '<div class="empty-state" style="padding: 20px;">No POIs selected yet</div>';
+          return;
+        }
+
+        container.innerHTML = selectedListPOIs
+          .map((poiId, index) => {
+            const poi = allPOIs.find((p) => p.properties.id === poiId);
+            if (!poi) return "";
+
+            const category = categoriesData[poi.properties.category];
+
+            return `
           <div class="selected-poi-item" draggable="true" data-poi-id="${poiId}" data-index="${index}">
             <div class="drag-handle">☰</div>
             <div class="poi-info">
               <div class="poi-name">${index + 1}. ${poi.properties.name}</div>
-              <div class="poi-category">${category ? category.emoji + ' ' + category.name.de : poi.properties.category}</div>
+              <div class="poi-category">${category ? category.emoji + " " + category.name.de : poi.properties.category}</div>
             </div>
             <button class="small danger" onclick="removeListPOI('${poiId}')">Remove</button>
           </div>
         `;
-      }).join('');
+          })
+          .join("");
 
-      setupListDragAndDrop();
-    }
-
-    // Remove POI from list
-    window.removeListPOI = function(poiId) {
-      selectedListPOIs = selectedListPOIs.filter(id => id !== poiId);
-      renderSelectedListPOIs();
-    };
-
-    // Drag and drop for lists
-    function setupListDragAndDrop() {
-      const items = document.querySelectorAll('#selectedPOIsContainerList .selected-poi-item');
-
-      items.forEach(item => {
-        item.addEventListener('dragstart', handleDragStart);
-        item.addEventListener('dragover', handleDragOver);
-        item.addEventListener('drop', handleDrop);
-        item.addEventListener('dragend', handleDragEnd);
-      });
-    }
-
-    function handleDragStart(e) {
-      draggedElement = this;
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/html', this.innerHTML);
-      this.style.opacity = '0.4';
-    }
-
-    function handleDragOver(e) {
-      if (e.preventDefault) {
-        e.preventDefault();
-      }
-      e.dataTransfer.dropEffect = 'move';
-      return false;
-    }
-
-    function handleDrop(e) {
-      if (e.stopPropagation) {
-        e.stopPropagation();
+        setupListDragAndDrop();
       }
 
-      if (draggedElement !== this) {
-        const draggedIndex = parseInt(draggedElement.dataset.index);
-        const targetIndex = parseInt(this.dataset.index);
+      // Remove POI from list
+      window.removeListPOI = function (poiId) {
+        selectedListPOIs = selectedListPOIs.filter((id) => id !== poiId);
+        renderSelectedListPOIs();
+      };
 
-        // Reorder array
-        const movedItem = selectedListPOIs[draggedIndex];
-        selectedListPOIs.splice(draggedIndex, 1);
-        selectedListPOIs.splice(targetIndex, 0, movedItem);
+      // Drag and drop for lists
+      function setupListDragAndDrop() {
+        const items = document.querySelectorAll(
+          "#selectedPOIsContainerList .selected-poi-item"
+        );
 
+        items.forEach((item) => {
+          item.addEventListener("dragstart", handleDragStart);
+          item.addEventListener("dragover", handleDragOver);
+          item.addEventListener("drop", handleDrop);
+          item.addEventListener("dragend", handleDragEnd);
+        });
+      }
+
+      function handleDragStart(e) {
+        draggedElement = this;
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/html", this.innerHTML);
+        this.style.opacity = "0.4";
+      }
+
+      function handleDragOver(e) {
+        if (e.preventDefault) {
+          e.preventDefault();
+        }
+        e.dataTransfer.dropEffect = "move";
+        return false;
+      }
+
+      function handleDrop(e) {
+        if (e.stopPropagation) {
+          e.stopPropagation();
+        }
+
+        if (draggedElement !== this) {
+          const draggedIndex = parseInt(draggedElement.dataset.index);
+          const targetIndex = parseInt(this.dataset.index);
+
+          // Reorder array
+          const movedItem = selectedListPOIs[draggedIndex];
+          selectedListPOIs.splice(draggedIndex, 1);
+          selectedListPOIs.splice(targetIndex, 0, movedItem);
+
+          renderSelectedListPOIs();
+        }
+
+        return false;
+      }
+
+      function handleDragEnd(e) {
+        this.style.opacity = "1";
+      }
+
+      // Reset list form
+      function resetListForm() {
+        currentListId = null;
+        document.getElementById("listFormTitle").textContent =
+          "Add New List or Walk";
+        document.getElementById("listEditingId").value = "";
+        document.getElementById("listForm").reset();
+        document.getElementById("listTitle-de").value = "";
+        document.getElementById("listTitle-en").value = "";
+        document.getElementById("listDescription-de").value = "";
+        document.getElementById("listDescription-en").value = "";
+        document.getElementById("listShowAsWalk").checked = false;
+        selectedListPOIs = [];
         renderSelectedListPOIs();
       }
 
-      return false;
-    }
+      // List form submission
+      document
+        .getElementById("listForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
 
-    function handleDragEnd(e) {
-      this.style.opacity = '1';
-    }
+          try {
+            const titleDe = document
+              .getElementById("listTitle-de")
+              .value.trim();
+            const titleEn = document
+              .getElementById("listTitle-en")
+              .value.trim();
+            const descriptionDe = document
+              .getElementById("listDescription-de")
+              .value.trim();
+            const descriptionEn = document
+              .getElementById("listDescription-en")
+              .value.trim();
+            const editingId = document.getElementById("listEditingId").value;
 
-    // Reset list form
-    function resetListForm() {
-      currentListId = null;
-      document.getElementById('listFormTitle').textContent = 'Add New List';
-      document.getElementById('listEditingId').value = '';
-      document.getElementById('listForm').reset();
-      document.getElementById('listTitle-de').value = '';
-      document.getElementById('listTitle-en').value = '';
-      document.getElementById('listDescription-de').value = '';
-      document.getElementById('listDescription-en').value = '';
-      selectedListPOIs = [];
-      renderSelectedListPOIs();
-    }
+            if (!titleDe || !titleEn) {
+              showToast("Title is required in both languages", "error");
+              return;
+            }
 
-    // List form submission
-    document.getElementById('listForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+            if (selectedListPOIs.length === 0) {
+              showToast("Please add at least one POI", "error");
+              return;
+            }
 
-      try {
-        const titleDe = document.getElementById('listTitle-de').value.trim();
-        const titleEn = document.getElementById('listTitle-en').value.trim();
-        const descriptionDe = document.getElementById('listDescription-de').value.trim();
-        const descriptionEn = document.getElementById('listDescription-en').value.trim();
-        const editingId = document.getElementById('listEditingId').value;
+            const showAsWalk =
+              document.getElementById("listShowAsWalk").checked;
 
-        if (!titleDe || !titleEn) {
-          showToast('Title is required in both languages', 'error');
-          return;
-        }
+            const list = {
+              title: {
+                de: titleDe,
+                en: titleEn,
+              },
+              description: {
+                de: descriptionDe,
+                en: descriptionEn,
+              },
+              slug: generateSlug(titleDe), // Generate slug from German title
+              pois: selectedListPOIs,
+              showAsWalk: showAsWalk,
+            };
 
-        if (selectedListPOIs.length === 0) {
-          showToast('Please add at least one POI', 'error');
-          return;
-        }
+            const url = editingId ? `/api/lists/${editingId}` : "/api/lists";
+            const method = editingId ? "PUT" : "POST";
 
-        const list = {
-          title: {
-            de: titleDe,
-            en: titleEn
-          },
-          description: {
-            de: descriptionDe,
-            en: descriptionEn
-          },
-          slug: generateSlug(titleDe), // Generate slug from German title
-          pois: selectedListPOIs
-        };
+            const response = await fetch(url, {
+              method,
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(list),
+            });
 
-        const url = editingId ? `/api/lists/${editingId}` : '/api/lists';
-        const method = editingId ? 'PUT' : 'POST';
-
-        const response = await fetch(url, {
-          method,
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(list)
+            if (response.ok) {
+              showToast(
+                editingId
+                  ? "List updated successfully"
+                  : "List created successfully"
+              );
+              resetListForm();
+              loadLists();
+            } else {
+              throw new Error("Save failed");
+            }
+          } catch (error) {
+            showToast("Failed to save list", "error");
+            console.error(error);
+          }
         });
 
-        if (response.ok) {
-          showToast(editingId ? 'List updated successfully' : 'List created successfully');
-          resetListForm();
-          loadLists();
-        } else {
-          throw new Error('Save failed');
-        }
-      } catch (error) {
-        showToast('Failed to save list', 'error');
-        console.error(error);
-      }
-    });
-
-    // Cancel list editing
-    document.getElementById('listCancelBtn').addEventListener('click', resetListForm);
-  </script>
-
-</body>
+      // Cancel list editing
+      document
+        .getElementById("listCancelBtn")
+        .addEventListener("click", resetListForm);
+    </script>
+  </body>
 </html>

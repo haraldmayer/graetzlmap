@@ -1,91 +1,75 @@
 <nav class="graetzl-nav">
-	<div class="nav-section">
-		<h2>Liste</h2>
-		<select id="list-select" class="list-select">
-			<option value="">Keine Liste ausgewählt</option>
-		</select>
-	</div>
+  <div class="nav-section">
+    <select id="list-select" class="list-select">
+      <option value="">Liste wählen</option>
+    </select>
+  </div>
 
-	<div class="nav-section">
-		<h2>Grätzlwalk</h2>
-		<select id="walkthrough-select" class="walkthrough-select">
-			<option value="">Kein Walk ausgewählt</option>
-		</select>
-	</div>
+  <div class="nav-section">
+    <h2>Grätzl wählen</h2>
+    <div class="searchable-select">
+      <input
+        type="text"
+        id="graetzl-search"
+        class="graetzl-search-input"
+        placeholder="Alle Grätzl werden angezeigt"
+        autocomplete="off"
+        data-selected="false"
+      />
+      <button
+        id="clear-graetzl"
+        class="clear-button"
+        type="button"
+        style="display: none;"
+        title="Auswahl löschen">×</button
+      >
+      <div
+        id="graetzl-dropdown"
+        class="graetzl-dropdown"
+        style="display: none;"
+      >
+        <!-- Options will be populated dynamically -->
+      </div>
+    </div>
+  </div>
 
-	<div class="nav-section">
-		<h2>Grätzl auswählen</h2>
-		<div class="searchable-select">
-			<input
-				type="text"
-				id="graetzl-search"
-				class="graetzl-search-input"
-				placeholder="Alle Grätzl werden angezeigt"
-				autocomplete="off"
-				data-selected="false"
-			/>
-			<button
-				id="clear-graetzl"
-				class="clear-button"
-				type="button"
-				style="display: none;"
-				title="Auswahl löschen"
-			>×</button>
-			<div id="graetzl-dropdown" class="graetzl-dropdown" style="display: none;">
-				<!-- Options will be populated dynamically -->
-			</div>
-		</div>
-	</div>
-
-	<div class="nav-section">
-		<h2>POI suchen</h2>
-		<div class="searchable-select">
-			<input
-				type="text"
-				id="poi-search"
-				class="graetzl-search-input"
-				placeholder="POI nach Name suchen..."
-				autocomplete="off"
-				data-selected="false"
-			/>
-			<button
-				id="clear-poi"
-				class="clear-button"
-				type="button"
-				style="display: none;"
-				title="Auswahl löschen"
-			>×</button>
-			<div id="poi-dropdown" class="graetzl-dropdown" style="display: none;">
-				<!-- Options will be populated dynamically -->
-			</div>
-		</div>
-	</div>
-
-	<div class="nav-section" style="display: none;">
-		<h2>Kategorien filtern</h2>
-		<div class="category-filter-container">
-			<button id="category-toggle" class="category-toggle" type="button">
-				<span class="category-toggle-text">Alle Kategorien</span>
-				<span class="category-toggle-icon">▼</span>
-			</button>
-			<div id="category-dropdown" class="category-dropdown" style="display: none;">
-				<div class="category-dropdown-header">
-					<button id="select-all-categories" class="category-action-btn" type="button">Alle auswählen</button>
-					<button id="deselect-all-categories" class="category-action-btn" type="button">Alle abwählen</button>
-				</div>
-				<div class="category-search-wrapper">
-					<input
-						type="text"
-						id="category-search"
-						class="category-search-input"
-						placeholder="Kategorien suchen..."
-						autocomplete="off"
-					/>
-				</div>
-				<div id="category-filters" class="category-filters">
-					<!-- Will be populated dynamically -->
-				</div>
-			</div>
-		</div>
-	</div>
+  <div class="nav-section" style="display: none;">
+    <h2>Kategorien filtern</h2>
+    <div class="category-filter-container">
+      <button id="category-toggle" class="category-toggle" type="button">
+        <span class="category-toggle-text">Alle Kategorien</span>
+        <span class="category-toggle-icon">▼</span>
+      </button>
+      <div
+        id="category-dropdown"
+        class="category-dropdown"
+        style="display: none;"
+      >
+        <div class="category-dropdown-header">
+          <button
+            id="select-all-categories"
+            class="category-action-btn"
+            type="button">Alle auswählen</button
+          >
+          <button
+            id="deselect-all-categories"
+            class="category-action-btn"
+            type="button">Alle abwählen</button
+          >
+        </div>
+        <div class="category-search-wrapper">
+          <input
+            type="text"
+            id="category-search"
+            class="category-search-input"
+            placeholder="Kategorien suchen..."
+            autocomplete="off"
+          />
+        </div>
+        <div id="category-filters" class="category-filters">
+          <!-- Will be populated dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
 </nav>
