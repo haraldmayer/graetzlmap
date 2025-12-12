@@ -1023,9 +1023,12 @@ function createCategoryFilters() {
 
 		// Add number markers at each POI
 		coords.forEach((coord, index) => {
+			const poiId = poiIds[index];
+			const poi = geoData.features.find(f => f.properties.id === poiId);
+
 			const numberMarker = L.marker(coord, {
 				icon: L.divIcon({
-					html: `<div style="
+					html: `<div class="walkthrough-number-marker" style="
 						background: #667eea;
 						color: white;
 						width: 24px;
@@ -1038,13 +1041,65 @@ function createCategoryFilters() {
 						font-size: 12px;
 						border: 2px solid white;
 						box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+						cursor: pointer;
 					">${index + 1}</div>`,
 					className: 'walkthrough-number',
 					iconSize: [24, 24],
-					iconAnchor: [12, 12]
+					iconAnchor: [12, 6]
 				}),
 				zIndexOffset: 1000
 			}).addTo(map);
+
+			// Store POI ID on marker
+			numberMarker.poiId = poiId;
+
+			// Add tooltip and popup if POI exists
+			if (poi) {
+				numberMarker.bindTooltip(poi.properties.name, {
+					direction: 'top',
+					offset: [0, -10],
+					opacity: 0.9
+				});
+
+				// Create and bind the same popup as the main marker
+				const icon = getCategoryIcon(poi.properties.category);
+				const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${coord[0]},${coord[1]}`;
+				const learnMoreLink = poi.properties.link ? `<a href="${poi.properties.link}" target="_blank" class="poi-link">Website →</a>` : '';
+				const categoryInfo = categories[poi.properties.category];
+				const categoryName = categoryInfo ? `${categoryInfo.emoji} ${getTranslated(categoryInfo.name)}` : '';
+				const tags = poi.properties.tags || [];
+				const tagsHtml = tags.length > 0
+					? `<div class="poi-tags">${tags.map(tag => `<span class="poi-tag">${tag}</span>`).join('')}</div>`
+					: '';
+				const photoHtml = poi.properties.photo
+					? `<img src="${poi.properties.photo}" alt="${poi.properties.name}" class="poi-photo" />`
+					: '';
+
+				const popupContent = `
+					<div class="poi-popup">
+						<div class="poi-icon">${icon}</div>
+						<h3>${poi.properties.name}</h3>
+						${categoryName ? `<div class="poi-category-label">${categoryName}</div>` : ''}
+						${photoHtml}
+						<p>${getTranslated(poi.properties.description)}</p>
+						${tagsHtml}
+						<div class="poi-actions">
+							${learnMoreLink}
+							<a href="${googleMapsUrl}" target="_blank" class="poi-link poi-link-secondary">Route</a>
+						</div>
+					</div>
+				`;
+
+				numberMarker.bindPopup(popupContent, {
+					maxWidth: 300,
+					className: 'custom-popup'
+				});
+
+				// Add click handler to open popup
+				numberMarker.on('click', () => {
+					numberMarker.openPopup();
+				});
+			}
 
 			walkthroughArrows.push(numberMarker);
 		});
@@ -1077,9 +1132,12 @@ function createCategoryFilters() {
 
 		// Add number markers at each POI
 		coords.forEach((coord, index) => {
+			const poiId = poiIds[index];
+			const poi = geoData.features.find(f => f.properties.id === poiId);
+
 			const numberMarker = L.marker(coord, {
 				icon: L.divIcon({
-					html: `<div style="
+					html: `<div class="list-number-marker" style="
 						background: #2563eb;
 						color: white;
 						width: 24px;
@@ -1092,13 +1150,65 @@ function createCategoryFilters() {
 						font-size: 12px;
 						border: 2px solid white;
 						box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+						cursor: pointer;
 					">${index + 1}</div>`,
 					className: 'list-number',
 					iconSize: [24, 24],
-					iconAnchor: [12, 12]
+					iconAnchor: [12, 14]
 				}),
 				zIndexOffset: 1000
 			}).addTo(map);
+
+			// Store POI ID on marker
+			numberMarker.poiId = poiId;
+
+			// Add tooltip and popup if POI exists
+			if (poi) {
+				numberMarker.bindTooltip(poi.properties.name, {
+					direction: 'top',
+					offset: [0, -10],
+					opacity: 0.9
+				});
+
+				// Create and bind the same popup as the main marker
+				const icon = getCategoryIcon(poi.properties.category);
+				const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${coord[0]},${coord[1]}`;
+				const learnMoreLink = poi.properties.link ? `<a href="${poi.properties.link}" target="_blank" class="poi-link">Website →</a>` : '';
+				const categoryInfo = categories[poi.properties.category];
+				const categoryName = categoryInfo ? `${categoryInfo.emoji} ${getTranslated(categoryInfo.name)}` : '';
+				const tags = poi.properties.tags || [];
+				const tagsHtml = tags.length > 0
+					? `<div class="poi-tags">${tags.map(tag => `<span class="poi-tag">${tag}</span>`).join('')}</div>`
+					: '';
+				const photoHtml = poi.properties.photo
+					? `<img src="${poi.properties.photo}" alt="${poi.properties.name}" class="poi-photo" />`
+					: '';
+
+				const popupContent = `
+					<div class="poi-popup">
+						<div class="poi-icon">${icon}</div>
+						<h3>${poi.properties.name}</h3>
+						${categoryName ? `<div class="poi-category-label">${categoryName}</div>` : ''}
+						${photoHtml}
+						<p>${getTranslated(poi.properties.description)}</p>
+						${tagsHtml}
+						<div class="poi-actions">
+							${learnMoreLink}
+							<a href="${googleMapsUrl}" target="_blank" class="poi-link poi-link-secondary">Route</a>
+						</div>
+					</div>
+				`;
+
+				numberMarker.bindPopup(popupContent, {
+					maxWidth: 300,
+					className: 'custom-popup'
+				});
+
+				// Add click handler to open popup
+				numberMarker.on('click', () => {
+					numberMarker.openPopup();
+				});
+			}
 
 			listMarkers.push(numberMarker);
 		});
