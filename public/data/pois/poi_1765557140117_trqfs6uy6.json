@@ -1,0 +1,23 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.337349768169958,
+      48.214084600346254
+    ]
+  },
+  "properties": {
+    "name": "Kafeneon",
+    "category": "restaurant",
+    "description": {
+      "de": "🇬🇷🍋‍🟩",
+      "en": ""
+    },
+    "link": "",
+    "instagram": "",
+    "photo": "",
+    "tags": [],
+    "id": "poi_1765557140117_trqfs6uy6"
+  }
+}

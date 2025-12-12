@@ -1,0 +1,23 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.36438872719027,
+      48.19802149812315
+    ]
+  },
+  "properties": {
+    "name": "Lisboa Lounge",
+    "category": "bar",
+    "description": {
+      "de": "🇵🇹🍸",
+      "en": ""
+    },
+    "link": "",
+    "instagram": "",
+    "photo": "",
+    "tags": [],
+    "id": "poi_1765557181458_qin7p0kc7"
+  }
+}
