@@ -81,6 +81,28 @@
       ],
       "showAsWalk": false,
       "id": "list_1765478372407_o59hbz5bs"
+    },
+    {
+      "title": {
+        "de": "Möbel shopping",
+        "en": "Shop for our apartment"
+      },
+      "description": {
+        "de": "",
+        "en": ""
+      },
+      "slug": "moebel-shopping",
+      "pois": [
+        "poi_1765577348479_ucmc8hnba",
+        "poi_1765577388400_2rjn4idy3",
+        "poi_1765577596262_e5ra4xo0k",
+        "poi_1765577310724_yjan2lwz6",
+        "poi_1765577563632_nbb0n3zux",
+        "poi_1765577423644_yh9e0s2c1",
+        "poi_1765577919401_6ygp0ozom"
+      ],
+      "showAsWalk": true,
+      "id": "list_1765577637788_15qtlk1gs"
     }
   ]
 }

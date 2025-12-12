@@ -8,7 +8,7 @@ const title = "POI Management System";
     <meta charset="utf-8" />
     <title>{title}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style>
+    <style is:global>
       * {
         box-sizing: border-box;
       }
@@ -135,18 +135,23 @@ const title = "POI Management System";
       }
 
       .poi-item {
-        padding: 12px;
-        border: 1px solid #e5e7eb;
+        padding: 14px;
+        border: 2px solid #e5e7eb;
         border-radius: 8px;
-        margin-bottom: 8px;
+        margin-bottom: 12px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        transition: background 0.2s;
+        transition: all 0.2s;
+        background: white;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
       }
 
       .poi-item:hover {
         background: #f9fafb;
+        border-color: #d1d5db;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        transform: translateY(-1px);
       }
 
       .poi-info {
@@ -407,15 +412,16 @@ const title = "POI Management System";
 
       .selected-poi-item {
         background: white;
-        padding: 10px 12px;
-        margin-bottom: 6px;
-        border-radius: 6px;
-        border: 1px solid #e5e7eb;
+        padding: 12px 14px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        border: 2px solid #e5e7eb;
         display: flex;
         justify-content: space-between;
         align-items: center;
         cursor: move;
         transition: all 0.2s;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
       }
 
       .selected-poi-item:last-child {
@@ -423,11 +429,15 @@ const title = "POI Management System";
       }
 
       .selected-poi-item:hover {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+        border-color: #d1d5db;
+        transform: translateX(-2px);
       }
 
       .selected-poi-item.dragging {
-        opacity: 0.5;
+        opacity: 0.6;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: scale(1.02);
       }
 
       .selected-poi-info {
