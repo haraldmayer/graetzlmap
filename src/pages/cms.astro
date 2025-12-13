@@ -519,6 +519,7 @@ const title = "POI Management System";
         box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
       }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/exifr@7/dist/lite.umd.js"></script>
   </head>
   <body>
     <div class="header">
@@ -1231,16 +1232,39 @@ const title = "POI Management System";
         document.getElementById("photoPreview").style.display = "none";
       });
 
-      // Show preview when file is selected
-      document.getElementById("photoFile").addEventListener("change", (e) => {
+      // Show preview when file is selected and extract GPS data
+      document.getElementById("photoFile").addEventListener("change", async (e) => {
         const file = e.target.files[0];
         if (file) {
+          // Show preview
           const reader = new FileReader();
           reader.onload = (e) => {
             document.getElementById("photoPreviewImg").src = e.target.result;
             document.getElementById("photoPreview").style.display = "block";
           };
           reader.readAsDataURL(file);
+
+          // Extract GPS coordinates from EXIF data if lat/lng fields are empty
+          const latInput = document.getElementById("lat");
+          const lngInput = document.getElementById("lng");
+
+          if ((!latInput.value || !lngInput.value) && window.exifr) {
+            try {
+              const gps = await exifr.gps(file);
+              if (gps && gps.latitude && gps.longitude) {
+                if (!latInput.value) {
+                  latInput.value = gps.latitude.toFixed(7);
+                }
+                if (!lngInput.value) {
+                  lngInput.value = gps.longitude.toFixed(7);
+                }
+                showToast("GPS coordinates extracted from image!", "success");
+              }
+            } catch (error) {
+              console.log("No GPS data found in image:", error);
+              // Silently fail - not all images have GPS data
+            }
+          }
         }
       });
 

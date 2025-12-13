@@ -1,0 +1,23 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.3598167,
+      48.1971083
+    ]
+  },
+  "properties": {
+    "name": "Wiener Blumen",
+    "category": "blumengeschaeft",
+    "description": {
+      "de": "",
+      "en": ""
+    },
+    "link": "",
+    "instagram": "",
+    "photo": "/uploads/poi_1765601869511.jpg",
+    "tags": [],
+    "id": "poi_1765601869516_e0jankrzm"
+  }
+}
