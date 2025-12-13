@@ -1,0 +1,23 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      16.3581611,
+      48.1987806
+    ]
+  },
+  "properties": {
+    "name": "Bakalowits",
+    "category": "moebel",
+    "description": {
+      "de": "🛋️💡",
+      "en": ""
+    },
+    "link": "",
+    "instagram": "",
+    "photo": "",
+    "tags": [],
+    "id": "poi_1765602417571_zdyw3zfe0"
+  }
+}

@@ -520,6 +520,7 @@ const title = "POI Management System";
       }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/exifr@7/dist/lite.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
   </head>
   <body>
     <div class="header">
@@ -1224,48 +1225,84 @@ const title = "POI Management System";
         selectedTags = [];
         renderTags();
         currentEditId = null;
+        convertedPhotoFile = null; // Clear converted file
       }
 
       // Handle remove photo button
       document.getElementById("removePhoto").addEventListener("click", () => {
         document.getElementById("photo").value = "";
+        document.getElementById("photoFile").value = "";
         document.getElementById("photoPreview").style.display = "none";
+        convertedPhotoFile = null;
       });
+
+      // Store converted file for upload
+      let convertedPhotoFile = null;
 
       // Show preview when file is selected and extract GPS data
       document.getElementById("photoFile").addEventListener("change", async (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          // Show preview
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            document.getElementById("photoPreviewImg").src = e.target.result;
-            document.getElementById("photoPreview").style.display = "block";
-          };
-          reader.readAsDataURL(file);
+        const originalFile = e.target.files[0];
+        if (!originalFile) return;
 
-          // Extract GPS coordinates from EXIF data if lat/lng fields are empty
-          const latInput = document.getElementById("lat");
-          const lngInput = document.getElementById("lng");
+        // Extract GPS coordinates from original file BEFORE conversion
+        // This ensures HEIC files' GPS data is preserved
+        const latInput = document.getElementById("lat");
+        const lngInput = document.getElementById("lng");
 
-          if ((!latInput.value || !lngInput.value) && window.exifr) {
-            try {
-              const gps = await exifr.gps(file);
-              if (gps && gps.latitude && gps.longitude) {
-                if (!latInput.value) {
-                  latInput.value = gps.latitude.toFixed(7);
-                }
-                if (!lngInput.value) {
-                  lngInput.value = gps.longitude.toFixed(7);
-                }
-                showToast("GPS coordinates extracted from image!", "success");
+        if ((!latInput.value || !lngInput.value) && window.exifr) {
+          try {
+            const gps = await exifr.gps(originalFile);
+            if (gps && gps.latitude && gps.longitude) {
+              if (!latInput.value) {
+                latInput.value = gps.latitude.toFixed(7);
               }
-            } catch (error) {
-              console.log("No GPS data found in image:", error);
-              // Silently fail - not all images have GPS data
+              if (!lngInput.value) {
+                lngInput.value = gps.longitude.toFixed(7);
+              }
+              showToast("GPS coordinates extracted from image!", "success");
             }
+          } catch (error) {
+            console.log("No GPS data found in image:", error);
+            // Silently fail - not all images have GPS data
           }
         }
+
+        let fileForPreview = originalFile;
+
+        // Convert HEIC to JPG if needed
+        const isHeic = originalFile.type === "image/heic" || originalFile.type === "image/heif" ||
+                       originalFile.name.toLowerCase().endsWith('.heic') ||
+                       originalFile.name.toLowerCase().endsWith('.heif');
+
+        if (isHeic) {
+          try {
+            showToast("Converting HEIC to JPG...", "success");
+            const convertedBlob = await heic2any({
+              blob: originalFile,
+              toType: "image/jpeg",
+              quality: 0.9
+            });
+            // Create a new File object from the blob
+            const fileName = originalFile.name.replace(/\.(heic|heif)$/i, '.jpg');
+            fileForPreview = new File([convertedBlob], fileName, { type: "image/jpeg" });
+            convertedPhotoFile = fileForPreview;
+            showToast("Image converted to JPG!", "success");
+          } catch (error) {
+            console.error("HEIC conversion failed:", error);
+            showToast("Failed to convert HEIC image", "error");
+            return;
+          }
+        } else {
+          convertedPhotoFile = originalFile;
+        }
+
+        // Show preview (use converted file for HEIC, original for others)
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          document.getElementById("photoPreviewImg").src = e.target.result;
+          document.getElementById("photoPreview").style.display = "block";
+        };
+        reader.readAsDataURL(fileForPreview);
       });
 
       // Edit POI
@@ -1297,7 +1334,11 @@ const title = "POI Management System";
           document.getElementById("link").value = poi.properties.link || "";
           document.getElementById("instagram").value =
             poi.properties.instagram || "";
-          document.getElementById("photo").value = poi.properties.photo || "";
+
+          // Only populate photo URL field if it's an absolute URL
+          const photoUrl = poi.properties.photo || "";
+          const isAbsoluteUrl = photoUrl.startsWith("http://") || photoUrl.startsWith("https://");
+          document.getElementById("photo").value = isAbsoluteUrl ? photoUrl : "";
 
           // Show photo preview if exists
           const photoPreview = document.getElementById("photoPreview");
@@ -1406,7 +1447,8 @@ const title = "POI Management System";
 
           // Handle photo upload if file is selected
           let photoUrl = document.getElementById("photo").value;
-          const photoFile = document.getElementById("photoFile").files[0];
+          // Use the converted file if available (HEIC was converted to JPG)
+          const photoFile = convertedPhotoFile;
 
           if (photoFile) {
             try {
