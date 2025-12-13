@@ -1,8 +1,30 @@
 <nav class="graetzl-nav">
   <div class="nav-section">
-    <select id="list-select" class="list-select">
-      <option value="">Liste wählen</option>
-    </select>
+    <h2>Liste wählen</h2>
+    <div class="searchable-select">
+      <input
+        type="text"
+        id="list-search"
+        class="graetzl-search-input"
+        placeholder="Keine Liste ausgewählt"
+        autocomplete="off"
+        data-selected="false"
+      />
+      <button
+        id="clear-list"
+        class="clear-button"
+        type="button"
+        style="display: none;"
+        title="Auswahl löschen">×</button
+      >
+      <div
+        id="list-dropdown"
+        class="graetzl-dropdown"
+        style="display: none;"
+      >
+        <!-- Options will be populated dynamically -->
+      </div>
+    </div>
   </div>
 
   <div class="nav-section">

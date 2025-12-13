@@ -3,21 +3,21 @@
   "geometry": {
     "type": "Point",
     "coordinates": [
-      16.36674992567765,
-      48.197624900430014
+      16.36228408351153,
+      48.19797364804036
     ]
   },
   "properties": {
-    "name": "Crupi",
+    "name": "Käsehütte",
     "category": "lebensmittelgeschaeft",
     "description": {
-      "de": "Sizilianische Spezialitäten",
-      "en": "Sizilianische Spezialitäten"
+      "de": "🧀",
+      "en": ""
     },
-    "link": "https://www.crupi.at/",
+    "link": "",
     "instagram": "",
     "photo": "",
     "tags": [],
-    "id": "poi_1765274869130_0010"
+    "id": "poi_1765609379368_oecm0c2ip"
   }
 }

@@ -266,6 +266,15 @@
       "emoji": "🪑",
       "icon": "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M20 9V6c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2v3'/><path d='M2 11h20'/><path d='M4 11v9'/><path d='M20 11v9'/><path d='M8 11v9'/><path d='M16 11v9'/></svg>",
       "color": "#92400E"
+    },
+    "lebensmittelgeschaeft": {
+      "name": {
+        "de": "Lebensmittelgeschäft",
+        "en": "Grocery Store"
+      },
+      "emoji": "🥬",
+      "icon": "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.3 9.4a1 1 0 0 0 1 1.2h13.6a1 1 0 0 0 1-1.2L18 13'/><circle cx='9' cy='21' r='1'/><circle cx='17' cy='21' r='1'/></svg>",
+      "color": "#16A34A"
     }
   }
 }

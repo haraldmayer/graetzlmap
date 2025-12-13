@@ -684,10 +684,6 @@ function createCategoryFilters() {
 				});
 				if (list) {
 					console.log('Found List:', list);
-					const listSelect = document.getElementById('list-select');
-					if (listSelect) {
-						listSelect.value = list.id;
-					}
 					// Wait for next tick to ensure everything is ready
 					requestAnimationFrame(() => {
 						requestAnimationFrame(() => {
@@ -1194,7 +1190,9 @@ function createCategoryFilters() {
 
 	// List selector functionality
 	function setupListSelector() {
-		const selectElement = document.getElementById('list-select');
+		const searchInput = document.getElementById('list-search');
+		const dropdown = document.getElementById('list-dropdown');
+		const clearButton = document.getElementById('clear-list');
 		const sidebarDiv = document.getElementById('poi-sidebar');
 		const sidebarTitle = document.getElementById('poi-sidebar-title');
 		const sidebarDescription = document.getElementById('poi-sidebar-description');
@@ -1203,25 +1201,157 @@ function createCategoryFilters() {
 		const categoryToggle = document.getElementById('category-toggle');
 		const categoryDropdown = document.getElementById('category-dropdown');
 
-		if (!selectElement || !sidebarDiv) {
+		if (!searchInput || !dropdown || !sidebarDiv) {
 			console.warn('List UI elements not found');
 			return;
 		}
 
-		// Populate list options
-		function populateLists() {
-			// Clear existing options except the first (default)
-			selectElement.innerHTML = '<option value="">Keine Liste/Walk ausgewählt</option>';
+		let selectedList = null;
+		let focusedListIndex = -1;
 
+		// Update clear button visibility
+		function updateClearButtonList() {
+			if (searchInput.value || searchInput.dataset.selected === 'true') {
+				clearButton.style.display = 'flex';
+			} else {
+				clearButton.style.display = 'none';
+			}
+		}
+
+		// Populate list dropdown
+		function populateLists() {
+			dropdown.innerHTML = '';
+
+			// Add "Keine Liste" option
+			const noneOption = document.createElement('div');
+			noneOption.className = 'graetzl-option';
+			noneOption.dataset.id = '';
+			noneOption.dataset.name = 'Keine Liste';
+			noneOption.textContent = 'Keine Liste';
+			noneOption.addEventListener('click', () => selectList(null));
+			dropdown.appendChild(noneOption);
+
+			// Add all list options
 			listData.forEach(list => {
-				const option = document.createElement('option');
-				option.value = list.id;
-				// Add icon to indicate if it's a walk
+				const option = document.createElement('div');
+				option.className = 'graetzl-option';
+				option.dataset.id = list.id;
 				const prefix = list.showAsWalk ? '🚶 ' : '📋 ';
-				option.textContent = prefix + getTranslated(list.title);
-				selectElement.appendChild(option);
+				const title = getTranslated(list.title);
+				option.dataset.name = title;
+				option.textContent = prefix + title;
+				option.addEventListener('click', () => selectList(list));
+				dropdown.appendChild(option);
 			});
 		}
+
+		// Filter dropdown based on search
+		function filterListDropdown(searchTerm) {
+			const options = dropdown.querySelectorAll('.graetzl-option');
+			const term = searchTerm.toLowerCase();
+
+			let visibleCount = 0;
+			options.forEach(option => {
+				const name = option.dataset.name.toLowerCase();
+				if (name.includes(term)) {
+					option.style.display = 'block';
+					visibleCount++;
+				} else {
+					option.style.display = 'none';
+				}
+			});
+
+			if (visibleCount > 0) {
+				dropdown.style.display = 'block';
+			} else {
+				dropdown.style.display = 'none';
+			}
+		}
+
+		// Update focused option
+		function updateFocusedListOption(options) {
+			options.forEach((opt, idx) => {
+				if (idx === focusedListIndex) {
+					opt.classList.add('focused');
+					opt.scrollIntoView({ block: 'nearest' });
+				} else {
+					opt.classList.remove('focused');
+				}
+			});
+		}
+
+		// Select a list
+		function selectList(list) {
+			if (list) {
+				selectedList = list;
+				const prefix = list.showAsWalk ? '🚶 ' : '📋 ';
+				searchInput.value = prefix + getTranslated(list.title);
+				searchInput.dataset.selected = 'true';
+				activateList(list.id);
+			} else {
+				selectedList = null;
+				searchInput.value = '';
+				searchInput.placeholder = 'Keine Liste ausgewählt';
+				searchInput.dataset.selected = 'false';
+				deactivateList();
+			}
+
+			dropdown.style.display = 'none';
+			focusedListIndex = -1;
+			updateClearButtonList();
+		}
+
+		// Search input handlers
+		searchInput.addEventListener('input', (e) => {
+			focusedListIndex = -1;
+			filterListDropdown(e.target.value);
+			updateClearButtonList();
+		});
+
+		searchInput.addEventListener('focus', () => {
+			if (searchInput.dataset.selected === 'false' || !searchInput.dataset.selected) {
+				searchInput.value = '';
+			} else if (selectedList) {
+				searchInput.select();
+			}
+			filterListDropdown(searchInput.value);
+			dropdown.style.display = 'block';
+		});
+
+		// Keyboard navigation
+		searchInput.addEventListener('keydown', (e) => {
+			const options = Array.from(dropdown.querySelectorAll('.graetzl-option:not([style*="display: none"])'));
+
+			if (e.key === 'ArrowDown') {
+				e.preventDefault();
+				focusedListIndex = Math.min(focusedListIndex + 1, options.length - 1);
+				updateFocusedListOption(options);
+			} else if (e.key === 'ArrowUp') {
+				e.preventDefault();
+				focusedListIndex = Math.max(focusedListIndex - 1, -1);
+				updateFocusedListOption(options);
+			} else if (e.key === 'Enter') {
+				e.preventDefault();
+				if (focusedListIndex >= 0 && options[focusedListIndex]) {
+					options[focusedListIndex].click();
+				}
+			} else if (e.key === 'Escape') {
+				dropdown.style.display = 'none';
+				searchInput.blur();
+			}
+		});
+
+		// Clear button
+		clearButton.addEventListener('click', () => {
+			selectList(null);
+		});
+
+		// Close dropdown when clicking outside
+		document.addEventListener('click', (e) => {
+			if (!e.target.closest('.searchable-select') || e.target.closest('#graetzl-search')) {
+				dropdown.style.display = 'none';
+			}
+		});
 
 		// Update sidebar with list POIs
 		function updateSidebar(list) {
@@ -1385,9 +1515,6 @@ function createCategoryFilters() {
 			clearListMarkers();
 			clearWalkthroughArrows();
 
-			// Reset select to default
-			selectElement.value = '';
-
 			// Update markers to show filtered POIs
 			updateMarkers();
 
@@ -1396,16 +1523,6 @@ function createCategoryFilters() {
 
 			console.log('List deactivated');
 		}
-
-		// Handle select change
-		selectElement.addEventListener('change', (e) => {
-			const listId = e.target.value;
-			if (listId) {
-				activateList(listId);
-			} else {
-				deactivateList();
-			}
-		});
 
 		// Handle close button
 		if (closeSidebar) {
@@ -1464,9 +1581,9 @@ function createCategoryFilters() {
 		});
 
 		// Placeholders
-		const listSelect = document.getElementById('list-select');
-		if (listSelect && listSelect.options[0]) {
-			listSelect.options[0].textContent = t('placeholder.noList');
+		const listSearch = document.getElementById('list-search');
+		if (listSearch && !listSearch.dataset.selected) {
+			listSearch.placeholder = t('placeholder.noList');
 		}
 
 		const graetzlSearch = document.getElementById('graetzl-search');
@@ -1512,18 +1629,32 @@ function createCategoryFilters() {
 		}
 
 		// Update list/walk dropdown
-		const listSelectEl = document.getElementById('list-select');
-		if (listSelectEl && listData.length > 0) {
-			const currentValue = listSelectEl.value;
-			listSelectEl.innerHTML = `<option value="">${t('placeholder.noList')}</option>`;
+		const listSearchEl = document.getElementById('list-search');
+		const listDropdownEl = document.getElementById('list-dropdown');
+		if (listSearchEl && listDropdownEl && listData.length > 0) {
+			const currentSelected = currentList;
+
+			// Re-populate dropdown with translated titles
+			listDropdownEl.innerHTML = '';
+
+			const noneOption = document.createElement('div');
+			noneOption.className = 'graetzl-option';
+			noneOption.textContent = t('placeholder.noList');
+			listDropdownEl.appendChild(noneOption);
+
 			listData.forEach(list => {
-				const option = document.createElement('option');
-				option.value = list.id;
+				const option = document.createElement('div');
+				option.className = 'graetzl-option';
 				const prefix = list.showAsWalk ? '🚶 ' : '📋 ';
 				option.textContent = prefix + getTranslated(list.title);
-				listSelectEl.appendChild(option);
+				listDropdownEl.appendChild(option);
 			});
-			listSelectEl.value = currentValue;
+
+			// Update current selection if active
+			if (currentSelected) {
+				const prefix = currentSelected.showAsWalk ? '🚶 ' : '📋 ';
+				listSearchEl.value = prefix + getTranslated(currentSelected.title);
+			}
 		}
 
 		// Update sidebar if active
